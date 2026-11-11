@@ -32,6 +32,7 @@ from pqt_qcat.core.integrator import (
     AdaptiveHeunIntegrator,
     IntegratorConfig,
     NonFiniteStateError,
+    IntegratorConvergenceError,
 )
 
 
@@ -220,7 +221,7 @@ def test_trajectory_convergence_h_refinement():
         n_steps = int(round(total_t / dt))
         z = z_init.copy()
         integrator = AdaptiveHeunIntegrator(
-            config=IntegratorConfig(h_base=dt, tol=1e-8, max_subdivisions=0),
+            config=IntegratorConfig(mode="fixed", h_base=dt),
             cell_params=params,
             vortex_params=v_params,
         )
@@ -228,17 +229,17 @@ def test_trajectory_convergence_h_refinement():
             z, _ = integrator.step_cell(z, dt=dt)
         return z
 
-    z_coarse = integrate_fixed_step(z0, h_coarse, t_final)
-    z_medium = integrate_fixed_step(z0, h_medium, t_final)
-    z_fine = integrate_fixed_step(z0, h_fine, t_final)
+    z_ref = integrate_fixed_step(z0, 0.000625, t_final)
+    z_coarse = integrate_fixed_step(z0, 0.01, t_final)
+    z_medium = integrate_fixed_step(z0, 0.005, t_final)
 
-    err_coarse = np.max(np.abs(z_coarse - z_fine))
-    err_medium = np.max(np.abs(z_medium - z_fine))
+    err_coarse = np.max(np.abs(z_coarse - z_ref))
+    err_medium = np.max(np.abs(z_medium - z_ref))
 
     assert err_medium < err_coarse, f"Error did not decrease: err(h)={err_coarse}, err(h/2)={err_medium}"
     convergence_ratio = err_coarse / (err_medium + 1e-14)
-    # For second-order Heun, ratio ~ 2^2 = 4 (typically between 3.0 and 4.5)
-    assert 2.5 <= convergence_ratio <= 5.5, f"Unexpected convergence ratio: {convergence_ratio}"
+    # For second-order Heun, ratio ~ 2^2 = 4 (typically between 3.0 and 5.0)
+    assert 3.0 <= convergence_ratio <= 5.0, f"Unexpected convergence ratio: {convergence_ratio}"
 
 
 def test_monotonic_energy_along_adaptive_trajectory():
@@ -287,3 +288,100 @@ def test_strict_non_finite_fail_fast():
     u_nan[1] = float('nan')
     with pytest.raises(NonFiniteStateError):
         integrator.step_cell(z_normal, u=u_nan)
+
+
+def test_m1_fix_001_unreachable_tolerance_raises_convergence_error():
+    """Negative test (M1-FIX-001): impossibly tight tolerance must raise IntegratorConvergenceError."""
+    # Impossible tolerance 1e-15 with only 1 subdivision level
+    config = IntegratorConfig(mode="adaptive", tol=1e-15, max_subdivisions=1)
+    integrator = AdaptiveHeunIntegrator(config=config)
+
+    z = np.array([1.0, -0.5, 0.2, 0.5, -0.2, 0.1, -0.5, 0.8], dtype=np.float64)
+    with pytest.raises(IntegratorConvergenceError) as exc_info:
+        integrator.step_cell(z, dt=0.05)
+
+    assert "exceeds tol" in str(exc_info.value)
+
+
+def test_explicit_fixed_mode_operates_without_subdivision():
+    """Verify that mode='fixed' executes single Heun step without subdivision."""
+    config_fixed = IntegratorConfig(mode="fixed", h_base=0.01)
+    integrator_fixed = AdaptiveHeunIntegrator(config=config_fixed)
+
+    z = np.array([0.5, -0.5, 0.5, 0.1, -0.1, 0.1, 0.0, 0.5], dtype=np.float64)
+    z_next, diag = integrator_fixed.step_cell(z)
+
+    assert diag.substeps_taken == 1
+    assert np.all(np.isfinite(z_next))
+
+
+def test_invalid_dt_and_shape_handling():
+    """Verify rejection of invalid dt <= 0, NaN dt, and invalid state shapes."""
+    integrator = AdaptiveHeunIntegrator()
+    z = np.zeros(8)
+
+    # dt <= 0
+    with pytest.raises(ValueError):
+        integrator.step_cell(z, dt=0.0)
+    with pytest.raises(ValueError):
+        integrator.step_cell(z, dt=-0.01)
+    with pytest.raises(ValueError):
+        integrator.step_cell(z, dt=float('nan'))
+
+    # Invalid state shape (e.g. 7 coordinates)
+    with pytest.raises(ValueError):
+        integrator.step_cell(np.zeros(7))
+
+    # Multi-cell vector not divisible by 8
+    with pytest.raises(ValueError):
+        integrator.step_multi(np.zeros(15))
+
+
+def test_input_bounding_and_clipping():
+    """Verify external input norm bounding and clipping."""
+    config_clip = IntegratorConfig(max_u_norm=5.0, clip_u=True)
+    integrator_clip = AdaptiveHeunIntegrator(config=config_clip)
+
+    z = np.zeros(8)
+    u_large = np.ones(8) * 10.0  # norm = sqrt(8 * 100) ~ 28.28 > 5.0
+
+    # With clip_u=True, runs safely with clipped norm
+    z_next, diag = integrator_clip.step_cell(z, u=u_large)
+    assert np.all(np.isfinite(z_next))
+
+    # With clip_u=False, raises ValueError
+    config_no_clip = IntegratorConfig(max_u_norm=5.0, clip_u=False)
+    integrator_no_clip = AdaptiveHeunIntegrator(config=config_no_clip)
+    with pytest.raises(ValueError) as exc_info:
+        integrator_no_clip.step_cell(z, u=u_large)
+    assert "exceeds limit" in str(exc_info.value)
+
+
+def test_latch_vortex_boundary_transition():
+    """Verify smooth and finite integration across the latch/vortex boundary w0 = 0."""
+    integrator = AdaptiveHeunIntegrator(config=IntegratorConfig(h_base=0.005))
+    # State starting in vortex (w0 = -0.5), moving toward latch
+    z = np.array([0.2, -0.2, 0.1, 0.1, 0.1, 0.1, -0.2, 0.5], dtype=np.float64)
+
+    for _ in range(50):
+        z, diag = integrator.step_cell(z)
+        assert diag.finite
+        assert np.all(np.isfinite(z))
+
+
+def test_extended_energy_monotonicity_across_50_initial_states():
+    """Verify energy monotonicity across 50 diverse random initial states in closed system."""
+    params = CellParameters()
+    integrator = AdaptiveHeunIntegrator(
+        config=IntegratorConfig(h_base=0.005, tol=1e-4, enforce_monotonic_energy=True),
+        cell_params=params,
+    )
+    rng = np.random.default_rng(TEST_SEED + 7)
+
+    for i in range(50):
+        z = rng.uniform(-1.5, 1.5, size=8)
+        # Advance 5 steps
+        for _ in range(5):
+            z, diag = integrator.step_cell(z)
+            assert diag.delta_energy <= 1e-6, f"State {i}: Energy increased by {diag.delta_energy}"
+

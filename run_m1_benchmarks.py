@@ -147,7 +147,7 @@ def run_benchmarks() -> dict:
         n = int(round(t_end / h_step))
         z = z0.copy()
         stepper = AdaptiveHeunIntegrator(
-            config=IntegratorConfig(h_base=h_step, tol=1e-9, max_subdivisions=0),
+            config=IntegratorConfig(mode="fixed", h_base=h_step),
             cell_params=c_params,
             vortex_params=v_params,
         )
