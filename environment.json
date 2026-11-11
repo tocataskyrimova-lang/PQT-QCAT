@@ -1,0 +1,10 @@
+{
+  "python": "3.14.4 (tags/v3.14.4:23116f9, Apr  7 2026, 14:10:54) [MSC v.1944 64 bit (AMD64)]",
+  "numpy": "2.4.4",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "main_lives": 50,
+  "long_lives": 9,
+  "temporal_lives": 12,
+  "guarded_lives": 3,
+  "state_only_lives": 3
+}

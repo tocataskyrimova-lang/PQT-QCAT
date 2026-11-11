@@ -1,0 +1,92 @@
+{
+  "stages": [
+    {
+      "context": "forward",
+      "first100_accuracy": 0.78,
+      "last100_accuracy": 1.0
+    },
+    {
+      "context": "reverse",
+      "first100_accuracy": 0.83,
+      "last100_accuracy": 1.0
+    }
+  ],
+  "idle_ticks": 10000,
+  "teacher_labels_during_idle": 0,
+  "replay_updates_during_idle": 500,
+  "generated": {
+    "forward": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      0
+    ],
+    "reverse": [
+      7,
+      6,
+      5,
+      4,
+      3,
+      2,
+      1,
+      0
+    ]
+  },
+  "expected": {
+    "forward": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      0
+    ],
+    "reverse": [
+      7,
+      6,
+      5,
+      4,
+      3,
+      2,
+      1,
+      0
+    ]
+  },
+  "status": {
+    "logical_initializations": 1,
+    "predictions": 1016,
+    "feedback": 1000,
+    "idle_ticks": 10000,
+    "ticks": 30320,
+    "replay_updates": 500,
+    "consolidations": 758,
+    "new_contexts": 2,
+    "expired_eligibility": 0,
+    "encoder_update_norm": 0.0037186717866687087,
+    "readout_update_norm": 207.38231944365612,
+    "core_path_length": 943.653316254371,
+    "external_events": 1016,
+    "core_resets": 0,
+    "clock": 30320,
+    "event_id": 1016,
+    "contexts": [
+      "forward",
+      "reverse"
+    ],
+    "memory_items": 128,
+    "pending_feedback": 16,
+    "finite": true,
+    "max_abs_state": 3.339319487859419,
+    "physical_energy": -7.172167835012134,
+    "subdivisions": 615,
+    "encoder_norm": 9.350310514222663,
+    "fast_norm": 0.0350683563275445,
+    "slow_norm": 37.12686470001768
+  }
+}

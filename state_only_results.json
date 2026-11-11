@@ -1,0 +1,4010 @@
+[
+  {
+    "seed": 802,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415035681633,
+            "confidence": 0.1250000047639592
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079438647876912,
+            "confidence": 0.12500036172592893
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0792173203714412,
+            "confidence": 0.12502803106246374
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0612412064366423,
+            "confidence": 0.12729742595637442
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 45120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.01696925001419284,
+          "readout_update_norm": 853.244981771907,
+          "core_path_length": 1591.204895570208,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 0,
+          "clock": 45120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.469673151969046,
+          "physical_energy": -3.5503682463393917,
+          "subdivisions": 156,
+          "encoder_norm": 9.45971880775697,
+          "fast_norm": 0.6961528389241572,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 0.0
+      },
+      "naive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.71875,
+            "cross_entropy": 1.866597596070713,
+            "confidence": 0.16147301430870473
+          },
+          "B": {
+            "accuracy": 0.71875,
+            "cross_entropy": 1.972352203195114,
+            "confidence": 0.14124190192903133
+          },
+          "C": {
+            "accuracy": 0.703125,
+            "cross_entropy": 2.021173677465266,
+            "confidence": 0.13342160792606728
+          },
+          "D": {
+            "accuracy": 0.75,
+            "cross_entropy": 2.0495070337972923,
+            "confidence": 0.1290596920797901
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.01696925001419284,
+          "readout_update_norm": 942.1715821647579,
+          "core_path_length": 1705.2866858603604,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 500,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.266278948465929,
+          "physical_energy": -4.970585188366101,
+          "subdivisions": 156,
+          "encoder_norm": 9.45971880775697,
+          "fast_norm": 5.5916298617333275,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 114.08179029015241
+      },
+      "state_only": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441541422776,
+            "confidence": 0.1250000000321325
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415222080955,
+            "confidence": 0.12500000243396758
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794400327456604,
+            "confidence": 0.12500018861692586
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0793188103712765,
+            "confidence": 0.12501534242461793
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.01696925001419284,
+          "readout_update_norm": 853.244981771907,
+          "core_path_length": 1705.2866858603604,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 500,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.266278948465929,
+          "physical_energy": -4.970585188366101,
+          "subdivisions": 156,
+          "encoder_norm": 9.45971880775697,
+          "fast_norm": 0.004684779341084233,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 114.08179029015241
+      },
+      "no_replay": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415414249885,
+            "confidence": 0.125000000031856
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415222082474,
+            "confidence": 0.12500000243394863
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794400327490767,
+            "confidence": 0.12500018861649884
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0793188103739424,
+            "confidence": 0.12501534242428464
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.01696925001419284,
+          "readout_update_norm": 853.244981771907,
+          "core_path_length": 1595.2529962496708,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 0,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.2157100687771076,
+          "physical_energy": -5.154381377668869,
+          "subdivisions": 156,
+          "encoder_norm": 9.45971880775697,
+          "fast_norm": 0.004684779341084233,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 4.048100679462777
+      }
+    },
+    "full_state_only_life": {
+      "seed": 802,
+      "variant": "state_only_PQT",
+      "config": {
+        "seed": 802,
+        "core": "pqt",
+        "cells": 6,
+        "alphabet": 8,
+        "h": 0.01,
+        "integration_substeps": 1,
+        "event_ticks": 20,
+        "input_gain": 2.0,
+        "learning_rate": 0.8,
+        "input_learning_rate": 1e-05,
+        "fast_decay": 0.0005,
+        "consolidation_rate": 0.08,
+        "consolidation_period": 40,
+        "replay_period": 20,
+        "replay_capacity": 64,
+        "learning": true,
+        "replay": true,
+        "consolidation": true,
+        "reset_core": false,
+        "context_gates": true,
+        "internal_drive": true,
+        "guarded_replay": false,
+        "replay_weight_updates": false
+      },
+      "seconds": 35.499655499937944,
+      "stages": [
+        {
+          "stage": "learn_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.73,
+          "last100": 1.0,
+          "overall": 0.944,
+          "events_to_rolling100_90pct": 133
+        },
+        {
+          "stage": "learn_B",
+          "context": "B",
+          "n": 500,
+          "first100": 0.8,
+          "last100": 1.0,
+          "overall": 0.958,
+          "events_to_rolling100_90pct": 116
+        },
+        {
+          "stage": "learn_C",
+          "context": "C",
+          "n": 500,
+          "first100": 0.8,
+          "last100": 1.0,
+          "overall": 0.958,
+          "events_to_rolling100_90pct": 118
+        },
+        {
+          "stage": "learn_D",
+          "context": "D",
+          "n": 500,
+          "first100": 0.79,
+          "last100": 1.0,
+          "overall": 0.958,
+          "events_to_rolling100_90pct": 116
+        },
+        {
+          "stage": "new_version_A",
+          "context": "A_v2",
+          "n": 500,
+          "first100": 0.84,
+          "last100": 0.99,
+          "overall": 0.964,
+          "events_to_rolling100_90pct": 106
+        },
+        {
+          "stage": "unannounced_overwrite_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.23,
+          "last100": 0.99,
+          "overall": 0.826,
+          "events_to_rolling100_90pct": 194
+        }
+      ],
+      "before_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.12196025832172361,
+          "confidence": 0.8900188729721384
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10467944258935716,
+          "confidence": 0.9049420198242868
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10068436582689341,
+          "confidence": 0.9075964696974408
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09368695845985131,
+          "confidence": 0.9138866164749019
+        }
+      },
+      "paired_noidle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10328921995373538,
+          "confidence": 0.9051172325937957
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10517147952234367,
+          "confidence": 0.9028480114048933
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10508252766305286,
+          "confidence": 0.9034283745257827
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08366206787159604,
+          "confidence": 0.9216218390764186
+        }
+      },
+      "after_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10170966933440564,
+          "confidence": 0.9063866889900705
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10522666941104504,
+          "confidence": 0.9028042457255223
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10509237805385041,
+          "confidence": 0.9034226027235326
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08366188420670394,
+          "confidence": 0.9216220202664064
+        }
+      },
+      "generation": {
+        "exact_match": 1.0,
+        "rows": [
+          {
+            "context": "A",
+            "start": 0,
+            "generated": [
+              6,
+              0,
+              6,
+              0,
+              6,
+              0,
+              6,
+              0
+            ],
+            "target": [
+              6,
+              0,
+              6,
+              0,
+              6,
+              0,
+              6,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 1,
+            "generated": [
+              4,
+              7,
+              1,
+              4,
+              7,
+              1,
+              4,
+              7
+            ],
+            "target": [
+              4,
+              7,
+              1,
+              4,
+              7,
+              1,
+              4,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 2,
+            "generated": [
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2
+            ],
+            "target": [
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 3,
+            "generated": [
+              2,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              3
+            ],
+            "target": [
+              2,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 4,
+            "generated": [
+              7,
+              1,
+              4,
+              7,
+              1,
+              4,
+              7,
+              1
+            ],
+            "target": [
+              7,
+              1,
+              4,
+              7,
+              1,
+              4,
+              7,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 5,
+            "generated": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "target": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 6,
+            "generated": [
+              0,
+              6,
+              0,
+              6,
+              0,
+              6,
+              0,
+              6
+            ],
+            "target": [
+              0,
+              6,
+              0,
+              6,
+              0,
+              6,
+              0,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 7,
+            "generated": [
+              1,
+              4,
+              7,
+              1,
+              4,
+              7,
+              1,
+              4
+            ],
+            "target": [
+              1,
+              4,
+              7,
+              1,
+              4,
+              7,
+              1,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 0,
+            "generated": [
+              7,
+              0,
+              7,
+              0,
+              7,
+              0,
+              7,
+              0
+            ],
+            "target": [
+              7,
+              0,
+              7,
+              0,
+              7,
+              0,
+              7,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 1,
+            "generated": [
+              5,
+              2,
+              4,
+              6,
+              3,
+              1,
+              5,
+              2
+            ],
+            "target": [
+              5,
+              2,
+              4,
+              6,
+              3,
+              1,
+              5,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 2,
+            "generated": [
+              4,
+              6,
+              3,
+              1,
+              5,
+              2,
+              4,
+              6
+            ],
+            "target": [
+              4,
+              6,
+              3,
+              1,
+              5,
+              2,
+              4,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 3,
+            "generated": [
+              1,
+              5,
+              2,
+              4,
+              6,
+              3,
+              1,
+              5
+            ],
+            "target": [
+              1,
+              5,
+              2,
+              4,
+              6,
+              3,
+              1,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 4,
+            "generated": [
+              6,
+              3,
+              1,
+              5,
+              2,
+              4,
+              6,
+              3
+            ],
+            "target": [
+              6,
+              3,
+              1,
+              5,
+              2,
+              4,
+              6,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 5,
+            "generated": [
+              2,
+              4,
+              6,
+              3,
+              1,
+              5,
+              2,
+              4
+            ],
+            "target": [
+              2,
+              4,
+              6,
+              3,
+              1,
+              5,
+              2,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 6,
+            "generated": [
+              3,
+              1,
+              5,
+              2,
+              4,
+              6,
+              3,
+              1
+            ],
+            "target": [
+              3,
+              1,
+              5,
+              2,
+              4,
+              6,
+              3,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 7,
+            "generated": [
+              0,
+              7,
+              0,
+              7,
+              0,
+              7,
+              0,
+              7
+            ],
+            "target": [
+              0,
+              7,
+              0,
+              7,
+              0,
+              7,
+              0,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 0,
+            "generated": [
+              7,
+              4,
+              2,
+              0,
+              7,
+              4,
+              2,
+              0
+            ],
+            "target": [
+              7,
+              4,
+              2,
+              0,
+              7,
+              4,
+              2,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 1,
+            "generated": [
+              6,
+              5,
+              1,
+              6,
+              5,
+              1,
+              6,
+              5
+            ],
+            "target": [
+              6,
+              5,
+              1,
+              6,
+              5,
+              1,
+              6,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 2,
+            "generated": [
+              0,
+              7,
+              4,
+              2,
+              0,
+              7,
+              4,
+              2
+            ],
+            "target": [
+              0,
+              7,
+              4,
+              2,
+              0,
+              7,
+              4,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 3,
+            "generated": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "target": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 4,
+            "generated": [
+              2,
+              0,
+              7,
+              4,
+              2,
+              0,
+              7,
+              4
+            ],
+            "target": [
+              2,
+              0,
+              7,
+              4,
+              2,
+              0,
+              7,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 5,
+            "generated": [
+              1,
+              6,
+              5,
+              1,
+              6,
+              5,
+              1,
+              6
+            ],
+            "target": [
+              1,
+              6,
+              5,
+              1,
+              6,
+              5,
+              1,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 6,
+            "generated": [
+              5,
+              1,
+              6,
+              5,
+              1,
+              6,
+              5,
+              1
+            ],
+            "target": [
+              5,
+              1,
+              6,
+              5,
+              1,
+              6,
+              5,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 7,
+            "generated": [
+              4,
+              2,
+              0,
+              7,
+              4,
+              2,
+              0,
+              7
+            ],
+            "target": [
+              4,
+              2,
+              0,
+              7,
+              4,
+              2,
+              0,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 0,
+            "generated": [
+              5,
+              7,
+              4,
+              6,
+              2,
+              0,
+              5,
+              7
+            ],
+            "target": [
+              5,
+              7,
+              4,
+              6,
+              2,
+              0,
+              5,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 1,
+            "generated": [
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1
+            ],
+            "target": [
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 2,
+            "generated": [
+              0,
+              5,
+              7,
+              4,
+              6,
+              2,
+              0,
+              5
+            ],
+            "target": [
+              0,
+              5,
+              7,
+              4,
+              6,
+              2,
+              0,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 3,
+            "generated": [
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3
+            ],
+            "target": [
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 4,
+            "generated": [
+              6,
+              2,
+              0,
+              5,
+              7,
+              4,
+              6,
+              2
+            ],
+            "target": [
+              6,
+              2,
+              0,
+              5,
+              7,
+              4,
+              6,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 5,
+            "generated": [
+              7,
+              4,
+              6,
+              2,
+              0,
+              5,
+              7,
+              4
+            ],
+            "target": [
+              7,
+              4,
+              6,
+              2,
+              0,
+              5,
+              7,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 6,
+            "generated": [
+              2,
+              0,
+              5,
+              7,
+              4,
+              6,
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0,
+              5,
+              7,
+              4,
+              6,
+              2,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 7,
+            "generated": [
+              4,
+              6,
+              2,
+              0,
+              5,
+              7,
+              4,
+              6
+            ],
+            "target": [
+              4,
+              6,
+              2,
+              0,
+              5,
+              7,
+              4,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          }
+        ]
+      },
+      "old_after_new_context": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.14113117628077854,
+          "confidence": 0.8761440379615306
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10180624415142717,
+          "confidence": 0.905346364334962
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09335271634847986,
+          "confidence": 0.91183284743099
+        },
+        "D": {
+          "accuracy": 0.984375,
+          "cross_entropy": 0.14822106784022954,
+          "confidence": 0.883787431555719
+        }
+      },
+      "new_rule": {
+        "A_v2": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.1054546597467902,
+          "confidence": 0.9025537828211098
+        }
+      },
+      "same_context_conflict": {
+        "new_A": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 0.09707756041149695,
+            "confidence": 0.910323725697894
+          }
+        },
+        "old_A": {
+          "A": {
+            "accuracy": 0.0,
+            "cross_entropy": 4.549295732159203,
+            "confidence": 0.9129520041466819
+          }
+        }
+      },
+      "idle_metrics": {
+        "external_events_delta": 0,
+        "teacher_feedback_delta": 0,
+        "replay_updates": 0,
+        "consolidations": 250,
+        "core_motion": 1.0600267840011626,
+        "physical_W_motion": 0.8075999129616316,
+        "path_length": 114.08200609321693
+      },
+      "encoder_delta_norm": 0.0012077648772648867,
+      "status": {
+        "logical_initializations": 1,
+        "predictions": 4216,
+        "feedback": 3000,
+        "idle_ticks": 10000,
+        "ticks": 94320,
+        "replay_updates": 0,
+        "consolidations": 2358,
+        "new_contexts": 5,
+        "expired_eligibility": 960,
+        "encoder_update_norm": 0.014338397432806212,
+        "readout_update_norm": 718.307366237944,
+        "core_path_length": 3035.9107459682577,
+        "external_events": 4216,
+        "core_resets": 0,
+        "replay_proposals": 0,
+        "replay_rejections": 0,
+        "guard_anchor_evaluations": 0,
+        "internal_replay_events": 500,
+        "clock": 94320,
+        "event_id": 4216,
+        "contexts": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "A_v2"
+        ],
+        "memory_items": 320,
+        "pending_feedback": 256,
+        "finite": true,
+        "max_abs_state": 3.2308884839563268,
+        "physical_energy": -3.5657181854774644,
+        "subdivisions": 296,
+        "encoder_norm": 9.459735988496845,
+        "fast_norm": 0.0005578904827325356,
+        "slow_norm": 95.40364354926038
+      },
+      "all_feedback_follows_prediction": true
+    }
+  },
+  {
+    "seed": 803,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0794415037816565,
+            "confidence": 0.12500000473881476
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794388246547504,
+            "confidence": 0.12500033962862855
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.079209473706803,
+            "confidence": 0.12502903351285527
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.061556743632955,
+            "confidence": 0.12725741649552003
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 45120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.016552801167081403,
+          "readout_update_norm": 854.8623482403467,
+          "core_path_length": 1894.0536732348112,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 0,
+          "clock": 45120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.1409187636626883,
+          "physical_energy": -0.7008234748452051,
+          "subdivisions": 541,
+          "encoder_norm": 9.308473016617631,
+          "fast_norm": 0.6937695570912361,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 0.0
+      },
+      "naive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.796875,
+            "cross_entropy": 1.830465655035762,
+            "confidence": 0.1639481216545369
+          },
+          "B": {
+            "accuracy": 0.84375,
+            "cross_entropy": 2.004305146692105,
+            "confidence": 0.1354499488801837
+          },
+          "C": {
+            "accuracy": 0.71875,
+            "cross_entropy": 2.029317270315316,
+            "confidence": 0.13227478392653533
+          },
+          "D": {
+            "accuracy": 0.84375,
+            "cross_entropy": 2.0457910736751135,
+            "confidence": 0.12960996742019942
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.016552801167081403,
+          "readout_update_norm": 943.8594576888197,
+          "core_path_length": 2020.2395656664094,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 500,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 1.8138730355882455,
+          "physical_energy": -1.6314570547424645,
+          "subdivisions": 541,
+          "encoder_norm": 9.308473016617631,
+          "fast_norm": 5.379145366426201,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 126.18589243159818
+      },
+      "state_only": {
+        "queries": {
+          "A": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0794415414230567,
+            "confidence": 0.12500000003210804
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441523396511,
+            "confidence": 0.1250000022854156
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0794399799252594,
+            "confidence": 0.12500019536370086
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079320912431522,
+            "confidence": 0.12501507964189384
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.016552801167081403,
+          "readout_update_norm": 854.8623482403467,
+          "core_path_length": 2020.2395656664094,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 500,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 1.8138730355882455,
+          "physical_energy": -1.6314570547424645,
+          "subdivisions": 541,
+          "encoder_norm": 9.308473016617631,
+          "fast_norm": 0.004668740981588199,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 126.18589243159818
+      },
+      "no_replay": {
+        "queries": {
+          "A": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0794415414252585,
+            "confidence": 0.12500000003183298
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.07944152339617,
+            "confidence": 0.12500000228545827
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.079439979921174,
+            "confidence": 0.1250001953642954
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0793209124697998,
+            "confidence": 0.12501507963710884
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.016552801167081403,
+          "readout_update_norm": 854.8623482403467,
+          "core_path_length": 1897.494562056019,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 0,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 1.6809075810689995,
+          "physical_energy": -1.7652914323496884,
+          "subdivisions": 541,
+          "encoder_norm": 9.308473016617631,
+          "fast_norm": 0.004668740981588199,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 3.4408888212078637
+      }
+    },
+    "full_state_only_life": {
+      "seed": 803,
+      "variant": "state_only_PQT",
+      "config": {
+        "seed": 803,
+        "core": "pqt",
+        "cells": 6,
+        "alphabet": 8,
+        "h": 0.01,
+        "integration_substeps": 1,
+        "event_ticks": 20,
+        "input_gain": 2.0,
+        "learning_rate": 0.8,
+        "input_learning_rate": 1e-05,
+        "fast_decay": 0.0005,
+        "consolidation_rate": 0.08,
+        "consolidation_period": 40,
+        "replay_period": 20,
+        "replay_capacity": 64,
+        "learning": true,
+        "replay": true,
+        "consolidation": true,
+        "reset_core": false,
+        "context_gates": true,
+        "internal_drive": true,
+        "guarded_replay": false,
+        "replay_weight_updates": false
+      },
+      "seconds": 36.16673759999685,
+      "stages": [
+        {
+          "stage": "learn_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.76,
+          "last100": 1.0,
+          "overall": 0.946,
+          "events_to_rolling100_90pct": 128
+        },
+        {
+          "stage": "learn_B",
+          "context": "B",
+          "n": 500,
+          "first100": 0.82,
+          "last100": 1.0,
+          "overall": 0.964,
+          "events_to_rolling100_90pct": 110
+        },
+        {
+          "stage": "learn_C",
+          "context": "C",
+          "n": 500,
+          "first100": 0.77,
+          "last100": 1.0,
+          "overall": 0.952,
+          "events_to_rolling100_90pct": 138
+        },
+        {
+          "stage": "learn_D",
+          "context": "D",
+          "n": 500,
+          "first100": 0.84,
+          "last100": 1.0,
+          "overall": 0.968,
+          "events_to_rolling100_90pct": 106
+        },
+        {
+          "stage": "new_version_A",
+          "context": "A_v2",
+          "n": 500,
+          "first100": 0.8,
+          "last100": 1.0,
+          "overall": 0.958,
+          "events_to_rolling100_90pct": 118
+        },
+        {
+          "stage": "unannounced_overwrite_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.27,
+          "last100": 1.0,
+          "overall": 0.84,
+          "events_to_rolling100_90pct": 191
+        }
+      ],
+      "before_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08868147088291567,
+          "confidence": 0.91660551557252
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10192608965351199,
+          "confidence": 0.9057968185625925
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.11193403230431508,
+          "confidence": 0.8996470312053115
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07919371825265845,
+          "confidence": 0.9248897772898764
+        }
+      },
+      "paired_noidle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10609472708409204,
+          "confidence": 0.9012519601084563
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10678965093891954,
+          "confidence": 0.9020674714042944
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09942023824269826,
+          "confidence": 0.9080102728002424
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08799091077426842,
+          "confidence": 0.9170620836646767
+        }
+      },
+      "after_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10366533949403817,
+          "confidence": 0.9033204690556674
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10688407784677811,
+          "confidence": 0.901993508449072
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0994186538665295,
+          "confidence": 0.9080115630535623
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08799078874250915,
+          "confidence": 0.9170621939626586
+        }
+      },
+      "generation": {
+        "exact_match": 0.84375,
+        "rows": [
+          {
+            "context": "A",
+            "start": 0,
+            "generated": [
+              6,
+              5,
+              3,
+              2,
+              4,
+              7,
+              1,
+              0
+            ],
+            "target": [
+              6,
+              5,
+              3,
+              2,
+              4,
+              7,
+              1,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 1,
+            "generated": [
+              0,
+              6,
+              5,
+              3,
+              2,
+              4,
+              7,
+              1
+            ],
+            "target": [
+              0,
+              6,
+              5,
+              3,
+              2,
+              4,
+              7,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 2,
+            "generated": [
+              4,
+              7,
+              1,
+              0,
+              6,
+              5,
+              3,
+              2
+            ],
+            "target": [
+              4,
+              7,
+              1,
+              0,
+              6,
+              5,
+              3,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 3,
+            "generated": [
+              4,
+              7,
+              1,
+              0,
+              6,
+              5,
+              3,
+              2
+            ],
+            "target": [
+              2,
+              4,
+              7,
+              1,
+              0,
+              6,
+              5,
+              3
+            ],
+            "exact": false,
+            "prefix_tokens": 0
+          },
+          {
+            "context": "A",
+            "start": 4,
+            "generated": [
+              7,
+              1,
+              0,
+              6,
+              5,
+              3,
+              2,
+              4
+            ],
+            "target": [
+              7,
+              1,
+              0,
+              6,
+              5,
+              3,
+              2,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 5,
+            "generated": [
+              3,
+              2,
+              4,
+              7,
+              1,
+              0,
+              6,
+              5
+            ],
+            "target": [
+              3,
+              2,
+              4,
+              7,
+              1,
+              0,
+              6,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 6,
+            "generated": [
+              5,
+              3,
+              2,
+              4,
+              7,
+              1,
+              0,
+              6
+            ],
+            "target": [
+              5,
+              3,
+              2,
+              4,
+              7,
+              1,
+              0,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 7,
+            "generated": [
+              1,
+              0,
+              6,
+              5,
+              3,
+              2,
+              4,
+              7
+            ],
+            "target": [
+              1,
+              0,
+              6,
+              5,
+              3,
+              2,
+              4,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 0,
+            "generated": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              6,
+              2
+            ],
+            "target": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": false,
+            "prefix_tokens": 5
+          },
+          {
+            "context": "B",
+            "start": 1,
+            "generated": [
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1
+            ],
+            "target": [
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 2,
+            "generated": [
+              6,
+              2,
+              6,
+              2,
+              6,
+              2,
+              6,
+              2
+            ],
+            "target": [
+              6,
+              2,
+              6,
+              2,
+              6,
+              2,
+              6,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 3,
+            "generated": [
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3
+            ],
+            "target": [
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 4,
+            "generated": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              7,
+              7,
+              7
+            ],
+            "target": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "exact": false,
+            "prefix_tokens": 5
+          },
+          {
+            "context": "B",
+            "start": 5,
+            "generated": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "target": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 6,
+            "generated": [
+              2,
+              6,
+              2,
+              6,
+              2,
+              6,
+              2,
+              6
+            ],
+            "target": [
+              2,
+              6,
+              2,
+              6,
+              2,
+              6,
+              2,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 7,
+            "generated": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              0,
+              0,
+              0
+            ],
+            "target": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "exact": false,
+            "prefix_tokens": 5
+          },
+          {
+            "context": "C",
+            "start": 0,
+            "generated": [
+              7,
+              0,
+              7,
+              0,
+              7,
+              0,
+              7,
+              0
+            ],
+            "target": [
+              7,
+              0,
+              7,
+              0,
+              7,
+              0,
+              7,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 1,
+            "generated": [
+              1,
+              1,
+              1,
+              1,
+              3,
+              6,
+              4,
+              2
+            ],
+            "target": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "exact": false,
+            "prefix_tokens": 4
+          },
+          {
+            "context": "C",
+            "start": 2,
+            "generated": [
+              3,
+              6,
+              4,
+              2,
+              3,
+              6,
+              4,
+              2
+            ],
+            "target": [
+              3,
+              6,
+              4,
+              2,
+              3,
+              6,
+              4,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 3,
+            "generated": [
+              6,
+              4,
+              2,
+              3,
+              6,
+              4,
+              2,
+              3
+            ],
+            "target": [
+              6,
+              4,
+              2,
+              3,
+              6,
+              4,
+              2,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 4,
+            "generated": [
+              2,
+              3,
+              6,
+              4,
+              2,
+              3,
+              6,
+              4
+            ],
+            "target": [
+              2,
+              3,
+              6,
+              4,
+              2,
+              3,
+              6,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 5,
+            "generated": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "target": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 6,
+            "generated": [
+              4,
+              2,
+              3,
+              6,
+              4,
+              2,
+              3,
+              6
+            ],
+            "target": [
+              4,
+              2,
+              3,
+              6,
+              4,
+              2,
+              3,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 7,
+            "generated": [
+              0,
+              7,
+              0,
+              7,
+              0,
+              7,
+              0,
+              7
+            ],
+            "target": [
+              0,
+              7,
+              0,
+              7,
+              0,
+              7,
+              0,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 0,
+            "generated": [
+              2,
+              4,
+              1,
+              0,
+              2,
+              4,
+              1,
+              0
+            ],
+            "target": [
+              2,
+              4,
+              1,
+              0,
+              2,
+              4,
+              1,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 1,
+            "generated": [
+              0,
+              2,
+              4,
+              1,
+              0,
+              2,
+              4,
+              1
+            ],
+            "target": [
+              0,
+              2,
+              4,
+              1,
+              0,
+              2,
+              4,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 2,
+            "generated": [
+              4,
+              1,
+              0,
+              2,
+              4,
+              1,
+              0,
+              2
+            ],
+            "target": [
+              4,
+              1,
+              0,
+              2,
+              4,
+              1,
+              0,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 3,
+            "generated": [
+              7,
+              3,
+              7,
+              3,
+              7,
+              3,
+              7,
+              3
+            ],
+            "target": [
+              7,
+              3,
+              7,
+              3,
+              7,
+              3,
+              7,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 4,
+            "generated": [
+              1,
+              0,
+              2,
+              4,
+              1,
+              0,
+              2,
+              4
+            ],
+            "target": [
+              1,
+              0,
+              2,
+              4,
+              1,
+              0,
+              2,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 5,
+            "generated": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "target": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 6,
+            "generated": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "target": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 7,
+            "generated": [
+              3,
+              7,
+              3,
+              7,
+              3,
+              7,
+              3,
+              7
+            ],
+            "target": [
+              3,
+              7,
+              3,
+              7,
+              3,
+              7,
+              3,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          }
+        ]
+      },
+      "old_after_new_context": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10061302170151862,
+          "confidence": 0.9065324884516963
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10737521630252383,
+          "confidence": 0.9010672226160812
+        },
+        "C": {
+          "accuracy": 0.984375,
+          "cross_entropy": 0.12749738769620983,
+          "confidence": 0.9036343698899294
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.11403195835154524,
+          "confidence": 0.8966266185043565
+        }
+      },
+      "new_rule": {
+        "A_v2": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.11466918917889243,
+          "confidence": 0.8964269910320866
+        }
+      },
+      "same_context_conflict": {
+        "new_A": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 0.09671078022448436,
+            "confidence": 0.9110451861396023
+          }
+        },
+        "old_A": {
+          "A": {
+            "accuracy": 0.0,
+            "cross_entropy": 4.443441592726591,
+            "confidence": 0.9087668104287316
+          }
+        }
+      },
+      "idle_metrics": {
+        "external_events_delta": 0,
+        "teacher_feedback_delta": 0,
+        "replay_updates": 0,
+        "consolidations": 250,
+        "core_motion": 1.0962097841816092,
+        "physical_W_motion": 0.8172746084219805,
+        "path_length": 126.1881773362195
+      },
+      "encoder_delta_norm": 0.0011870925647898066,
+      "status": {
+        "logical_initializations": 1,
+        "predictions": 4216,
+        "feedback": 3000,
+        "idle_ticks": 10000,
+        "ticks": 94320,
+        "replay_updates": 0,
+        "consolidations": 2358,
+        "new_contexts": 5,
+        "expired_eligibility": 960,
+        "encoder_update_norm": 0.013867205591668767,
+        "readout_update_norm": 725.3602846876831,
+        "core_path_length": 3694.9655649863057,
+        "external_events": 4216,
+        "core_resets": 0,
+        "replay_proposals": 0,
+        "replay_rejections": 0,
+        "guard_anchor_evaluations": 0,
+        "internal_replay_events": 500,
+        "clock": 94320,
+        "event_id": 4216,
+        "contexts": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "A_v2"
+        ],
+        "memory_items": 320,
+        "pending_feedback": 256,
+        "finite": true,
+        "max_abs_state": 2.1640951241467756,
+        "physical_energy": 0.08965032036900888,
+        "subdivisions": 1182,
+        "encoder_norm": 9.308508202033916,
+        "fast_norm": 0.000646512814979698,
+        "slow_norm": 95.71406034579631
+      },
+      "all_feedback_follows_prediction": true
+    }
+  },
+  {
+    "seed": 801,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441501745235,
+            "confidence": 0.1250000049918253
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079438512726165,
+            "confidence": 0.12500037861982272
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079205531379415,
+            "confidence": 0.12502950498636903
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0609311580277225,
+            "confidence": 0.12733746064538742
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 45120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.012132858148683026,
+          "readout_update_norm": 808.3660439403592,
+          "core_path_length": 1390.9080946471304,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 0,
+          "clock": 45120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.5072879550780325,
+          "physical_energy": -16.851667395786144,
+          "subdivisions": 1510,
+          "encoder_norm": 9.87452512267854,
+          "fast_norm": 0.6984298090275916,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 0.0
+      },
+      "naive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.78125,
+            "cross_entropy": 1.8886575466305076,
+            "confidence": 0.15454411736962648
+          },
+          "B": {
+            "accuracy": 0.828125,
+            "cross_entropy": 1.9551470696789717,
+            "confidence": 0.1424350313903061
+          },
+          "C": {
+            "accuracy": 0.765625,
+            "cross_entropy": 2.021182202781599,
+            "confidence": 0.13328709313068615
+          },
+          "D": {
+            "accuracy": 0.640625,
+            "cross_entropy": 2.0422600622941047,
+            "confidence": 0.13053931408402386
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.012132858148683026,
+          "readout_update_norm": 896.855259952207,
+          "core_path_length": 1488.286206680119,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 500,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.2901979487260395,
+          "physical_energy": -18.51335561468159,
+          "subdivisions": 1510,
+          "encoder_norm": 9.87452512267854,
+          "fast_norm": 5.7998132981905055,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 97.37811203298861
+      },
+      "state_only": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441541415698,
+            "confidence": 0.1250000000330172
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415212969133,
+            "confidence": 0.12500000254786534
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794399533971566,
+            "confidence": 0.1250001985355024
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0793166947747976,
+            "confidence": 0.12501560693203853
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.012132858148683026,
+          "readout_update_norm": 808.3660439403592,
+          "core_path_length": 1488.286206680119,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 500,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.2901979487260395,
+          "physical_energy": -18.51335561468159,
+          "subdivisions": 1510,
+          "encoder_norm": 9.87452512267854,
+          "fast_norm": 0.004700102272923914,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 97.37811203298861
+      },
+      "no_replay": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.07944154141898,
+            "confidence": 0.12500000003260703
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441521297359,
+            "confidence": 0.12500000254780963
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079439953396647,
+            "confidence": 0.12500019853556615
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0793166947753896,
+            "confidence": 0.1250156069319645
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2256,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 55120,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 0,
+          "encoder_update_norm": 0.012132858148683026,
+          "readout_update_norm": 808.3660439403592,
+          "core_path_length": 1394.6901043380678,
+          "external_events": 2256,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "internal_replay_events": 0,
+          "clock": 55120,
+          "event_id": 2256,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.215710068777109,
+          "physical_energy": -18.7107411589456,
+          "subdivisions": 1510,
+          "encoder_norm": 9.87452512267854,
+          "fast_norm": 0.004700102272923914,
+          "slow_norm": 0.0
+        },
+        "idle_path_length": 3.782009690937457
+      }
+    },
+    "full_state_only_life": {
+      "seed": 801,
+      "variant": "state_only_PQT",
+      "config": {
+        "seed": 801,
+        "core": "pqt",
+        "cells": 6,
+        "alphabet": 8,
+        "h": 0.01,
+        "integration_substeps": 1,
+        "event_ticks": 20,
+        "input_gain": 2.0,
+        "learning_rate": 0.8,
+        "input_learning_rate": 1e-05,
+        "fast_decay": 0.0005,
+        "consolidation_rate": 0.08,
+        "consolidation_period": 40,
+        "replay_period": 20,
+        "replay_capacity": 64,
+        "learning": true,
+        "replay": true,
+        "consolidation": true,
+        "reset_core": false,
+        "context_gates": true,
+        "internal_drive": true,
+        "guarded_replay": false,
+        "replay_weight_updates": false
+      },
+      "seconds": 37.40243599994574,
+      "stages": [
+        {
+          "stage": "learn_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.7,
+          "last100": 1.0,
+          "overall": 0.94,
+          "events_to_rolling100_90pct": 132
+        },
+        {
+          "stage": "learn_B",
+          "context": "B",
+          "n": 500,
+          "first100": 0.86,
+          "last100": 0.99,
+          "overall": 0.97,
+          "events_to_rolling100_90pct": 105
+        },
+        {
+          "stage": "learn_C",
+          "context": "C",
+          "n": 500,
+          "first100": 0.76,
+          "last100": 1.0,
+          "overall": 0.952,
+          "events_to_rolling100_90pct": 127
+        },
+        {
+          "stage": "learn_D",
+          "context": "D",
+          "n": 500,
+          "first100": 0.81,
+          "last100": 1.0,
+          "overall": 0.962,
+          "events_to_rolling100_90pct": 109
+        },
+        {
+          "stage": "new_version_A",
+          "context": "A_v2",
+          "n": 500,
+          "first100": 0.81,
+          "last100": 1.0,
+          "overall": 0.958,
+          "events_to_rolling100_90pct": 114
+        },
+        {
+          "stage": "unannounced_overwrite_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.49,
+          "last100": 1.0,
+          "overall": 0.88,
+          "events_to_rolling100_90pct": 185
+        }
+      ],
+      "before_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08153612563909089,
+          "confidence": 0.9229340018849079
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07516068828595734,
+          "confidence": 0.9287323205812719
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.06563564935378607,
+          "confidence": 0.9372807570925672
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.06727623869726197,
+          "confidence": 0.9357371229536626
+        }
+      },
+      "paired_noidle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07294988175684328,
+          "confidence": 0.93110133802418
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08712650031119763,
+          "confidence": 0.9186044326267908
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0924833534974066,
+          "confidence": 0.9147624074426377
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.12732795591748522,
+          "confidence": 0.8907630051931186
+        }
+      },
+      "after_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07808830761457386,
+          "confidence": 0.9264616655076666
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08712752238512625,
+          "confidence": 0.9186014632048901
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09248281463782446,
+          "confidence": 0.9147629635873469
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.12732803527220343,
+          "confidence": 0.8907629792250719
+        }
+      },
+      "generation": {
+        "exact_match": 0.90625,
+        "rows": [
+          {
+            "context": "A",
+            "start": 0,
+            "generated": [
+              1,
+              6,
+              7,
+              0,
+              1,
+              6,
+              7,
+              0
+            ],
+            "target": [
+              1,
+              6,
+              7,
+              0,
+              1,
+              6,
+              7,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 1,
+            "generated": [
+              6,
+              7,
+              0,
+              1,
+              6,
+              7,
+              0,
+              1
+            ],
+            "target": [
+              6,
+              7,
+              0,
+              1,
+              6,
+              7,
+              0,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 2,
+            "generated": [
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2
+            ],
+            "target": [
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 3,
+            "generated": [
+              2,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              3
+            ],
+            "target": [
+              2,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 4,
+            "generated": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              5,
+              5,
+              5
+            ],
+            "target": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "exact": false,
+            "prefix_tokens": 5
+          },
+          {
+            "context": "A",
+            "start": 5,
+            "generated": [
+              5,
+              5,
+              5,
+              0,
+              1,
+              6,
+              7,
+              0
+            ],
+            "target": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "exact": false,
+            "prefix_tokens": 3
+          },
+          {
+            "context": "A",
+            "start": 6,
+            "generated": [
+              7,
+              0,
+              1,
+              6,
+              7,
+              0,
+              1,
+              6
+            ],
+            "target": [
+              7,
+              0,
+              1,
+              6,
+              7,
+              0,
+              1,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 7,
+            "generated": [
+              0,
+              1,
+              6,
+              7,
+              0,
+              1,
+              6,
+              7
+            ],
+            "target": [
+              0,
+              1,
+              6,
+              7,
+              0,
+              1,
+              6,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 0,
+            "generated": [
+              7,
+              5,
+              2,
+              1,
+              4,
+              3,
+              6,
+              0
+            ],
+            "target": [
+              7,
+              5,
+              2,
+              1,
+              4,
+              3,
+              6,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 1,
+            "generated": [
+              4,
+              3,
+              6,
+              0,
+              7,
+              5,
+              2,
+              1
+            ],
+            "target": [
+              4,
+              3,
+              6,
+              0,
+              7,
+              5,
+              2,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 2,
+            "generated": [
+              1,
+              4,
+              3,
+              6,
+              0,
+              7,
+              5,
+              2
+            ],
+            "target": [
+              1,
+              4,
+              3,
+              6,
+              0,
+              7,
+              5,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 3,
+            "generated": [
+              6,
+              0,
+              7,
+              5,
+              2,
+              1,
+              4,
+              3
+            ],
+            "target": [
+              6,
+              0,
+              7,
+              5,
+              2,
+              1,
+              4,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 4,
+            "generated": [
+              3,
+              6,
+              0,
+              7,
+              5,
+              2,
+              1,
+              4
+            ],
+            "target": [
+              3,
+              6,
+              0,
+              7,
+              5,
+              2,
+              1,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 5,
+            "generated": [
+              2,
+              1,
+              4,
+              3,
+              6,
+              0,
+              7,
+              5
+            ],
+            "target": [
+              2,
+              1,
+              4,
+              3,
+              6,
+              0,
+              7,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 6,
+            "generated": [
+              0,
+              7,
+              5,
+              2,
+              1,
+              4,
+              3,
+              6
+            ],
+            "target": [
+              0,
+              7,
+              5,
+              2,
+              1,
+              4,
+              3,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 7,
+            "generated": [
+              5,
+              2,
+              1,
+              4,
+              3,
+              6,
+              0,
+              7
+            ],
+            "target": [
+              5,
+              2,
+              1,
+              4,
+              3,
+              6,
+              0,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 0,
+            "generated": [
+              1,
+              5,
+              4,
+              7,
+              2,
+              6,
+              0,
+              1
+            ],
+            "target": [
+              1,
+              5,
+              4,
+              7,
+              2,
+              6,
+              0,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 1,
+            "generated": [
+              5,
+              4,
+              7,
+              2,
+              6,
+              0,
+              1,
+              5
+            ],
+            "target": [
+              5,
+              4,
+              7,
+              2,
+              6,
+              0,
+              1,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 2,
+            "generated": [
+              6,
+              0,
+              1,
+              5,
+              4,
+              7,
+              2,
+              6
+            ],
+            "target": [
+              6,
+              0,
+              1,
+              5,
+              4,
+              7,
+              2,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 3,
+            "generated": [
+              3,
+              3,
+              3,
+              3,
+              7,
+              2,
+              6,
+              0
+            ],
+            "target": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "exact": false,
+            "prefix_tokens": 4
+          },
+          {
+            "context": "C",
+            "start": 4,
+            "generated": [
+              7,
+              2,
+              6,
+              0,
+              1,
+              5,
+              4,
+              7
+            ],
+            "target": [
+              7,
+              2,
+              6,
+              0,
+              1,
+              5,
+              4,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 5,
+            "generated": [
+              4,
+              7,
+              2,
+              6,
+              0,
+              1,
+              5,
+              4
+            ],
+            "target": [
+              4,
+              7,
+              2,
+              6,
+              0,
+              1,
+              5,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 6,
+            "generated": [
+              0,
+              1,
+              5,
+              4,
+              7,
+              2,
+              6,
+              0
+            ],
+            "target": [
+              0,
+              1,
+              5,
+              4,
+              7,
+              2,
+              6,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 7,
+            "generated": [
+              2,
+              6,
+              0,
+              1,
+              5,
+              4,
+              7,
+              2
+            ],
+            "target": [
+              2,
+              6,
+              0,
+              1,
+              5,
+              4,
+              7,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 0,
+            "generated": [
+              3,
+              0,
+              3,
+              0,
+              3,
+              0,
+              3,
+              0
+            ],
+            "target": [
+              3,
+              0,
+              3,
+              0,
+              3,
+              0,
+              3,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 1,
+            "generated": [
+              4,
+              6,
+              1,
+              4,
+              6,
+              1,
+              4,
+              6
+            ],
+            "target": [
+              4,
+              6,
+              1,
+              4,
+              6,
+              1,
+              4,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 2,
+            "generated": [
+              5,
+              2,
+              5,
+              2,
+              5,
+              2,
+              5,
+              2
+            ],
+            "target": [
+              5,
+              2,
+              5,
+              2,
+              5,
+              2,
+              5,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 3,
+            "generated": [
+              0,
+              3,
+              0,
+              3,
+              0,
+              3,
+              0,
+              3
+            ],
+            "target": [
+              0,
+              3,
+              0,
+              3,
+              0,
+              3,
+              0,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 4,
+            "generated": [
+              6,
+              1,
+              4,
+              6,
+              1,
+              4,
+              6,
+              1
+            ],
+            "target": [
+              6,
+              1,
+              4,
+              6,
+              1,
+              4,
+              6,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 5,
+            "generated": [
+              2,
+              5,
+              2,
+              5,
+              2,
+              5,
+              2,
+              5
+            ],
+            "target": [
+              2,
+              5,
+              2,
+              5,
+              2,
+              5,
+              2,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 6,
+            "generated": [
+              1,
+              4,
+              6,
+              1,
+              4,
+              6,
+              1,
+              4
+            ],
+            "target": [
+              1,
+              4,
+              6,
+              1,
+              4,
+              6,
+              1,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 7,
+            "generated": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "target": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          }
+        ]
+      },
+      "old_after_new_context": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08743204536535325,
+          "confidence": 0.9210017201146529
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.061305606615169844,
+          "confidence": 0.9411872305967285
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10954124944956789,
+          "confidence": 0.9006475575590149
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09562308422072999,
+          "confidence": 0.9118134485247993
+        }
+      },
+      "new_rule": {
+        "A_v2": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09811963317453452,
+          "confidence": 0.9084211793724928
+        }
+      },
+      "same_context_conflict": {
+        "new_A": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 0.09056086667661972,
+            "confidence": 0.9161917777282375
+          }
+        },
+        "old_A": {
+          "A": {
+            "accuracy": 0.296875,
+            "cross_entropy": 2.999844080332868,
+            "confidence": 0.9172957788705234
+          }
+        }
+      },
+      "idle_metrics": {
+        "external_events_delta": 0,
+        "teacher_feedback_delta": 0,
+        "replay_updates": 0,
+        "consolidations": 250,
+        "core_motion": 1.2681488409296215,
+        "physical_W_motion": 1.173559419533747,
+        "path_length": 97.37968547694845
+      },
+      "encoder_delta_norm": 0.0009572281334668092,
+      "status": {
+        "logical_initializations": 1,
+        "predictions": 4216,
+        "feedback": 3000,
+        "idle_ticks": 10000,
+        "ticks": 94320,
+        "replay_updates": 0,
+        "consolidations": 2358,
+        "new_contexts": 5,
+        "expired_eligibility": 960,
+        "encoder_update_norm": 0.009697652164945347,
+        "readout_update_norm": 641.8609830802026,
+        "core_path_length": 2669.4401882366246,
+        "external_events": 4216,
+        "core_resets": 0,
+        "replay_proposals": 0,
+        "replay_rejections": 0,
+        "guard_anchor_evaluations": 0,
+        "internal_replay_events": 500,
+        "clock": 94320,
+        "event_id": 4216,
+        "contexts": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "A_v2"
+        ],
+        "memory_items": 320,
+        "pending_feedback": 256,
+        "finite": true,
+        "max_abs_state": 3.4167997906021363,
+        "physical_energy": -16.837534836030006,
+        "subdivisions": 2853,
+        "encoder_norm": 9.874525242367982,
+        "fast_norm": 0.0003608527985021015,
+        "slow_norm": 93.5808689357559
+      },
+      "all_feedback_follows_prediction": true
+    }
+  }
+]

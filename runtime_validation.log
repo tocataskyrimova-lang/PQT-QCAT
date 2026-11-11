@@ -1,0 +1,1 @@
+RUNTIME VALIDATION {'1': {'rms_to_k8': 6.641744313452411e-05, 'finite': True}, '2': {'rms_to_k8': 1.5505993769297316e-05, 'finite': True}, '4': {'rms_to_k8': 3.06973889946665e-06, 'finite': True}, '8': {'rms_to_k8': 0.0, 'finite': True}} True

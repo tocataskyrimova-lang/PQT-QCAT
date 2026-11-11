@@ -1,0 +1,167 @@
+{
+  "refinement": {
+    "1": {
+      "rms_to_k8": 6.641744313452411e-05,
+      "finite": true
+    },
+    "2": {
+      "rms_to_k8": 1.5505993769297316e-05,
+      "finite": true
+    },
+    "4": {
+      "rms_to_k8": 3.06973889946665e-06,
+      "finite": true
+    },
+    "8": {
+      "rms_to_k8": 0.0,
+      "finite": true
+    }
+  },
+  "long_idle": {
+    "before": {
+      "logical_initializations": 1,
+      "predictions": 128,
+      "feedback": 128,
+      "idle_ticks": 0,
+      "ticks": 2560,
+      "replay_updates": 0,
+      "consolidations": 64,
+      "new_contexts": 1,
+      "expired_eligibility": 0,
+      "encoder_update_norm": 0.0010354577573402943,
+      "readout_update_norm": 50.70113520637952,
+      "core_path_length": 108.19230380675471,
+      "external_events": 128,
+      "core_resets": 0,
+      "clock": 2560,
+      "event_id": 128,
+      "contexts": [
+        "stress"
+      ],
+      "memory_items": 64,
+      "pending_feedback": 0,
+      "finite": true,
+      "max_abs_state": 3.2794643164234465,
+      "physical_energy": -7.590176814152635,
+      "subdivisions": 44,
+      "encoder_norm": 8.345246067898254,
+      "fast_norm": 1.035569082967569,
+      "slow_norm": 9.877306551870289
+    },
+    "after": {
+      "logical_initializations": 1,
+      "predictions": 128,
+      "feedback": 128,
+      "idle_ticks": 100000,
+      "ticks": 102560,
+      "replay_updates": 5000,
+      "consolidations": 2564,
+      "new_contexts": 1,
+      "expired_eligibility": 0,
+      "encoder_update_norm": 0.0010354577573402943,
+      "readout_update_norm": 105.31359385085612,
+      "core_path_length": 1093.0526311622236,
+      "external_events": 128,
+      "core_resets": 0,
+      "clock": 102560,
+      "event_id": 128,
+      "contexts": [
+        "stress"
+      ],
+      "memory_items": 64,
+      "pending_feedback": 0,
+      "finite": true,
+      "max_abs_state": 3.239598884546213,
+      "physical_energy": -8.412838973540957,
+      "subdivisions": 44,
+      "encoder_norm": 8.345246067898254,
+      "fast_norm": 0.026363670345282173,
+      "slow_norm": 20.52818868680132
+    },
+    "seconds": 46.95355929993093
+  },
+  "server": {
+    "ready": true,
+    "prediction": {
+      "event_id": 1,
+      "token": 0,
+      "probabilities": [
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125
+      ],
+      "tick": 20
+    },
+    "status_after_silence": {
+      "logical_initializations": 1,
+      "predictions": 1,
+      "feedback": 0,
+      "idle_ticks": 10,
+      "ticks": 30,
+      "replay_updates": 0,
+      "consolidations": 0,
+      "new_contexts": 1,
+      "expired_eligibility": 0,
+      "encoder_update_norm": 0.0,
+      "readout_update_norm": 0.0,
+      "core_path_length": 2.30778188186466,
+      "external_events": 1,
+      "core_resets": 0,
+      "clock": 30,
+      "event_id": 1,
+      "contexts": [
+        "live"
+      ],
+      "memory_items": 0,
+      "pending_feedback": 1,
+      "finite": true,
+      "max_abs_state": 0.7106284563943778,
+      "physical_energy": 9.119953759652667,
+      "subdivisions": 0,
+      "encoder_norm": 8.491422658123172,
+      "fast_norm": 0.0,
+      "slow_norm": 0.0
+    },
+    "feedback_ack": {
+      "accepted": true
+    },
+    "exit_code": 0,
+    "checkpoint_saved": true,
+    "continued_during_silence": true,
+    "resumed_status": {
+      "logical_initializations": 1,
+      "predictions": 1,
+      "feedback": 1,
+      "idle_ticks": 10,
+      "ticks": 30,
+      "replay_updates": 0,
+      "consolidations": 0,
+      "new_contexts": 1,
+      "expired_eligibility": 0,
+      "encoder_update_norm": 1.2342720826375023e-05,
+      "readout_update_norm": 0.7483314698714736,
+      "core_path_length": 2.30778188186466,
+      "external_events": 1,
+      "core_resets": 0,
+      "clock": 30,
+      "event_id": 1,
+      "contexts": [
+        "live"
+      ],
+      "memory_items": 1,
+      "pending_feedback": 0,
+      "finite": true,
+      "max_abs_state": 0.7106284563943778,
+      "physical_energy": 9.119953759652667,
+      "subdivisions": 0,
+      "encoder_norm": 8.491423334915973,
+      "fast_norm": 0.7483314698714736,
+      "slow_norm": 0.0
+    }
+  }
+}

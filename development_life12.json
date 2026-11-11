@@ -1,0 +1,1076 @@
+{
+  "seed": 12,
+  "variant": "PQT",
+  "config": {
+    "seed": 12,
+    "core": "pqt",
+    "cells": 6,
+    "alphabet": 8,
+    "h": 0.01,
+    "event_ticks": 20,
+    "input_gain": 2.0,
+    "learning_rate": 0.8,
+    "input_learning_rate": 1e-05,
+    "fast_decay": 0.0005,
+    "consolidation_rate": 0.08,
+    "consolidation_period": 40,
+    "replay_period": 20,
+    "replay_capacity": 64,
+    "learning": true,
+    "replay": true,
+    "consolidation": true,
+    "reset_core": false,
+    "context_gates": true,
+    "internal_drive": true
+  },
+  "seconds": 34.951138200005516,
+  "stages": [
+    {
+      "stage": "learn_A",
+      "context": "A",
+      "n": 500,
+      "first100": 0.7,
+      "last100": 1.0,
+      "overall": 0.932,
+      "events_to_rolling100_90pct": 132
+    },
+    {
+      "stage": "learn_B",
+      "context": "B",
+      "n": 500,
+      "first100": 0.73,
+      "last100": 1.0,
+      "overall": 0.946,
+      "events_to_rolling100_90pct": 133
+    },
+    {
+      "stage": "learn_C",
+      "context": "C",
+      "n": 500,
+      "first100": 0.83,
+      "last100": 1.0,
+      "overall": 0.96,
+      "events_to_rolling100_90pct": 107
+    },
+    {
+      "stage": "learn_D",
+      "context": "D",
+      "n": 500,
+      "first100": 0.78,
+      "last100": 1.0,
+      "overall": 0.954,
+      "events_to_rolling100_90pct": 118
+    },
+    {
+      "stage": "new_version_A",
+      "context": "A_v2",
+      "n": 500,
+      "first100": 0.81,
+      "last100": 1.0,
+      "overall": 0.962,
+      "events_to_rolling100_90pct": 113
+    },
+    {
+      "stage": "unannounced_overwrite_A",
+      "context": "A",
+      "n": 500,
+      "first100": 0.46,
+      "last100": 1.0,
+      "overall": 0.882,
+      "events_to_rolling100_90pct": 164
+    }
+  ],
+  "before_idle": {
+    "A": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.1089603939533973,
+      "confidence": 0.9001315979059907
+    },
+    "B": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.08176391836545341,
+      "confidence": 0.9226833456769155
+    },
+    "C": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.08012303859016415,
+      "confidence": 0.9238757180558386
+    },
+    "D": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.1144208459557699,
+      "confidence": 0.899043294576179
+    }
+  },
+  "paired_noidle": {
+    "A": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.08295987632992785,
+      "confidence": 0.9219297194090307
+    },
+    "B": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.10304860020508987,
+      "confidence": 0.9068926960831611
+    },
+    "C": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.0832384369469055,
+      "confidence": 0.9213663260539895
+    },
+    "D": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.09952306206936451,
+      "confidence": 0.9096277148621423
+    }
+  },
+  "after_idle": {
+    "A": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.07992572415087958,
+      "confidence": 0.9245388968983447
+    },
+    "B": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.09886782175449574,
+      "confidence": 0.910803283645675
+    },
+    "C": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.0777719060640337,
+      "confidence": 0.9263488561816617
+    },
+    "D": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.09677748844570688,
+      "confidence": 0.9121648517245742
+    }
+  },
+  "generation": {
+    "exact_match": 0.78125,
+    "rows": [
+      {
+        "context": "A",
+        "start": 0,
+        "generated": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          7,
+          4
+        ],
+        "target": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "exact": false,
+        "prefix_tokens": 5
+      },
+      {
+        "context": "A",
+        "start": 1,
+        "generated": [
+          5,
+          6,
+          1,
+          5,
+          6,
+          1,
+          5,
+          6
+        ],
+        "target": [
+          5,
+          6,
+          1,
+          5,
+          6,
+          1,
+          5,
+          6
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "A",
+        "start": 2,
+        "generated": [
+          2,
+          2,
+          2,
+          2,
+          1,
+          5,
+          6,
+          1
+        ],
+        "target": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "exact": false,
+        "prefix_tokens": 4
+      },
+      {
+        "context": "A",
+        "start": 3,
+        "generated": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          4,
+          7,
+          4
+        ],
+        "target": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "exact": false,
+        "prefix_tokens": 5
+      },
+      {
+        "context": "A",
+        "start": 4,
+        "generated": [
+          7,
+          4,
+          7,
+          4,
+          7,
+          4,
+          7,
+          4
+        ],
+        "target": [
+          7,
+          4,
+          7,
+          4,
+          7,
+          4,
+          7,
+          4
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "A",
+        "start": 5,
+        "generated": [
+          6,
+          1,
+          5,
+          6,
+          1,
+          5,
+          6,
+          1
+        ],
+        "target": [
+          6,
+          1,
+          5,
+          6,
+          1,
+          5,
+          6,
+          1
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "A",
+        "start": 6,
+        "generated": [
+          1,
+          5,
+          6,
+          1,
+          5,
+          6,
+          1,
+          5
+        ],
+        "target": [
+          1,
+          5,
+          6,
+          1,
+          5,
+          6,
+          1,
+          5
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "A",
+        "start": 7,
+        "generated": [
+          4,
+          7,
+          4,
+          7,
+          4,
+          7,
+          4,
+          7
+        ],
+        "target": [
+          4,
+          7,
+          4,
+          7,
+          4,
+          7,
+          4,
+          7
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "B",
+        "start": 0,
+        "generated": [
+          4,
+          7,
+          5,
+          6,
+          3,
+          2,
+          0,
+          4
+        ],
+        "target": [
+          4,
+          7,
+          5,
+          6,
+          3,
+          2,
+          0,
+          4
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "B",
+        "start": 1,
+        "generated": [
+          1,
+          1,
+          1,
+          1,
+          2,
+          0,
+          4,
+          7
+        ],
+        "target": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "exact": false,
+        "prefix_tokens": 4
+      },
+      {
+        "context": "B",
+        "start": 2,
+        "generated": [
+          0,
+          4,
+          7,
+          5,
+          6,
+          3,
+          2,
+          0
+        ],
+        "target": [
+          0,
+          4,
+          7,
+          5,
+          6,
+          3,
+          2,
+          0
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "B",
+        "start": 3,
+        "generated": [
+          2,
+          0,
+          4,
+          7,
+          5,
+          6,
+          3,
+          2
+        ],
+        "target": [
+          2,
+          0,
+          4,
+          7,
+          5,
+          6,
+          3,
+          2
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "B",
+        "start": 4,
+        "generated": [
+          7,
+          5,
+          6,
+          3,
+          2,
+          0,
+          4,
+          7
+        ],
+        "target": [
+          7,
+          5,
+          6,
+          3,
+          2,
+          0,
+          4,
+          7
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "B",
+        "start": 5,
+        "generated": [
+          6,
+          3,
+          2,
+          0,
+          4,
+          7,
+          5,
+          6
+        ],
+        "target": [
+          6,
+          3,
+          2,
+          0,
+          4,
+          7,
+          5,
+          6
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "B",
+        "start": 6,
+        "generated": [
+          3,
+          2,
+          0,
+          4,
+          7,
+          5,
+          6,
+          3
+        ],
+        "target": [
+          3,
+          2,
+          0,
+          4,
+          7,
+          5,
+          6,
+          3
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "B",
+        "start": 7,
+        "generated": [
+          5,
+          6,
+          3,
+          2,
+          0,
+          4,
+          7,
+          5
+        ],
+        "target": [
+          5,
+          6,
+          3,
+          2,
+          0,
+          4,
+          7,
+          5
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "C",
+        "start": 0,
+        "generated": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "target": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "C",
+        "start": 1,
+        "generated": [
+          5,
+          3,
+          4,
+          7,
+          1,
+          5,
+          3,
+          4
+        ],
+        "target": [
+          5,
+          3,
+          4,
+          7,
+          1,
+          5,
+          3,
+          4
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "C",
+        "start": 2,
+        "generated": [
+          2,
+          2,
+          2,
+          2,
+          6,
+          6,
+          6,
+          6
+        ],
+        "target": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "exact": false,
+        "prefix_tokens": 4
+      },
+      {
+        "context": "C",
+        "start": 3,
+        "generated": [
+          4,
+          7,
+          1,
+          5,
+          3,
+          4,
+          7,
+          1
+        ],
+        "target": [
+          4,
+          7,
+          1,
+          5,
+          3,
+          4,
+          7,
+          1
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "C",
+        "start": 4,
+        "generated": [
+          7,
+          1,
+          5,
+          3,
+          4,
+          7,
+          1,
+          5
+        ],
+        "target": [
+          7,
+          1,
+          5,
+          3,
+          4,
+          7,
+          1,
+          5
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "C",
+        "start": 5,
+        "generated": [
+          3,
+          4,
+          7,
+          1,
+          5,
+          3,
+          4,
+          7
+        ],
+        "target": [
+          3,
+          4,
+          7,
+          1,
+          5,
+          3,
+          4,
+          7
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "C",
+        "start": 6,
+        "generated": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "target": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "C",
+        "start": 7,
+        "generated": [
+          1,
+          5,
+          3,
+          4,
+          7,
+          1,
+          5,
+          3
+        ],
+        "target": [
+          1,
+          5,
+          3,
+          4,
+          7,
+          1,
+          5,
+          3
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "D",
+        "start": 0,
+        "generated": [
+          6,
+          0,
+          6,
+          0,
+          6,
+          0,
+          6,
+          0
+        ],
+        "target": [
+          6,
+          0,
+          6,
+          0,
+          6,
+          0,
+          6,
+          0
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "D",
+        "start": 1,
+        "generated": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          4,
+          5,
+          2
+        ],
+        "target": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "exact": false,
+        "prefix_tokens": 5
+      },
+      {
+        "context": "D",
+        "start": 2,
+        "generated": [
+          3,
+          4,
+          5,
+          2,
+          3,
+          4,
+          5,
+          2
+        ],
+        "target": [
+          3,
+          4,
+          5,
+          2,
+          3,
+          4,
+          5,
+          2
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "D",
+        "start": 3,
+        "generated": [
+          4,
+          5,
+          2,
+          3,
+          4,
+          5,
+          2,
+          3
+        ],
+        "target": [
+          4,
+          5,
+          2,
+          3,
+          4,
+          5,
+          2,
+          3
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "D",
+        "start": 4,
+        "generated": [
+          5,
+          2,
+          3,
+          4,
+          5,
+          2,
+          3,
+          4
+        ],
+        "target": [
+          5,
+          2,
+          3,
+          4,
+          5,
+          2,
+          3,
+          4
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "D",
+        "start": 5,
+        "generated": [
+          2,
+          3,
+          4,
+          5,
+          2,
+          3,
+          4,
+          5
+        ],
+        "target": [
+          2,
+          3,
+          4,
+          5,
+          2,
+          3,
+          4,
+          5
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "D",
+        "start": 6,
+        "generated": [
+          0,
+          6,
+          0,
+          6,
+          0,
+          6,
+          0,
+          6
+        ],
+        "target": [
+          0,
+          6,
+          0,
+          6,
+          0,
+          6,
+          0,
+          6
+        ],
+        "exact": true,
+        "prefix_tokens": 8
+      },
+      {
+        "context": "D",
+        "start": 7,
+        "generated": [
+          7,
+          7,
+          7,
+          5,
+          2,
+          3,
+          4,
+          5
+        ],
+        "target": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "exact": false,
+        "prefix_tokens": 3
+      }
+    ]
+  },
+  "old_after_new_context": {
+    "A": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.09070183452415993,
+      "confidence": 0.9152278730489439
+    },
+    "B": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.09398627458057549,
+      "confidence": 0.913277490350962
+    },
+    "C": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.06443018439647445,
+      "confidence": 0.9381796051742065
+    },
+    "D": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.08312431813534549,
+      "confidence": 0.9229147854062505
+    }
+  },
+  "new_rule": {
+    "A_v2": {
+      "accuracy": 1.0,
+      "cross_entropy": 0.10242340261701688,
+      "confidence": 0.9064902526447214
+    }
+  },
+  "same_context_conflict": {
+    "new_A": {
+      "A": {
+        "accuracy": 1.0,
+        "cross_entropy": 0.08222776446707622,
+        "confidence": 0.924741132545609
+      }
+    },
+    "old_A": {
+      "A": {
+        "accuracy": 0.171875,
+        "cross_entropy": 3.9760060020316144,
+        "confidence": 0.9249797290440454
+      }
+    }
+  },
+  "idle_metrics": {
+    "external_events_delta": 0,
+    "teacher_feedback_delta": 0,
+    "replay_updates": 500,
+    "consolidations": 250,
+    "core_motion": 1.0675670107418525,
+    "physical_W_motion": 0.8736675715512815,
+    "path_length": 105.40352388473389
+  },
+  "encoder_delta_norm": 0.0013517307116639686,
+  "status": {
+    "logical_initializations": 1,
+    "predictions": 4216,
+    "feedback": 3000,
+    "idle_ticks": 10000,
+    "ticks": 94320,
+    "replay_updates": 500,
+    "consolidations": 2358,
+    "new_contexts": 5,
+    "expired_eligibility": 960,
+    "encoder_update_norm": 0.014024420204449413,
+    "readout_update_norm": 658.8301046082718,
+    "core_path_length": 2810.9820053033027,
+    "external_events": 4216,
+    "core_resets": 0,
+    "clock": 94320,
+    "event_id": 4216,
+    "contexts": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "A_v2"
+    ],
+    "memory_items": 320,
+    "pending_feedback": 256,
+    "finite": true,
+    "max_abs_state": 3.378229763348499,
+    "physical_energy": -3.8809143701043185,
+    "subdivisions": 697,
+    "encoder_norm": 8.606371261322625,
+    "fast_norm": 0.0007080088028589775,
+    "slow_norm": 95.11096926917963
+  },
+  "all_feedback_follows_prediction": true
+}

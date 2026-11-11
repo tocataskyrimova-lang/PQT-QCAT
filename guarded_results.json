@@ -1,0 +1,3980 @@
+[
+  {
+    "seed": 702,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.079441503478991,
+            "confidence": 0.12500000478004336
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794386139558494,
+            "confidence": 0.12500036596607106
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079218799161701,
+            "confidence": 0.12502784622419724
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0601553774200845,
+            "confidence": 0.1274354005860857
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 50240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.015450889480846719,
+          "readout_update_norm": 823.0252055982935,
+          "core_path_length": 1946.099946402099,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 50240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.1066838568844566,
+          "physical_energy": -0.4510109557666713,
+          "subdivisions": 226,
+          "encoder_norm": 9.73148791338774,
+          "fast_norm": 0.05384031997438084,
+          "slow_norm": 0.0
+        }
+      },
+      "naive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.75,
+            "cross_entropy": 1.9145059135262064,
+            "confidence": 0.14920227746557288
+          },
+          "B": {
+            "accuracy": 0.8125,
+            "cross_entropy": 1.9775433453435212,
+            "confidence": 0.13978980647308625
+          },
+          "C": {
+            "accuracy": 0.828125,
+            "cross_entropy": 2.0175942127295214,
+            "confidence": 0.13365132185967718
+          },
+          "D": {
+            "accuracy": 0.75,
+            "cross_entropy": 2.045463859492217,
+            "confidence": 0.12973006362194972
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.015450889480846719,
+          "readout_update_norm": 912.2948847459281,
+          "core_path_length": 2072.934914590007,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.1066837361208575,
+          "physical_energy": -0.4514405535284318,
+          "subdivisions": 227,
+          "encoder_norm": 9.73148791338774,
+          "fast_norm": 0.4192657881363399,
+          "slow_norm": 0.0
+        }
+      },
+      "guarded": {
+        "queries": {
+          "A": {
+            "accuracy": 0.96875,
+            "cross_entropy": 2.0794415414238996,
+            "confidence": 0.12500000003204767
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415219615705,
+            "confidence": 0.12500000246478318
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079440042554525,
+            "confidence": 0.1250001873908183
+          },
+          "D": {
+            "accuracy": 0.890625,
+            "cross_entropy": 2.0690490595566677,
+            "confidence": 0.12638117056946258
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 50,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.015450889480846719,
+          "readout_update_norm": 832.1611982407935,
+          "core_path_length": 2072.934914590007,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 450,
+          "guard_anchor_evaluations": 1600,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.1066837361208575,
+          "physical_energy": -0.4514405535284318,
+          "subdivisions": 227,
+          "encoder_norm": 9.73148791338774,
+          "fast_norm": 0.03694244618979746,
+          "slow_norm": 0.0
+        }
+      },
+      "no_replay": {
+        "queries": {
+          "A": {
+            "accuracy": 0.96875,
+            "cross_entropy": 2.0794415414271015,
+            "confidence": 0.1250000000316619
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441521960384,
+            "confidence": 0.12500000246493154
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794400425642454,
+            "confidence": 0.12500018738960322
+          },
+          "D": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079311482720919,
+            "confidence": 0.12501625848220263
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.015450889480846719,
+          "readout_update_norm": 823.0252055982935,
+          "core_path_length": 1952.3350057261107,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.106683703094032,
+          "physical_energy": -0.4513145550643598,
+          "subdivisions": 227,
+          "encoder_norm": 9.73148791338774,
+          "fast_norm": 0.0003623198881486187,
+          "slow_norm": 0.0
+        }
+      }
+    },
+    "full_guarded_life": {
+      "seed": 702,
+      "variant": "guarded_PQT",
+      "config": {
+        "seed": 702,
+        "core": "pqt",
+        "cells": 6,
+        "alphabet": 8,
+        "h": 0.01,
+        "integration_substeps": 1,
+        "event_ticks": 20,
+        "input_gain": 2.0,
+        "learning_rate": 0.8,
+        "input_learning_rate": 1e-05,
+        "fast_decay": 0.0005,
+        "consolidation_rate": 0.08,
+        "consolidation_period": 40,
+        "replay_period": 20,
+        "replay_capacity": 64,
+        "learning": true,
+        "replay": true,
+        "consolidation": true,
+        "reset_core": false,
+        "context_gates": true,
+        "internal_drive": true,
+        "guarded_replay": true
+      },
+      "seconds": 46.48269800003618,
+      "stages": [
+        {
+          "stage": "learn_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.76,
+          "last100": 1.0,
+          "overall": 0.95,
+          "events_to_rolling100_90pct": 121
+        },
+        {
+          "stage": "learn_B",
+          "context": "B",
+          "n": 500,
+          "first100": 0.82,
+          "last100": 1.0,
+          "overall": 0.96,
+          "events_to_rolling100_90pct": 111
+        },
+        {
+          "stage": "learn_C",
+          "context": "C",
+          "n": 500,
+          "first100": 0.83,
+          "last100": 1.0,
+          "overall": 0.964,
+          "events_to_rolling100_90pct": 111
+        },
+        {
+          "stage": "learn_D",
+          "context": "D",
+          "n": 500,
+          "first100": 0.85,
+          "last100": 1.0,
+          "overall": 0.97,
+          "events_to_rolling100_90pct": 105
+        },
+        {
+          "stage": "new_version_A",
+          "context": "A_v2",
+          "n": 500,
+          "first100": 0.8,
+          "last100": 1.0,
+          "overall": 0.958,
+          "events_to_rolling100_90pct": 120
+        },
+        {
+          "stage": "unannounced_overwrite_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.48,
+          "last100": 1.0,
+          "overall": 0.886,
+          "events_to_rolling100_90pct": 176
+        }
+      ],
+      "before_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08559604778290461,
+          "confidence": 0.9214975770574874
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0835780539307139,
+          "confidence": 0.9210030197883168
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.12013693199782183,
+          "confidence": 0.8943324852416594
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09354531494409701,
+          "confidence": 0.9129665646359271
+        }
+      },
+      "paired_noidle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.13498799867226952,
+          "confidence": 0.8822051269652895
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09350168493076082,
+          "confidence": 0.9168366215143023
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10967478082343529,
+          "confidence": 0.9036242299226906
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0732527543668629,
+          "confidence": 0.9304524796346879
+        }
+      },
+      "after_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.12691579499568167,
+          "confidence": 0.8887849121429386
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08734659115368876,
+          "confidence": 0.9215661607223432
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10458807832388235,
+          "confidence": 0.9077691513117786
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.06977193999835132,
+          "confidence": 0.9336127901413228
+        }
+      },
+      "generation": {
+        "exact_match": 0.84375,
+        "rows": [
+          {
+            "context": "A",
+            "start": 0,
+            "generated": [
+              2,
+              3,
+              4,
+              7,
+              0,
+              2,
+              3,
+              4
+            ],
+            "target": [
+              2,
+              3,
+              4,
+              7,
+              0,
+              2,
+              3,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 1,
+            "generated": [
+              6,
+              1,
+              6,
+              1,
+              6,
+              1,
+              6,
+              1
+            ],
+            "target": [
+              6,
+              1,
+              6,
+              1,
+              6,
+              1,
+              6,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 2,
+            "generated": [
+              3,
+              4,
+              7,
+              0,
+              2,
+              3,
+              4,
+              7
+            ],
+            "target": [
+              3,
+              4,
+              7,
+              0,
+              2,
+              3,
+              4,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 3,
+            "generated": [
+              4,
+              7,
+              0,
+              2,
+              3,
+              4,
+              7,
+              0
+            ],
+            "target": [
+              4,
+              7,
+              0,
+              2,
+              3,
+              4,
+              7,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 4,
+            "generated": [
+              7,
+              0,
+              2,
+              3,
+              4,
+              7,
+              0,
+              2
+            ],
+            "target": [
+              7,
+              0,
+              2,
+              3,
+              4,
+              7,
+              0,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 5,
+            "generated": [
+              5,
+              5,
+              5,
+              5,
+              3,
+              4,
+              7,
+              0
+            ],
+            "target": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "exact": false,
+            "prefix_tokens": 4
+          },
+          {
+            "context": "A",
+            "start": 6,
+            "generated": [
+              1,
+              6,
+              1,
+              6,
+              1,
+              6,
+              1,
+              6
+            ],
+            "target": [
+              1,
+              6,
+              1,
+              6,
+              1,
+              6,
+              1,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 7,
+            "generated": [
+              0,
+              2,
+              3,
+              4,
+              7,
+              0,
+              2,
+              3
+            ],
+            "target": [
+              0,
+              2,
+              3,
+              4,
+              7,
+              0,
+              2,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 0,
+            "generated": [
+              7,
+              3,
+              5,
+              0,
+              7,
+              3,
+              5,
+              0
+            ],
+            "target": [
+              7,
+              3,
+              5,
+              0,
+              7,
+              3,
+              5,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 1,
+            "generated": [
+              2,
+              1,
+              2,
+              1,
+              2,
+              1,
+              2,
+              1
+            ],
+            "target": [
+              2,
+              1,
+              2,
+              1,
+              2,
+              1,
+              2,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 2,
+            "generated": [
+              1,
+              2,
+              1,
+              2,
+              1,
+              2,
+              1,
+              2
+            ],
+            "target": [
+              1,
+              2,
+              1,
+              2,
+              1,
+              2,
+              1,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 3,
+            "generated": [
+              5,
+              0,
+              7,
+              3,
+              5,
+              0,
+              7,
+              3
+            ],
+            "target": [
+              5,
+              0,
+              7,
+              3,
+              5,
+              0,
+              7,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 4,
+            "generated": [
+              6,
+              4,
+              6,
+              4,
+              6,
+              4,
+              6,
+              4
+            ],
+            "target": [
+              6,
+              4,
+              6,
+              4,
+              6,
+              4,
+              6,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 5,
+            "generated": [
+              0,
+              7,
+              3,
+              5,
+              0,
+              7,
+              3,
+              5
+            ],
+            "target": [
+              0,
+              7,
+              3,
+              5,
+              0,
+              7,
+              3,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 6,
+            "generated": [
+              4,
+              6,
+              4,
+              6,
+              4,
+              6,
+              4,
+              6
+            ],
+            "target": [
+              4,
+              6,
+              4,
+              6,
+              4,
+              6,
+              4,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 7,
+            "generated": [
+              3,
+              5,
+              0,
+              7,
+              3,
+              5,
+              0,
+              7
+            ],
+            "target": [
+              3,
+              5,
+              0,
+              7,
+              3,
+              5,
+              0,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 0,
+            "generated": [
+              7,
+              1,
+              0,
+              7,
+              1,
+              0,
+              7,
+              1
+            ],
+            "target": [
+              7,
+              1,
+              0,
+              7,
+              1,
+              0,
+              7,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 1,
+            "generated": [
+              0,
+              7,
+              1,
+              0,
+              7,
+              1,
+              0,
+              7
+            ],
+            "target": [
+              0,
+              7,
+              1,
+              0,
+              7,
+              1,
+              0,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 2,
+            "generated": [
+              5,
+              4,
+              3,
+              2,
+              5,
+              4,
+              3,
+              2
+            ],
+            "target": [
+              5,
+              4,
+              3,
+              2,
+              5,
+              4,
+              3,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 3,
+            "generated": [
+              2,
+              5,
+              4,
+              3,
+              2,
+              5,
+              4,
+              3
+            ],
+            "target": [
+              2,
+              5,
+              4,
+              3,
+              2,
+              5,
+              4,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 4,
+            "generated": [
+              3,
+              2,
+              5,
+              4,
+              3,
+              2,
+              5,
+              4
+            ],
+            "target": [
+              3,
+              2,
+              5,
+              4,
+              3,
+              2,
+              5,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 5,
+            "generated": [
+              4,
+              3,
+              2,
+              5,
+              4,
+              3,
+              2,
+              5
+            ],
+            "target": [
+              4,
+              3,
+              2,
+              5,
+              4,
+              3,
+              2,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 6,
+            "generated": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              7,
+              1,
+              0
+            ],
+            "target": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "exact": false,
+            "prefix_tokens": 5
+          },
+          {
+            "context": "C",
+            "start": 7,
+            "generated": [
+              1,
+              0,
+              7,
+              1,
+              0,
+              7,
+              1,
+              0
+            ],
+            "target": [
+              1,
+              0,
+              7,
+              1,
+              0,
+              7,
+              1,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 0,
+            "generated": [
+              4,
+              5,
+              0,
+              4,
+              5,
+              0,
+              4,
+              5
+            ],
+            "target": [
+              4,
+              5,
+              0,
+              4,
+              5,
+              0,
+              4,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 1,
+            "generated": [
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1
+            ],
+            "target": [
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 2,
+            "generated": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              7,
+              7,
+              7
+            ],
+            "target": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "exact": false,
+            "prefix_tokens": 5
+          },
+          {
+            "context": "D",
+            "start": 3,
+            "generated": [
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3
+            ],
+            "target": [
+              1,
+              3,
+              1,
+              3,
+              1,
+              3,
+              1,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 4,
+            "generated": [
+              5,
+              0,
+              4,
+              5,
+              0,
+              4,
+              5,
+              0
+            ],
+            "target": [
+              5,
+              0,
+              4,
+              5,
+              0,
+              4,
+              5,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 5,
+            "generated": [
+              0,
+              4,
+              5,
+              0,
+              4,
+              5,
+              0,
+              4
+            ],
+            "target": [
+              0,
+              4,
+              5,
+              0,
+              4,
+              5,
+              0,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 6,
+            "generated": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              4,
+              5
+            ],
+            "target": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "exact": false,
+            "prefix_tokens": 6
+          },
+          {
+            "context": "D",
+            "start": 7,
+            "generated": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              1,
+              3,
+              1
+            ],
+            "target": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "exact": false,
+            "prefix_tokens": 5
+          }
+        ]
+      },
+      "old_after_new_context": {
+        "A": {
+          "accuracy": 0.96875,
+          "cross_entropy": 0.16963028283271603,
+          "confidence": 0.8803101100754764
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07581454670791671,
+          "confidence": 0.9286456440378819
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0966398506955956,
+          "confidence": 0.9111765384437169
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0699544075932168,
+          "confidence": 0.9334425520085043
+        }
+      },
+      "new_rule": {
+        "A_v2": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08421755857140932,
+          "confidence": 0.9203765761522282
+        }
+      },
+      "same_context_conflict": {
+        "new_A": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 0.07545522609399832,
+            "confidence": 0.929383891945419
+          }
+        },
+        "old_A": {
+          "A": {
+            "accuracy": 0.359375,
+            "cross_entropy": 3.345087017765411,
+            "confidence": 0.9302647045063632
+          }
+        }
+      },
+      "idle_metrics": {
+        "external_events_delta": 0,
+        "teacher_feedback_delta": 0,
+        "replay_updates": 419,
+        "consolidations": 250,
+        "core_motion": 1.5884541210981318,
+        "physical_W_motion": 1.1863597110313455,
+        "path_length": 126.5631809427855
+      },
+      "encoder_delta_norm": 0.001212886800940292,
+      "status": {
+        "logical_initializations": 1,
+        "predictions": 4216,
+        "feedback": 3000,
+        "idle_ticks": 10000,
+        "ticks": 94320,
+        "replay_updates": 419,
+        "consolidations": 2358,
+        "new_contexts": 5,
+        "expired_eligibility": 960,
+        "encoder_update_norm": 0.012516602758416647,
+        "readout_update_norm": 656.4983237239635,
+        "core_path_length": 3417.5930176948445,
+        "external_events": 4216,
+        "core_resets": 0,
+        "replay_proposals": 500,
+        "replay_rejections": 81,
+        "guard_anchor_evaluations": 1600,
+        "clock": 94320,
+        "event_id": 4216,
+        "contexts": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "A_v2"
+        ],
+        "memory_items": 320,
+        "pending_feedback": 256,
+        "finite": true,
+        "max_abs_state": 2.18150726410848,
+        "physical_energy": -0.4339125483624797,
+        "subdivisions": 394,
+        "encoder_norm": 9.731509077864464,
+        "fast_norm": 0.0005199767634888042,
+        "slow_norm": 95.38101116576442
+      },
+      "all_feedback_follows_prediction": true
+    }
+  },
+  {
+    "seed": 701,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415034004574,
+            "confidence": 0.12500000478492246
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794386556723,
+            "confidence": 0.12500036075149507
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0791947864651843,
+            "confidence": 0.12503084851717766
+          },
+          "D": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.060535416710095,
+            "confidence": 0.1273877901749062
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 50240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.014978524005343139,
+          "readout_update_norm": 790.9907147805791,
+          "core_path_length": 2042.3319148229834,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 50240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.274453483788727,
+          "physical_energy": -0.2640876613525691,
+          "subdivisions": 376,
+          "encoder_norm": 9.138072745785971,
+          "fast_norm": 0.05380049034584839,
+          "slow_norm": 0.0
+        }
+      },
+      "naive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.78125,
+            "cross_entropy": 1.8465340805102464,
+            "confidence": 0.16030398916024152
+          },
+          "B": {
+            "accuracy": 0.75,
+            "cross_entropy": 1.9751688048087779,
+            "confidence": 0.14005841141344993
+          },
+          "C": {
+            "accuracy": 0.8125,
+            "cross_entropy": 2.0170531538816467,
+            "confidence": 0.13373001388042563
+          },
+          "D": {
+            "accuracy": 0.875,
+            "cross_entropy": 2.0441326582689836,
+            "confidence": 0.12968318553684466
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.014978524005343139,
+          "readout_update_norm": 879.8641554907053,
+          "core_path_length": 2170.013300135026,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.2744535107049346,
+          "physical_energy": -0.2640878312867345,
+          "subdivisions": 375,
+          "encoder_norm": 9.138072745785971,
+          "fast_norm": 0.4479326314841541,
+          "slow_norm": 0.0
+        }
+      },
+      "guarded": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415414197935,
+            "confidence": 0.12500000003250528
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441522259098,
+            "confidence": 0.1250000024275923
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079439881089686,
+            "confidence": 0.1250002075739551
+          },
+          "D": {
+            "accuracy": 0.671875,
+            "cross_entropy": 2.0782041907147093,
+            "confidence": 0.12517278104486593
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 25,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.014978524005343139,
+          "readout_update_norm": 795.5308389708183,
+          "core_path_length": 2170.013300135026,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 475,
+          "guard_anchor_evaluations": 1600,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.2744535107049346,
+          "physical_energy": -0.2640878312867345,
+          "subdivisions": 375,
+          "encoder_norm": 9.138072745785971,
+          "fast_norm": 0.0043641894998497684,
+          "slow_norm": 0.0
+        }
+      },
+      "no_replay": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415414210397,
+            "confidence": 0.12500000003234948
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415222593745,
+            "confidence": 0.12500000242755765
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794398810894617,
+            "confidence": 0.12500020757398314
+          },
+          "D": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0793140459413837,
+            "confidence": 0.12501594148307574
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.014978524005343139,
+          "readout_update_norm": 790.9907147805791,
+          "core_path_length": 2046.0335576326495,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 2.2744535165036632,
+          "physical_energy": -0.2640878768831083,
+          "subdivisions": 374,
+          "encoder_norm": 9.138072745785971,
+          "fast_norm": 0.00036205185358712775,
+          "slow_norm": 0.0
+        }
+      }
+    },
+    "full_guarded_life": {
+      "seed": 701,
+      "variant": "guarded_PQT",
+      "config": {
+        "seed": 701,
+        "core": "pqt",
+        "cells": 6,
+        "alphabet": 8,
+        "h": 0.01,
+        "integration_substeps": 1,
+        "event_ticks": 20,
+        "input_gain": 2.0,
+        "learning_rate": 0.8,
+        "input_learning_rate": 1e-05,
+        "fast_decay": 0.0005,
+        "consolidation_rate": 0.08,
+        "consolidation_period": 40,
+        "replay_period": 20,
+        "replay_capacity": 64,
+        "learning": true,
+        "replay": true,
+        "consolidation": true,
+        "reset_core": false,
+        "context_gates": true,
+        "internal_drive": true,
+        "guarded_replay": true
+      },
+      "seconds": 47.045730000012554,
+      "stages": [
+        {
+          "stage": "learn_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.77,
+          "last100": 1.0,
+          "overall": 0.954,
+          "events_to_rolling100_90pct": 115
+        },
+        {
+          "stage": "learn_B",
+          "context": "B",
+          "n": 500,
+          "first100": 0.8,
+          "last100": 1.0,
+          "overall": 0.96,
+          "events_to_rolling100_90pct": 119
+        },
+        {
+          "stage": "learn_C",
+          "context": "C",
+          "n": 500,
+          "first100": 0.87,
+          "last100": 1.0,
+          "overall": 0.974,
+          "events_to_rolling100_90pct": 104
+        },
+        {
+          "stage": "learn_D",
+          "context": "D",
+          "n": 500,
+          "first100": 0.83,
+          "last100": 1.0,
+          "overall": 0.966,
+          "events_to_rolling100_90pct": 110
+        },
+        {
+          "stage": "new_version_A",
+          "context": "A_v2",
+          "n": 500,
+          "first100": 0.8,
+          "last100": 1.0,
+          "overall": 0.956,
+          "events_to_rolling100_90pct": 113
+        },
+        {
+          "stage": "unannounced_overwrite_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.36,
+          "last100": 1.0,
+          "overall": 0.846,
+          "events_to_rolling100_90pct": 206
+        }
+      ],
+      "before_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0710931720555654,
+          "confidence": 0.9325899070478894
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.09313814266176015,
+          "confidence": 0.9131722928431005
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0702227892360627,
+          "confidence": 0.9335537277212732
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.05831688736779587,
+          "confidence": 0.9437952366565241
+        }
+      },
+      "paired_noidle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0851419137617404,
+          "confidence": 0.9207054287905658
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0862649347851816,
+          "confidence": 0.9184053675517768
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.062207509475466494,
+          "confidence": 0.940523397706428
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08196277429068344,
+          "confidence": 0.9223605864515192
+        }
+      },
+      "after_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07718766355469425,
+          "confidence": 0.9277533056209919
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08127479692826253,
+          "confidence": 0.9228869607830599
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.05883841090663228,
+          "confidence": 0.9436057574629588
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07800618740422627,
+          "confidence": 0.9259658963703656
+        }
+      },
+      "generation": {
+        "exact_match": 0.90625,
+        "rows": [
+          {
+            "context": "A",
+            "start": 0,
+            "generated": [
+              6,
+              2,
+              5,
+              7,
+              0,
+              6,
+              2,
+              5
+            ],
+            "target": [
+              6,
+              2,
+              5,
+              7,
+              0,
+              6,
+              2,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 1,
+            "generated": [
+              4,
+              3,
+              1,
+              4,
+              3,
+              1,
+              4,
+              3
+            ],
+            "target": [
+              4,
+              3,
+              1,
+              4,
+              3,
+              1,
+              4,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 2,
+            "generated": [
+              5,
+              7,
+              0,
+              6,
+              2,
+              5,
+              7,
+              0
+            ],
+            "target": [
+              5,
+              7,
+              0,
+              6,
+              2,
+              5,
+              7,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 3,
+            "generated": [
+              1,
+              4,
+              3,
+              1,
+              4,
+              3,
+              1,
+              4
+            ],
+            "target": [
+              1,
+              4,
+              3,
+              1,
+              4,
+              3,
+              1,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 4,
+            "generated": [
+              3,
+              1,
+              4,
+              3,
+              1,
+              4,
+              3,
+              1
+            ],
+            "target": [
+              3,
+              1,
+              4,
+              3,
+              1,
+              4,
+              3,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 5,
+            "generated": [
+              7,
+              0,
+              6,
+              2,
+              5,
+              7,
+              0,
+              6
+            ],
+            "target": [
+              7,
+              0,
+              6,
+              2,
+              5,
+              7,
+              0,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 6,
+            "generated": [
+              2,
+              5,
+              7,
+              0,
+              6,
+              2,
+              5,
+              7
+            ],
+            "target": [
+              2,
+              5,
+              7,
+              0,
+              6,
+              2,
+              5,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 7,
+            "generated": [
+              0,
+              6,
+              2,
+              5,
+              7,
+              0,
+              6,
+              2
+            ],
+            "target": [
+              0,
+              6,
+              2,
+              5,
+              7,
+              0,
+              6,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 0,
+            "generated": [
+              7,
+              2,
+              5,
+              4,
+              3,
+              6,
+              1,
+              0
+            ],
+            "target": [
+              7,
+              2,
+              5,
+              4,
+              3,
+              6,
+              1,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 1,
+            "generated": [
+              0,
+              7,
+              2,
+              5,
+              4,
+              3,
+              6,
+              1
+            ],
+            "target": [
+              0,
+              7,
+              2,
+              5,
+              4,
+              3,
+              6,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 2,
+            "generated": [
+              5,
+              4,
+              3,
+              6,
+              1,
+              0,
+              7,
+              2
+            ],
+            "target": [
+              5,
+              4,
+              3,
+              6,
+              1,
+              0,
+              7,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 3,
+            "generated": [
+              6,
+              1,
+              0,
+              7,
+              2,
+              5,
+              4,
+              3
+            ],
+            "target": [
+              6,
+              1,
+              0,
+              7,
+              2,
+              5,
+              4,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 4,
+            "generated": [
+              3,
+              6,
+              1,
+              0,
+              7,
+              2,
+              5,
+              4
+            ],
+            "target": [
+              3,
+              6,
+              1,
+              0,
+              7,
+              2,
+              5,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 5,
+            "generated": [
+              4,
+              3,
+              6,
+              1,
+              0,
+              7,
+              2,
+              5
+            ],
+            "target": [
+              4,
+              3,
+              6,
+              1,
+              0,
+              7,
+              2,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 6,
+            "generated": [
+              1,
+              0,
+              7,
+              2,
+              5,
+              4,
+              3,
+              6
+            ],
+            "target": [
+              1,
+              0,
+              7,
+              2,
+              5,
+              4,
+              3,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 7,
+            "generated": [
+              2,
+              5,
+              4,
+              3,
+              6,
+              1,
+              0,
+              7
+            ],
+            "target": [
+              2,
+              5,
+              4,
+              3,
+              6,
+              1,
+              0,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 0,
+            "generated": [
+              6,
+              1,
+              5,
+              0,
+              6,
+              1,
+              5,
+              0
+            ],
+            "target": [
+              6,
+              1,
+              5,
+              0,
+              6,
+              1,
+              5,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 1,
+            "generated": [
+              5,
+              0,
+              6,
+              1,
+              5,
+              0,
+              6,
+              1
+            ],
+            "target": [
+              5,
+              0,
+              6,
+              1,
+              5,
+              0,
+              6,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 2,
+            "generated": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "target": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 3,
+            "generated": [
+              3,
+              3,
+              3,
+              3,
+              4,
+              7,
+              4,
+              7
+            ],
+            "target": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "exact": false,
+            "prefix_tokens": 4
+          },
+          {
+            "context": "C",
+            "start": 4,
+            "generated": [
+              7,
+              4,
+              7,
+              4,
+              7,
+              4,
+              7,
+              4
+            ],
+            "target": [
+              7,
+              4,
+              7,
+              4,
+              7,
+              4,
+              7,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 5,
+            "generated": [
+              0,
+              6,
+              1,
+              5,
+              0,
+              6,
+              1,
+              5
+            ],
+            "target": [
+              0,
+              6,
+              1,
+              5,
+              0,
+              6,
+              1,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 6,
+            "generated": [
+              1,
+              5,
+              0,
+              6,
+              1,
+              5,
+              0,
+              6
+            ],
+            "target": [
+              1,
+              5,
+              0,
+              6,
+              1,
+              5,
+              0,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 7,
+            "generated": [
+              4,
+              7,
+              4,
+              7,
+              4,
+              7,
+              4,
+              7
+            ],
+            "target": [
+              4,
+              7,
+              4,
+              7,
+              4,
+              7,
+              4,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 0,
+            "generated": [
+              7,
+              3,
+              0,
+              7,
+              3,
+              0,
+              7,
+              3
+            ],
+            "target": [
+              7,
+              3,
+              0,
+              7,
+              3,
+              0,
+              7,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 1,
+            "generated": [
+              1,
+              1,
+              1,
+              1,
+              4,
+              2,
+              4,
+              2
+            ],
+            "target": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "exact": false,
+            "prefix_tokens": 4
+          },
+          {
+            "context": "D",
+            "start": 2,
+            "generated": [
+              4,
+              2,
+              4,
+              2,
+              4,
+              2,
+              4,
+              2
+            ],
+            "target": [
+              4,
+              2,
+              4,
+              2,
+              4,
+              2,
+              4,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 3,
+            "generated": [
+              0,
+              7,
+              3,
+              0,
+              7,
+              3,
+              0,
+              7
+            ],
+            "target": [
+              0,
+              7,
+              3,
+              0,
+              7,
+              3,
+              0,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 4,
+            "generated": [
+              2,
+              4,
+              2,
+              4,
+              2,
+              4,
+              2,
+              4
+            ],
+            "target": [
+              2,
+              4,
+              2,
+              4,
+              2,
+              4,
+              2,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 5,
+            "generated": [
+              5,
+              5,
+              5,
+              1,
+              1,
+              1,
+              3,
+              0
+            ],
+            "target": [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "exact": false,
+            "prefix_tokens": 3
+          },
+          {
+            "context": "D",
+            "start": 6,
+            "generated": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "target": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 7,
+            "generated": [
+              3,
+              0,
+              7,
+              3,
+              0,
+              7,
+              3,
+              0
+            ],
+            "target": [
+              3,
+              0,
+              7,
+              3,
+              0,
+              7,
+              3,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          }
+        ]
+      },
+      "old_after_new_context": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07916309833662648,
+          "confidence": 0.9251822811458439
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08330373836061034,
+          "confidence": 0.9216262642310398
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0743775958576566,
+          "confidence": 0.9294810633940893
+        },
+        "D": {
+          "accuracy": 0.96875,
+          "cross_entropy": 0.1283320432619846,
+          "confidence": 0.9084847279909151
+        }
+      },
+      "new_rule": {
+        "A_v2": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10282289259943053,
+          "confidence": 0.9073863525709973
+        }
+      },
+      "same_context_conflict": {
+        "new_A": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 0.08242252976963477,
+            "confidence": 0.9234584093746674
+          }
+        },
+        "old_A": {
+          "A": {
+            "accuracy": 0.0,
+            "cross_entropy": 4.323721925944408,
+            "confidence": 0.9215948626880213
+          }
+        }
+      },
+      "idle_metrics": {
+        "external_events_delta": 0,
+        "teacher_feedback_delta": 0,
+        "replay_updates": 437,
+        "consolidations": 250,
+        "core_motion": 1.1757054413243702,
+        "physical_W_motion": 0.9161794782917473,
+        "path_length": 127.85625157266463
+      },
+      "encoder_delta_norm": 0.0011358444998599366,
+      "status": {
+        "logical_initializations": 1,
+        "predictions": 4216,
+        "feedback": 3000,
+        "idle_ticks": 10000,
+        "ticks": 94320,
+        "replay_updates": 437,
+        "consolidations": 2358,
+        "new_contexts": 5,
+        "expired_eligibility": 960,
+        "encoder_update_norm": 0.012013021435838687,
+        "readout_update_norm": 647.6098416269316,
+        "core_path_length": 3565.5933368052306,
+        "external_events": 4216,
+        "core_resets": 0,
+        "replay_proposals": 500,
+        "replay_rejections": 63,
+        "guard_anchor_evaluations": 1600,
+        "clock": 94320,
+        "event_id": 4216,
+        "contexts": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "A_v2"
+        ],
+        "memory_items": 320,
+        "pending_feedback": 256,
+        "finite": true,
+        "max_abs_state": 2.2828088482889646,
+        "physical_energy": -0.09660834783949168,
+        "subdivisions": 632,
+        "encoder_norm": 9.138129454825156,
+        "fast_norm": 0.00047298708110923236,
+        "slow_norm": 93.64330779572819
+      },
+      "all_feedback_follows_prediction": true
+    }
+  },
+  {
+    "seed": 703,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441503515147,
+            "confidence": 0.1250000047705862
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794387340257408,
+            "confidence": 0.12500035095729858
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0792258696707204,
+            "confidence": 0.12502696208747494
+          },
+          "D": {
+            "accuracy": 0.96875,
+            "cross_entropy": 2.060809633678182,
+            "confidence": 0.1273593496770835
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 50240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.014847678669833957,
+          "readout_update_norm": 829.0646438941659,
+          "core_path_length": 1886.0045249025827,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 50240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.411219570844583,
+          "physical_energy": -3.212220640233251,
+          "subdivisions": 1241,
+          "encoder_norm": 9.477833228445444,
+          "fast_norm": 0.053820665775218275,
+          "slow_norm": 0.0
+        }
+      },
+      "naive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.765625,
+            "cross_entropy": 1.8428003596383058,
+            "confidence": 0.16109104056608117
+          },
+          "B": {
+            "accuracy": 0.640625,
+            "cross_entropy": 1.998662187825008,
+            "confidence": 0.13740116120747023
+          },
+          "C": {
+            "accuracy": 0.59375,
+            "cross_entropy": 2.0216451886322093,
+            "confidence": 0.1343047900663348
+          },
+          "D": {
+            "accuracy": 0.78125,
+            "cross_entropy": 2.04240218255147,
+            "confidence": 0.13002062716796572
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.014847678669833957,
+          "readout_update_norm": 917.7420505472585,
+          "core_path_length": 2001.3129911205183,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4112195730191632,
+          "physical_energy": -3.2122202836525307,
+          "subdivisions": 1241,
+          "encoder_norm": 9.477833228445444,
+          "fast_norm": 0.4486498506391472,
+          "slow_norm": 0.0
+        }
+      },
+      "guarded": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441541424271,
+            "confidence": 0.1250000000319456
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415227842715,
+            "confidence": 0.12500000236194558
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794400902874597,
+            "confidence": 0.12500018142418678
+          },
+          "D": {
+            "accuracy": 0.71875,
+            "cross_entropy": 2.0685069338814657,
+            "confidence": 0.12653893359419185
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 35,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.014847678669833957,
+          "readout_update_norm": 835.4544518746741,
+          "core_path_length": 2001.3129911205183,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 500,
+          "replay_rejections": 465,
+          "guard_anchor_evaluations": 1600,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4112195730191632,
+          "physical_energy": -3.2122202836525307,
+          "subdivisions": 1241,
+          "encoder_norm": 9.477833228445444,
+          "fast_norm": 0.03850295445341026,
+          "slow_norm": 0.0
+        }
+      },
+      "no_replay": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441541425303,
+            "confidence": 0.1250000000318166
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415227839362,
+            "confidence": 0.1250000023619875
+          },
+          "C": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794400902832386,
+            "confidence": 0.12500018142471442
+          },
+          "D": {
+            "accuracy": 0.96875,
+            "cross_entropy": 2.0793159066956344,
+            "confidence": 0.12501575183203023
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.014847678669833957,
+          "readout_update_norm": 829.0646438941659,
+          "core_path_length": 1889.6894647622764,
+          "external_events": 2512,
+          "core_resets": 0,
+          "replay_proposals": 0,
+          "replay_rejections": 0,
+          "guard_anchor_evaluations": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4112195712078472,
+          "physical_energy": -3.2122219247228285,
+          "subdivisions": 1241,
+          "encoder_norm": 9.477833228445444,
+          "fast_norm": 0.00036218762468425607,
+          "slow_norm": 0.0
+        }
+      }
+    },
+    "full_guarded_life": {
+      "seed": 703,
+      "variant": "guarded_PQT",
+      "config": {
+        "seed": 703,
+        "core": "pqt",
+        "cells": 6,
+        "alphabet": 8,
+        "h": 0.01,
+        "integration_substeps": 1,
+        "event_ticks": 20,
+        "input_gain": 2.0,
+        "learning_rate": 0.8,
+        "input_learning_rate": 1e-05,
+        "fast_decay": 0.0005,
+        "consolidation_rate": 0.08,
+        "consolidation_period": 40,
+        "replay_period": 20,
+        "replay_capacity": 64,
+        "learning": true,
+        "replay": true,
+        "consolidation": true,
+        "reset_core": false,
+        "context_gates": true,
+        "internal_drive": true,
+        "guarded_replay": true
+      },
+      "seconds": 48.760268999962136,
+      "stages": [
+        {
+          "stage": "learn_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.77,
+          "last100": 1.0,
+          "overall": 0.954,
+          "events_to_rolling100_90pct": 119
+        },
+        {
+          "stage": "learn_B",
+          "context": "B",
+          "n": 500,
+          "first100": 0.84,
+          "last100": 1.0,
+          "overall": 0.964,
+          "events_to_rolling100_90pct": 108
+        },
+        {
+          "stage": "learn_C",
+          "context": "C",
+          "n": 500,
+          "first100": 0.82,
+          "last100": 1.0,
+          "overall": 0.96,
+          "events_to_rolling100_90pct": 115
+        },
+        {
+          "stage": "learn_D",
+          "context": "D",
+          "n": 500,
+          "first100": 0.8,
+          "last100": 1.0,
+          "overall": 0.96,
+          "events_to_rolling100_90pct": 113
+        },
+        {
+          "stage": "new_version_A",
+          "context": "A_v2",
+          "n": 500,
+          "first100": 0.84,
+          "last100": 1.0,
+          "overall": 0.964,
+          "events_to_rolling100_90pct": 110
+        },
+        {
+          "stage": "unannounced_overwrite_A",
+          "context": "A",
+          "n": 500,
+          "first100": 0.45,
+          "last100": 0.99,
+          "overall": 0.864,
+          "events_to_rolling100_90pct": 204
+        }
+      ],
+      "before_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10355932337122323,
+          "confidence": 0.9052166956353569
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.12966928455240756,
+          "confidence": 0.8833422725789316
+        },
+        "C": {
+          "accuracy": 0.96875,
+          "cross_entropy": 0.1724295504021755,
+          "confidence": 0.8608055573250497
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.0879972365763996,
+          "confidence": 0.9172914916771207
+        }
+      },
+      "paired_noidle": {
+        "A": {
+          "accuracy": 0.984375,
+          "cross_entropy": 0.10017180571224454,
+          "confidence": 0.9118757664684077
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.11416680686556983,
+          "confidence": 0.8960835339124926
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.13725285533721185,
+          "confidence": 0.8820073115153353
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.08298715570733206,
+          "confidence": 0.9222839626044672
+        }
+      },
+      "after_idle": {
+        "A": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.10057259534763574,
+          "confidence": 0.9112266801949002
+        },
+        "B": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.11021819552490916,
+          "confidence": 0.8994247217482227
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.1308207343960619,
+          "confidence": 0.8867660281646609
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.07838782709541905,
+          "confidence": 0.9263134997588608
+        }
+      },
+      "generation": {
+        "exact_match": 0.875,
+        "rows": [
+          {
+            "context": "A",
+            "start": 0,
+            "generated": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "target": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 1,
+            "generated": [
+              6,
+              7,
+              3,
+              4,
+              2,
+              5,
+              1,
+              6
+            ],
+            "target": [
+              6,
+              7,
+              3,
+              4,
+              2,
+              5,
+              1,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 2,
+            "generated": [
+              5,
+              1,
+              6,
+              7,
+              3,
+              4,
+              2,
+              5
+            ],
+            "target": [
+              5,
+              1,
+              6,
+              7,
+              3,
+              4,
+              2,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 3,
+            "generated": [
+              4,
+              2,
+              5,
+              1,
+              6,
+              7,
+              3,
+              4
+            ],
+            "target": [
+              4,
+              2,
+              5,
+              1,
+              6,
+              7,
+              3,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 4,
+            "generated": [
+              2,
+              5,
+              1,
+              6,
+              7,
+              3,
+              4,
+              2
+            ],
+            "target": [
+              2,
+              5,
+              1,
+              6,
+              7,
+              3,
+              4,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 5,
+            "generated": [
+              1,
+              6,
+              7,
+              3,
+              4,
+              2,
+              5,
+              1
+            ],
+            "target": [
+              1,
+              6,
+              7,
+              3,
+              4,
+              2,
+              5,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 6,
+            "generated": [
+              7,
+              3,
+              4,
+              2,
+              5,
+              1,
+              6,
+              7
+            ],
+            "target": [
+              7,
+              3,
+              4,
+              2,
+              5,
+              1,
+              6,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "A",
+            "start": 7,
+            "generated": [
+              3,
+              4,
+              2,
+              5,
+              1,
+              6,
+              7,
+              3
+            ],
+            "target": [
+              3,
+              4,
+              2,
+              5,
+              1,
+              6,
+              7,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 0,
+            "generated": [
+              0,
+              0,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "target": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": false,
+            "prefix_tokens": 2
+          },
+          {
+            "context": "B",
+            "start": 1,
+            "generated": [
+              4,
+              1,
+              4,
+              1,
+              4,
+              1,
+              4,
+              1
+            ],
+            "target": [
+              4,
+              1,
+              4,
+              1,
+              4,
+              1,
+              4,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 2,
+            "generated": [
+              7,
+              6,
+              5,
+              2,
+              7,
+              6,
+              5,
+              2
+            ],
+            "target": [
+              7,
+              6,
+              5,
+              2,
+              7,
+              6,
+              5,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 3,
+            "generated": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              0
+            ],
+            "target": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "exact": false,
+            "prefix_tokens": 7
+          },
+          {
+            "context": "B",
+            "start": 4,
+            "generated": [
+              1,
+              4,
+              1,
+              4,
+              1,
+              4,
+              1,
+              4
+            ],
+            "target": [
+              1,
+              4,
+              1,
+              4,
+              1,
+              4,
+              1,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 5,
+            "generated": [
+              2,
+              7,
+              6,
+              5,
+              2,
+              7,
+              6,
+              5
+            ],
+            "target": [
+              2,
+              7,
+              6,
+              5,
+              2,
+              7,
+              6,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 6,
+            "generated": [
+              5,
+              2,
+              7,
+              6,
+              5,
+              2,
+              7,
+              6
+            ],
+            "target": [
+              5,
+              2,
+              7,
+              6,
+              5,
+              2,
+              7,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "B",
+            "start": 7,
+            "generated": [
+              6,
+              5,
+              2,
+              7,
+              6,
+              5,
+              2,
+              7
+            ],
+            "target": [
+              6,
+              5,
+              2,
+              7,
+              6,
+              5,
+              2,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 0,
+            "generated": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "target": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 1,
+            "generated": [
+              2,
+              4,
+              5,
+              7,
+              3,
+              1,
+              2,
+              4
+            ],
+            "target": [
+              2,
+              4,
+              5,
+              7,
+              3,
+              1,
+              2,
+              4
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 2,
+            "generated": [
+              4,
+              5,
+              7,
+              3,
+              1,
+              2,
+              4,
+              5
+            ],
+            "target": [
+              4,
+              5,
+              7,
+              3,
+              1,
+              2,
+              4,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 3,
+            "generated": [
+              1,
+              2,
+              4,
+              5,
+              7,
+              3,
+              1,
+              2
+            ],
+            "target": [
+              1,
+              2,
+              4,
+              5,
+              7,
+              3,
+              1,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 4,
+            "generated": [
+              5,
+              7,
+              3,
+              1,
+              2,
+              4,
+              5,
+              7
+            ],
+            "target": [
+              5,
+              7,
+              3,
+              1,
+              2,
+              4,
+              5,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 5,
+            "generated": [
+              7,
+              3,
+              1,
+              2,
+              4,
+              5,
+              7,
+              3
+            ],
+            "target": [
+              7,
+              3,
+              1,
+              2,
+              4,
+              5,
+              7,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "C",
+            "start": 6,
+            "generated": [
+              6,
+              6,
+              6,
+              1,
+              2,
+              4,
+              5,
+              7
+            ],
+            "target": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "exact": false,
+            "prefix_tokens": 3
+          },
+          {
+            "context": "C",
+            "start": 7,
+            "generated": [
+              3,
+              1,
+              2,
+              4,
+              5,
+              7,
+              3,
+              1
+            ],
+            "target": [
+              3,
+              1,
+              2,
+              4,
+              5,
+              7,
+              3,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 0,
+            "generated": [
+              3,
+              2,
+              0,
+              3,
+              2,
+              0,
+              3,
+              2
+            ],
+            "target": [
+              3,
+              2,
+              0,
+              3,
+              2,
+              0,
+              3,
+              2
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 1,
+            "generated": [
+              6,
+              5,
+              1,
+              6,
+              5,
+              1,
+              6,
+              5
+            ],
+            "target": [
+              6,
+              5,
+              1,
+              6,
+              5,
+              1,
+              6,
+              5
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 2,
+            "generated": [
+              0,
+              3,
+              2,
+              0,
+              3,
+              2,
+              0,
+              3
+            ],
+            "target": [
+              0,
+              3,
+              2,
+              0,
+              3,
+              2,
+              0,
+              3
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 3,
+            "generated": [
+              2,
+              0,
+              3,
+              2,
+              0,
+              3,
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0,
+              3,
+              2,
+              0,
+              3,
+              2,
+              0
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 4,
+            "generated": [
+              4,
+              4,
+              4,
+              4,
+              3,
+              2,
+              0,
+              3
+            ],
+            "target": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "exact": false,
+            "prefix_tokens": 4
+          },
+          {
+            "context": "D",
+            "start": 5,
+            "generated": [
+              1,
+              6,
+              5,
+              1,
+              6,
+              5,
+              1,
+              6
+            ],
+            "target": [
+              1,
+              6,
+              5,
+              1,
+              6,
+              5,
+              1,
+              6
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 6,
+            "generated": [
+              5,
+              1,
+              6,
+              5,
+              1,
+              6,
+              5,
+              1
+            ],
+            "target": [
+              5,
+              1,
+              6,
+              5,
+              1,
+              6,
+              5,
+              1
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          },
+          {
+            "context": "D",
+            "start": 7,
+            "generated": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "target": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "exact": true,
+            "prefix_tokens": 8
+          }
+        ]
+      },
+      "old_after_new_context": {
+        "A": {
+          "accuracy": 0.984375,
+          "cross_entropy": 0.17290642497769287,
+          "confidence": 0.8588591617721766
+        },
+        "B": {
+          "accuracy": 0.984375,
+          "cross_entropy": 0.1936678920590391,
+          "confidence": 0.839372687150197
+        },
+        "C": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.1028100774815296,
+          "confidence": 0.9086697172311577
+        },
+        "D": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.13448513438174875,
+          "confidence": 0.8792155958947989
+        }
+      },
+      "new_rule": {
+        "A_v2": {
+          "accuracy": 1.0,
+          "cross_entropy": 0.1058044137306019,
+          "confidence": 0.9043293406564601
+        }
+      },
+      "same_context_conflict": {
+        "new_A": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 0.07622313852311546,
+            "confidence": 0.9280039836839856
+          }
+        },
+        "old_A": {
+          "A": {
+            "accuracy": 0.109375,
+            "cross_entropy": 3.916082737333909,
+            "confidence": 0.928368233336614
+          }
+        }
+      },
+      "idle_metrics": {
+        "external_events_delta": 0,
+        "teacher_feedback_delta": 0,
+        "replay_updates": 423,
+        "consolidations": 250,
+        "core_motion": 1.1400077773961454,
+        "physical_W_motion": 0.8608718100316063,
+        "path_length": 115.6932139971409
+      },
+      "encoder_delta_norm": 0.0012492213910321787,
+      "status": {
+        "logical_initializations": 1,
+        "predictions": 4216,
+        "feedback": 3000,
+        "idle_ticks": 10000,
+        "ticks": 94320,
+        "replay_updates": 423,
+        "consolidations": 2358,
+        "new_contexts": 5,
+        "expired_eligibility": 960,
+        "encoder_update_norm": 0.012311422493052277,
+        "readout_update_norm": 692.217106103808,
+        "core_path_length": 3259.7601686598573,
+        "external_events": 4216,
+        "core_resets": 0,
+        "replay_proposals": 500,
+        "replay_rejections": 77,
+        "guard_anchor_evaluations": 1600,
+        "clock": 94320,
+        "event_id": 4216,
+        "contexts": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "A_v2"
+        ],
+        "memory_items": 320,
+        "pending_feedback": 256,
+        "finite": true,
+        "max_abs_state": 3.3485832750646978,
+        "physical_energy": -3.6837812034410136,
+        "subdivisions": 2034,
+        "encoder_norm": 9.477858090708432,
+        "fast_norm": 0.00046229013142453496,
+        "slow_norm": 96.87109707090225
+      },
+      "all_feedback_follows_prediction": true
+    }
+  }
+]

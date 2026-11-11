@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.tmp
+results/
+long_results/
+temporal_results/
+runtime/
+verification_replay/
+artifact_manifest.json
+GIT_REFERENCE.txt

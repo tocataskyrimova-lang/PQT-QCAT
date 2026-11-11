@@ -1,0 +1,24 @@
+test_adaptive_guard_handles_audit_counterexample (__main__.LifeTests.test_adaptive_guard_handles_audit_counterexample) ... ok
+test_checkpoint_exact_continuation_with_pending_feedback (__main__.LifeTests.test_checkpoint_exact_continuation_with_pending_feedback) ... ok
+test_closed_small_step_energy (__main__.LifeTests.test_closed_small_step_energy) ... ok
+test_consolidation_preserves_current_function (__main__.LifeTests.test_consolidation_preserves_current_function) ... ok
+test_feedback_cannot_be_reused (__main__.LifeTests.test_feedback_cannot_be_reused) ... ok
+test_frozen_control_does_not_change_synapses (__main__.LifeTests.test_frozen_control_does_not_change_synapses) ... ok
+test_generation_uses_previous_output (__main__.LifeTests.test_generation_uses_previous_output) ... ok
+test_guard_rejects_anchor_degrading_update (__main__.LifeTests.test_guard_rejects_anchor_degrading_update) ... ok
+test_guarded_checkpoint_continuation (__main__.LifeTests.test_guarded_checkpoint_continuation) ... ok
+test_idle_has_no_external_event_or_new_teacher (__main__.LifeTests.test_idle_has_no_external_event_or_new_teacher) ... ok
+test_independent_energy_gradient (__main__.LifeTests.test_independent_energy_gradient) ... ok
+test_invalid_inputs_rejected (__main__.LifeTests.test_invalid_inputs_rejected) ... ok
+test_learning_changes_actual_synapses (__main__.LifeTests.test_learning_changes_actual_synapses) ... ok
+test_memory_is_bounded (__main__.LifeTests.test_memory_is_bounded) ... ok
+test_nonfinite_readout_is_not_an_answer (__main__.LifeTests.test_nonfinite_readout_is_not_an_answer) ... ok
+test_state_only_replay_has_activity_without_replay_weight_writes (__main__.LifeTests.test_state_only_replay_has_activity_without_replay_weight_writes) ... ok
+test_state_persists (__main__.LifeTests.test_state_persists) ... ok
+test_substeps_do_not_change_learning_clock (__main__.LifeTests.test_substeps_do_not_change_learning_clock) ... ok
+test_target_is_unavailable_before_prediction (__main__.LifeTests.test_target_is_unavailable_before_prediction) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 1.409s
+
+OK

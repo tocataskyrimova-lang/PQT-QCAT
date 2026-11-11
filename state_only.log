@@ -1,0 +1,3 @@
+STATE ONLY 802 {'no_idle': np.float64(1.0), 'naive': np.float64(0.72265625), 'state_only': np.float64(1.0), 'no_replay': np.float64(1.0)}
+STATE ONLY 803 {'no_idle': np.float64(0.9921875), 'naive': np.float64(0.80078125), 'state_only': np.float64(0.9921875), 'no_replay': np.float64(0.9921875)}
+STATE ONLY 801 {'no_idle': np.float64(1.0), 'naive': np.float64(0.75390625), 'state_only': np.float64(1.0), 'no_replay': np.float64(1.0)}

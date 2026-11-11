@@ -1,0 +1,1043 @@
+[
+  {
+    "seed": 602,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.07944150441522,
+            "confidence": 0.12500000465807715
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794386235185445,
+            "confidence": 0.12500036477073456
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0792036488097008,
+            "confidence": 0.12502975872214106
+          },
+          "D": {
+            "accuracy": 0.96875,
+            "cross_entropy": 2.060854517752861,
+            "confidence": 0.12736716284233668
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 50240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01431151477831708,
+          "readout_update_norm": 812.6506148388223,
+          "core_path_length": 1848.598903293542,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 50240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.068312171671274,
+          "physical_energy": -4.0637950258645565,
+          "subdivisions": 814,
+          "encoder_norm": 8.682542560145219,
+          "fast_norm": 0.05327970367633864,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_on": {
+        "queries": {
+          "A": {
+            "accuracy": 0.859375,
+            "cross_entropy": 1.875119577230976,
+            "confidence": 0.15443319751285195
+          },
+          "B": {
+            "accuracy": 0.8125,
+            "cross_entropy": 1.945035010421139,
+            "confidence": 0.14358325805994457
+          },
+          "C": {
+            "accuracy": 0.78125,
+            "cross_entropy": 2.021890016726922,
+            "confidence": 0.13324466082360426
+          },
+          "D": {
+            "accuracy": 0.875,
+            "cross_entropy": 2.0447186935207498,
+            "confidence": 0.1295484868175173
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01431151477831708,
+          "readout_update_norm": 901.7097268015981,
+          "core_path_length": 1968.207728297067,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.0683121590104316,
+          "physical_energy": -4.063795284933889,
+          "subdivisions": 814,
+          "encoder_norm": 8.682542560145219,
+          "fast_norm": 0.420219883234878,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_off": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441541433216,
+            "confidence": 0.1250000000308275
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415220407467,
+            "confidence": 0.12500000245488618
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.079439940734634,
+            "confidence": 0.125000200241522
+          },
+          "D": {
+            "accuracy": 0.96875,
+            "cross_entropy": 2.0793161668299467,
+            "confidence": 0.12501580669389578
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01431151477831708,
+          "readout_update_norm": 812.6506148388223,
+          "core_path_length": 1852.6243982987176,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.0683121575780827,
+          "physical_energy": -4.063795317080589,
+          "subdivisions": 814,
+          "encoder_norm": 8.682542560145219,
+          "fast_norm": 0.00035854720562188803,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_without_drive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.859375,
+            "cross_entropy": 1.8763374334040883,
+            "confidence": 0.15422046692498204
+          },
+          "B": {
+            "accuracy": 0.8125,
+            "cross_entropy": 1.945032946429204,
+            "confidence": 0.1435839254425788
+          },
+          "C": {
+            "accuracy": 0.78125,
+            "cross_entropy": 2.0218901169345607,
+            "confidence": 0.13324464821755266
+          },
+          "D": {
+            "accuracy": 0.875,
+            "cross_entropy": 2.044718693199533,
+            "confidence": 0.12954848683545173
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01431151477831708,
+          "readout_update_norm": 901.7097268015981,
+          "core_path_length": 1852.6243982987176,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.0683121575780827,
+          "physical_energy": -4.063795317080589,
+          "subdivisions": 814,
+          "encoder_norm": 8.682542560145219,
+          "fast_norm": 0.420219883234878,
+          "slow_norm": 0.0
+        }
+      },
+      "consolidation_enabled": {
+        "queries": {
+          "A": {
+            "accuracy": 0.96875,
+            "cross_entropy": 1.1991628804141583,
+            "confidence": 0.3192438414786598
+          },
+          "B": {
+            "accuracy": 0.921875,
+            "cross_entropy": 1.1177328966998779,
+            "confidence": 0.34603108059752213
+          },
+          "C": {
+            "accuracy": 0.875,
+            "cross_entropy": 1.1846424788563141,
+            "confidence": 0.33489118789401773
+          },
+          "D": {
+            "accuracy": 0.9375,
+            "cross_entropy": 1.1408426366748934,
+            "confidence": 0.32976818033367905
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 378,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01431151477831708,
+          "readout_update_norm": 893.2998879381523,
+          "core_path_length": 1968.207728297067,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.0683121590104316,
+          "physical_energy": -4.063795284933889,
+          "subdivisions": 814,
+          "encoder_norm": 8.682542560145219,
+          "fast_norm": 1.8922146979957456e-06,
+          "slow_norm": 18.92172920082686
+        }
+      },
+      "freeze_core_during_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 0.859375,
+            "cross_entropy": 1.873804315213297,
+            "confidence": 0.15463541461421004
+          },
+          "B": {
+            "accuracy": 0.8125,
+            "cross_entropy": 1.9450387560292406,
+            "confidence": 0.14358122758023523
+          },
+          "C": {
+            "accuracy": 0.78125,
+            "cross_entropy": 2.0218898270683514,
+            "confidence": 0.13324467864704573
+          },
+          "D": {
+            "accuracy": 0.875,
+            "cross_entropy": 2.044718694251461,
+            "confidence": 0.12954848694785814
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01431151477831708,
+          "readout_update_norm": 901.7097268015981,
+          "core_path_length": 1848.598903293542,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.068312171671274,
+          "physical_energy": -4.0637950258645565,
+          "subdivisions": 814,
+          "encoder_norm": 8.682542560145219,
+          "fast_norm": 0.420219883234878,
+          "slow_norm": 0.0
+        }
+      }
+    }
+  },
+  {
+    "seed": 601,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 0.9375,
+            "cross_entropy": 2.079441501282851,
+            "confidence": 0.12500000506815254
+          },
+          "B": {
+            "accuracy": 0.828125,
+            "cross_entropy": 2.0794387680522104,
+            "confidence": 0.12500035501358214
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0792215100261298,
+            "confidence": 0.12502754423980392
+          },
+          "D": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.061571501545161,
+            "confidence": 0.1272607963415232
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 50240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.013917468689591449,
+          "readout_update_norm": 850.564286712408,
+          "core_path_length": 1745.031051618233,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 50240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.472375077969352,
+          "physical_energy": -14.12912898983306,
+          "subdivisions": 2102,
+          "encoder_norm": 9.04364731495252,
+          "fast_norm": 0.05316777974307395,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_on": {
+        "queries": {
+          "A": {
+            "accuracy": 0.546875,
+            "cross_entropy": 1.8594798918363202,
+            "confidence": 0.16479695426189678
+          },
+          "B": {
+            "accuracy": 0.671875,
+            "cross_entropy": 1.9702694621919923,
+            "confidence": 0.14212666807680588
+          },
+          "C": {
+            "accuracy": 0.484375,
+            "cross_entropy": 2.022400108359092,
+            "confidence": 0.13391970635047507
+          },
+          "D": {
+            "accuracy": 0.8125,
+            "cross_entropy": 2.04556836799647,
+            "confidence": 0.12955677041267563
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.013917468689591449,
+          "readout_update_norm": 939.2597046423843,
+          "core_path_length": 1852.9852598578902,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4723750781615212,
+          "physical_energy": -14.129128923723126,
+          "subdivisions": 2102,
+          "encoder_norm": 9.04364731495252,
+          "fast_norm": 0.44168535424339084,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_off": {
+        "queries": {
+          "A": {
+            "accuracy": 0.9375,
+            "cross_entropy": 2.0794415414107608,
+            "confidence": 0.12500000003376882
+          },
+          "B": {
+            "accuracy": 0.828125,
+            "cross_entropy": 2.0794415230160608,
+            "confidence": 0.12500000238893888
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.079440060924753,
+            "confidence": 0.12500018534345286
+          },
+          "D": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.079321002893292,
+            "confidence": 0.12501510467839905
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.013917468689591449,
+          "readout_update_norm": 850.564286712408,
+          "core_path_length": 1748.5245327122045,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4723750778128726,
+          "physical_energy": -14.129128857149727,
+          "subdivisions": 2103,
+          "encoder_norm": 9.04364731495252,
+          "fast_norm": 0.0003577940104885585,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_without_drive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.546875,
+            "cross_entropy": 1.8609300247509115,
+            "confidence": 0.164506645039234
+          },
+          "B": {
+            "accuracy": 0.671875,
+            "cross_entropy": 1.9702729568959678,
+            "confidence": 0.14212569636188305
+          },
+          "C": {
+            "accuracy": 0.484375,
+            "cross_entropy": 2.0224001554183264,
+            "confidence": 0.13391970084402768
+          },
+          "D": {
+            "accuracy": 0.8125,
+            "cross_entropy": 2.0455683669988742,
+            "confidence": 0.12955677054340017
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.013917468689591449,
+          "readout_update_norm": 939.2597046423843,
+          "core_path_length": 1748.5245327122045,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4723750778128726,
+          "physical_energy": -14.129128857149727,
+          "subdivisions": 2103,
+          "encoder_norm": 9.04364731495252,
+          "fast_norm": 0.44168535424339084,
+          "slow_norm": 0.0
+        }
+      },
+      "consolidation_enabled": {
+        "queries": {
+          "A": {
+            "accuracy": 0.75,
+            "cross_entropy": 1.2845402875940162,
+            "confidence": 0.3139667058287724
+          },
+          "B": {
+            "accuracy": 0.71875,
+            "cross_entropy": 1.2901438385621888,
+            "confidence": 0.31709775206611834
+          },
+          "C": {
+            "accuracy": 0.71875,
+            "cross_entropy": 1.2733215448050932,
+            "confidence": 0.31785787382422004
+          },
+          "D": {
+            "accuracy": 0.921875,
+            "cross_entropy": 1.0461684785188965,
+            "confidence": 0.37158100951295514
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 378,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.013917468689591449,
+          "readout_update_norm": 930.120422260435,
+          "core_path_length": 1852.9852598578902,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4723750781615212,
+          "physical_energy": -14.129128923723126,
+          "subdivisions": 2102,
+          "encoder_norm": 9.04364731495252,
+          "fast_norm": 1.7060700386331294e-06,
+          "slow_norm": 19.09485734739176
+        }
+      },
+      "freeze_core_during_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 0.546875,
+            "cross_entropy": 1.8583854375705708,
+            "confidence": 0.16503678971763353
+          },
+          "B": {
+            "accuracy": 0.671875,
+            "cross_entropy": 1.9702746216097617,
+            "confidence": 0.14212703738205718
+          },
+          "C": {
+            "accuracy": 0.484375,
+            "cross_entropy": 2.0224002354384725,
+            "confidence": 0.13391970085209137
+          },
+          "D": {
+            "accuracy": 0.8125,
+            "cross_entropy": 2.045568371885578,
+            "confidence": 0.12955676947315564
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.013917468689591449,
+          "readout_update_norm": 939.2597046423843,
+          "core_path_length": 1745.031051618233,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.472375077969352,
+          "physical_energy": -14.12912898983306,
+          "subdivisions": 2102,
+          "encoder_norm": 9.04364731495252,
+          "fast_norm": 0.44168535424339084,
+          "slow_norm": 0.0
+        }
+      }
+    }
+  },
+  {
+    "seed": 603,
+    "policies": {
+      "no_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.079441501615891,
+            "confidence": 0.1250000050079932
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794384328688893,
+            "confidence": 0.12500038860201557
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0791910547672634,
+            "confidence": 0.12503134985427225
+          },
+          "D": {
+            "accuracy": 0.953125,
+            "cross_entropy": 2.061085468328004,
+            "confidence": 0.12732675352326103
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 0,
+          "ticks": 50240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01269732467109851,
+          "readout_update_norm": 803.5320848600666,
+          "core_path_length": 1559.7229160434952,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 50240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.428604801140494,
+          "physical_energy": -13.104930246813467,
+          "subdivisions": 550,
+          "encoder_norm": 9.459578947996912,
+          "fast_norm": 0.053085084421239284,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_on": {
+        "queries": {
+          "A": {
+            "accuracy": 0.6875,
+            "cross_entropy": 1.8631539480160657,
+            "confidence": 0.15921082800489833
+          },
+          "B": {
+            "accuracy": 0.84375,
+            "cross_entropy": 1.9469127088628844,
+            "confidence": 0.14350635399301964
+          },
+          "C": {
+            "accuracy": 0.734375,
+            "cross_entropy": 2.007652917122049,
+            "confidence": 0.13549380341437073
+          },
+          "D": {
+            "accuracy": 0.484375,
+            "cross_entropy": 2.043275531477541,
+            "confidence": 0.13067474490060405
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01269732467109851,
+          "readout_update_norm": 891.9556901292119,
+          "core_path_length": 1662.2296833359965,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4286047990989705,
+          "physical_energy": -13.104930132299994,
+          "subdivisions": 550,
+          "encoder_norm": 9.459578947996912,
+          "fast_norm": 0.4486746574157701,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_off": {
+        "queries": {
+          "A": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.07944154141616,
+            "confidence": 0.1250000000329595
+          },
+          "B": {
+            "accuracy": 1.0,
+            "cross_entropy": 2.0794415207577797,
+            "confidence": 0.12500000261525707
+          },
+          "C": {
+            "accuracy": 0.984375,
+            "cross_entropy": 2.0794398559774123,
+            "confidence": 0.12500021094734332
+          },
+          "D": {
+            "accuracy": 0.953125,
+            "cross_entropy": 2.0793177452890754,
+            "confidence": 0.12501553661750642
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 0,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01269732467109851,
+          "readout_update_norm": 803.5320848600666,
+          "core_path_length": 1564.1333929096822,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4286047978479637,
+          "physical_energy": -13.104930136743926,
+          "subdivisions": 549,
+          "encoder_norm": 9.459578947996912,
+          "fast_norm": 0.0003572375100856668,
+          "slow_norm": 0.0
+        }
+      },
+      "replay_without_drive": {
+        "queries": {
+          "A": {
+            "accuracy": 0.6875,
+            "cross_entropy": 1.864465142778712,
+            "confidence": 0.1590236807129015
+          },
+          "B": {
+            "accuracy": 0.84375,
+            "cross_entropy": 1.9469106420119184,
+            "confidence": 0.14350663660472018
+          },
+          "C": {
+            "accuracy": 0.734375,
+            "cross_entropy": 2.007652915170396,
+            "confidence": 0.13549380131696315
+          },
+          "D": {
+            "accuracy": 0.484375,
+            "cross_entropy": 2.0432755299355554,
+            "confidence": 0.13067474494268652
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01269732467109851,
+          "readout_update_norm": 891.9556901292119,
+          "core_path_length": 1564.1333929096822,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4286047978479637,
+          "physical_energy": -13.104930136743926,
+          "subdivisions": 549,
+          "encoder_norm": 9.459578947996912,
+          "fast_norm": 0.4486746574157701,
+          "slow_norm": 0.0
+        }
+      },
+      "consolidation_enabled": {
+        "queries": {
+          "A": {
+            "accuracy": 0.953125,
+            "cross_entropy": 1.124381779036446,
+            "confidence": 0.34177673162698197
+          },
+          "B": {
+            "accuracy": 0.875,
+            "cross_entropy": 1.1042104339861472,
+            "confidence": 0.3539581157353978
+          },
+          "C": {
+            "accuracy": 0.9375,
+            "cross_entropy": 1.1459761151261183,
+            "confidence": 0.33648622753491797
+          },
+          "D": {
+            "accuracy": 0.859375,
+            "cross_entropy": 1.0697512676001786,
+            "confidence": 0.37900311781270624
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 378,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01269732467109851,
+          "readout_update_norm": 882.3526020659328,
+          "core_path_length": 1662.2296833359965,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.4286047990989705,
+          "physical_energy": -13.104930132299994,
+          "subdivisions": 550,
+          "encoder_norm": 9.459578947996912,
+          "fast_norm": 1.6693107361919839e-06,
+          "slow_norm": 19.349470272633575
+        }
+      },
+      "freeze_core_during_idle": {
+        "queries": {
+          "A": {
+            "accuracy": 0.6875,
+            "cross_entropy": 1.860779765975907,
+            "confidence": 0.15956467445077724
+          },
+          "B": {
+            "accuracy": 0.84375,
+            "cross_entropy": 1.9469217293127614,
+            "confidence": 0.14350533818857894
+          },
+          "C": {
+            "accuracy": 0.734375,
+            "cross_entropy": 2.007652660589917,
+            "confidence": 0.1354938457871138
+          },
+          "D": {
+            "accuracy": 0.484375,
+            "cross_entropy": 2.0432755264170077,
+            "confidence": 0.1306747452656056
+          }
+        },
+        "status": {
+          "logical_initializations": 1,
+          "predictions": 2512,
+          "feedback": 2000,
+          "idle_ticks": 10000,
+          "ticks": 60240,
+          "replay_updates": 500,
+          "consolidations": 0,
+          "new_contexts": 4,
+          "expired_eligibility": 256,
+          "encoder_update_norm": 0.01269732467109851,
+          "readout_update_norm": 891.9556901292119,
+          "core_path_length": 1559.7229160434952,
+          "external_events": 2512,
+          "core_resets": 0,
+          "clock": 60240,
+          "event_id": 2512,
+          "contexts": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "memory_items": 256,
+          "pending_feedback": 256,
+          "finite": true,
+          "max_abs_state": 3.428604801140494,
+          "physical_energy": -13.104930246813467,
+          "subdivisions": 550,
+          "encoder_norm": 9.459578947996912,
+          "fast_norm": 0.4486746574157701,
+          "slow_norm": 0.0
+        }
+      }
+    }
+  }
+]

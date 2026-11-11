@@ -1,0 +1,10 @@
+long 201 noA last 1.0 finite True seconds 109.5
+long 201 fixed_encoder last 1.0 finite True seconds 171.1
+long 201 PQT last 1.0 finite True seconds 195.0
+long 202 PQT last 0.98 finite True seconds 169.4
+long 202 noA last 1.0 finite True seconds 114.2
+long 202 fixed_encoder last 0.98 finite True seconds 189.7
+long 203 noA last 1.0 finite True seconds 111.2
+long 203 PQT last 0.99 finite True seconds 159.9
+long 203 fixed_encoder last 0.99 finite True seconds 168.7
+COMPLETE 9

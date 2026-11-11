@@ -1,0 +1,3 @@
+GUARDED 702 {'no_idle': np.float64(0.99609375), 'naive': np.float64(0.78515625), 'guarded': np.float64(0.96484375), 'no_replay': np.float64(0.9921875)}
+GUARDED 701 {'no_idle': np.float64(0.99609375), 'naive': np.float64(0.8046875), 'guarded': np.float64(0.91796875), 'no_replay': np.float64(0.99609375)}
+GUARDED 703 {'no_idle': np.float64(0.9921875), 'naive': np.float64(0.6953125), 'guarded': np.float64(0.9296875), 'no_replay': np.float64(0.9921875)}
