@@ -1,0 +1,209 @@
+{
+  "status": "PASS",
+  "milestone": "M3",
+  "seed_used": 42,
+  "protected_seeds_untouched": [
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "elapsed_seconds": 54.41,
+  "benchmarks": {
+    "scenario_t2_twin_histories": {
+      "baseline": {
+        "twin1_on_task_a": 1.0,
+        "twin1_on_task_b": 0.0,
+        "twin2_on_task_b": 1.0,
+        "twin2_on_task_a": 0.0
+      },
+      "context_identification": {
+        "twin1_dominant_basin": 7,
+        "twin1_basin_prob": 0.6326953748844096,
+        "twin1_basin_distance": 3.2905445111909075,
+        "twin2_dominant_basin": 7,
+        "twin2_basin_prob": 0.6313725058019558,
+        "twin2_basin_distance": 3.214596778435121
+      },
+      "interventions": {
+        "state_reset_preserves_learning": {
+          "twin1_on_task_a_after_reset": 1.0,
+          "twin2_on_task_b_after_reset": 1.0
+        },
+        "theta_core_swap": {
+          "twin1_with_theta2_on_task_b": 1.0,
+          "twin2_with_theta1_on_task_a": 1.0
+        },
+        "b_only_swap": {
+          "twin1_with_b2_on_task_b": 1.0,
+          "twin1_with_b2_on_task_a": 0.0
+        },
+        "k_only_swap": {
+          "twin1_with_k2_on_task_a": 1.0,
+          "twin1_with_k2_on_task_b": 0.0
+        }
+      }
+    },
+    "symmetric_pqt_vs_noa_control": {
+      "pqt_dynamic": {
+        "final_accuracy": 0.6,
+        "events_to_80pct_recovery": 43,
+        "false_switches_phase1": 15,
+        "adaptation_curve": [
+          0.0,
+          0.0,
+          0.0,
+          0.09090909090909091,
+          0.09090909090909091,
+          0.18181818181818182,
+          0.2727272727272727,
+          0.36363636363636365,
+          0.45454545454545453,
+          0.7272727272727273,
+          0.5454545454545454,
+          0.45454545454545453,
+          0.45454545454545453,
+          0.45454545454545453,
+          0.6363636363636364,
+          0.6363636363636364
+        ]
+      },
+      "noa_control": {
+        "final_accuracy": 0.4,
+        "events_to_80pct_recovery": null,
+        "false_switches_phase1": 15,
+        "adaptation_curve": [
+          0.0,
+          0.16666666666666666,
+          0.2727272727272727,
+          0.36363636363636365,
+          0.45454545454545453,
+          0.36363636363636365,
+          0.18181818181818182,
+          0.18181818181818182,
+          0.36363636363636365,
+          0.18181818181818182,
+          0.18181818181818182,
+          0.18181818181818182,
+          0.36363636363636365,
+          0.45454545454545453,
+          0.36363636363636365,
+          0.36363636363636365
+        ]
+      },
+      "causal_difference": 0.19999999999999996
+    },
+    "gap_1000_retention_diagnostics": {
+      "step_refinement_drift_1000_ticks": {
+        "0.01": {
+          "steps": 1000,
+          "drift_norm": 0.0007327284951783081,
+          "energy_final": -0.5720164653913753,
+          "stable_in_basin": true
+        },
+        "0.005": {
+          "steps": 2000,
+          "drift_norm": 0.0007327299629093058,
+          "energy_final": -0.572016465391316,
+          "stable_in_basin": true
+        },
+        "0.002": {
+          "steps": 5000,
+          "drift_norm": 0.0007327303745349163,
+          "energy_final": -0.5720164653912998,
+          "stable_in_basin": true
+        },
+        "0.001": {
+          "steps": 10000,
+          "drift_norm": 0.0007327304333849078,
+          "energy_final": -0.5720164653912978,
+          "stable_in_basin": true
+        }
+      },
+      "canonical_energy_barriers": {
+        "basin_1_to_2": {
+          "energy_basin_a": -0.5720151085723608,
+          "energy_basin_b": -0.5720151085723613,
+          "energy_saddle_max": 0.08855955747131267,
+          "barrier_from_a": 0.6605746660436735,
+          "barrier_from_b": 0.660574666043674
+        },
+        "basin_2_to_3": {
+          "energy_basin_a": -0.5720151085723613,
+          "energy_basin_b": -0.5720151085723613,
+          "energy_saddle_max": 0.7555837113068207,
+          "barrier_from_a": 1.327598819879182,
+          "barrier_from_b": 1.327598819879182
+        },
+        "basin_3_to_4": {
+          "energy_basin_a": -0.5720151085723613,
+          "energy_basin_b": -0.5720151085723613,
+          "energy_saddle_max": 1.4198695568570985,
+          "barrier_from_a": 1.9918846654294597,
+          "barrier_from_b": 1.9918846654294597
+        },
+        "basin_4_to_5": {
+          "energy_basin_a": -0.5720151085723613,
+          "energy_basin_b": -0.5720151085723613,
+          "energy_saddle_max": 0.7555837113068211,
+          "barrier_from_a": 1.3275988198791824,
+          "barrier_from_b": 1.3275988198791824
+        },
+        "basin_5_to_6": {
+          "energy_basin_a": -0.5720151085723613,
+          "energy_basin_b": -0.5720151085723608,
+          "energy_saddle_max": 0.08855955747131267,
+          "barrier_from_a": 0.660574666043674,
+          "barrier_from_b": 0.6605746660436735
+        },
+        "basin_6_to_1": {
+          "energy_basin_a": -0.5720151085723608,
+          "energy_basin_b": -0.5720151085723608,
+          "energy_saddle_max": 1.4198695568570985,
+          "barrier_from_a": 1.9918846654294593,
+          "barrier_from_b": 1.9918846654294593
+        },
+        "basin_0_to_7": {
+          "energy_basin_a": 0.05307022671955319,
+          "energy_basin_b": 0.05307022671955319,
+          "energy_saddle_max": 0.8013167051870603,
+          "barrier_from_a": 0.7482464784675071,
+          "barrier_from_b": 0.7482464784675071
+        },
+        "basin_1_to_7": {
+          "energy_basin_a": -0.5720151085723608,
+          "energy_basin_b": 0.05307022671955319,
+          "energy_saddle_max": 0.8186305555485038,
+          "barrier_from_a": 1.3906456641208647,
+          "barrier_from_b": 0.7655603288289506
+        }
+      },
+      "perturbation_recovery_curve": {
+        "0.01": 1.0,
+        "0.05": 1.0,
+        "0.1": 1.0,
+        "0.2": 0.4666666666666667,
+        "0.3": 0.0,
+        "0.5": 0.0
+      }
+    }
+  },
+  "hypotheses_evaluation": {
+    "H2_CORE": {
+      "name": "Endogenous History in Core",
+      "threshold": 0.85,
+      "twin1_on_task_a": 1.0,
+      "twin2_on_task_b": 1.0,
+      "status": "CONFIRMED"
+    },
+    "H5_A_CAUSAL": {
+      "name": "Causal Necessity of Vortex Operator A",
+      "pqt_acc": 0.6,
+      "noa_acc": 0.4,
+      "gain": 0.19999999999999996,
+      "verdict": "SUPPORTED"
+    }
+  },
+  "overall_verdict": "PASS"
+}
