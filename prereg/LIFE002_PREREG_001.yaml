@@ -1,0 +1,69 @@
+protocol_version: "LIFE-002-PREREG-001"
+date: "2026-11-11"
+status: "DRAFT_M0"
+target_branch: "pqt-qcat-life-002"
+
+evaluation_policy:
+  final_independent_seeds: [101, 102, 103, 104, 105]
+  tuning_calibration_seeds: [11, 12, 13]
+  strict_isolation: true
+  freeze_gate: "Seeds 101-105 are strictly sealed until git tag life002-prereg-v1"
+
+mathematical_invariants:
+  operator_antisymmetry:
+    formula: "A_I(w0) + A_I(w0)^T = 0"
+    max_tolerance: 1.0e-10
+  energy_conservation_in_vortex:
+    formula: "g^T * A_I(w0) * g = 0"
+    max_tolerance: 1.0e-12
+  energy_dissipation_closed:
+    formula: "dE/dt = -grad(E)^T * Gamma * grad(E) <= 0 (T=0, u=0)"
+  stepper_convergence:
+    schemes: ["h", "h/2", "h/4"]
+    required_consistency: true
+  finite_state:
+    nan_inf_tolerance: 0
+    action_on_nan: "FAIL_IMMEDIATE_INVALID"
+
+hypotheses:
+  H0_STABLE:
+    name: "Numerical Stability and Invariants"
+    metric: "invalid_count"
+    threshold: 0
+    condition: "invalid == 0 across all seeds, skew residual < 1e-10"
+
+  H1_HOLD:
+    name: "Cue Latching and Retention"
+    metric: "median_accuracy_gap_300"
+    threshold: 0.90
+    condition: "accuracy >= 90% at gap=300, not worse than noA at gap=100"
+
+  H2_CORE:
+    name: "Endogenous History in Core"
+    metric: "twin_history_probe_accuracy"
+    threshold: 0.85
+    condition: "accuracy >= 85% with frozen readout head; significant drop under core scramble"
+
+  H3_SLEEP_SAFE:
+    name: "Sleep Safety on Anchors"
+    metric: "median_anchor_degradation"
+    threshold: 0.02
+    condition: "degradation <= 2 percentage points after 1000 idle ticks; invalid == 0"
+
+  H4_DREAM_GAIN:
+    name: "Generalization Gain from DREAM"
+    metric: "pqt_dream_minus_guarded_replay"
+    threshold: 0.05
+    condition: "gain >= 5 percentage points on >= 4/5 seeds"
+
+  H5_A_CAUSAL:
+    name: "Causal Necessity of Vortex Operator A"
+    metric: "pqt_dream_minus_noA_dream"
+    threshold: 0.03
+    condition: "gain >= 3 percentage points on >= 4/5 seeds with identical codebase"
+
+  H6_PROVENANCE:
+    name: "Provenance Isolation and Anti-Leakage"
+    metric: "false_promotion_and_leakage_count"
+    threshold: 0
+    condition: "0 dream-to-observed promotions without external feedback; 0 test label leaks"
