@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "milestone": "M2",
+  "seed_used": 42,
+  "protected_seeds_untouched": [
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "checks": {
+    "architecture_six_echelon": {
+      "dimension": 48,
+      "n_echelons": 6,
+      "hold_intake_blocked_when_gate_zero": true,
+      "hold_intake_active_when_gate_one": true,
+      "status": "PASS"
+    },
+    "scenario_t1_hold_retention": {
+      "hypothesis": "H1-HOLD",
+      "pqt_retention": {
+        "gap_0": 1.0,
+        "gap_20": 1.0,
+        "gap_50": 1.0,
+        "gap_100": 1.0,
+        "gap_300": 1.0,
+        "gap_1000": 0.14285714285714285
+      },
+      "noA_retention": {
+        "gap_0": 1.0,
+        "gap_20": 1.0,
+        "gap_50": 1.0,
+        "gap_100": 1.0,
+        "gap_300": 1.0,
+        "gap_1000": 0.14285714285714285
+      },
+      "threshold_gap_300": 0.9,
+      "status": "PASS"
+    },
+    "scenario_t6_core_causality": {
+      "agent_a_on_task_a": 1.0,
+      "agent_a_on_task_b": 0.0,
+      "agent_b_on_task_b": 1.0,
+      "scrambled_accuracy": 0.25,
+      "restored_accuracy": 1.0,
+      "swapped_accuracy": 1.0,
+      "readout_strictly_frozen": true,
+      "status": "PASS"
+    },
+    "provenance_anti_leakage": {
+      "leakage_attempt_caught": true,
+      "status": "PASS"
+    }
+  },
+  "overall_verdict": "PASS"
+}

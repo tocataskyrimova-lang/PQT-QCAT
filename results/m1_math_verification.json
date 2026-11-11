@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "milestone": "M1",
+  "seed_used": 42,
+  "protected_seeds_untouched": [
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "checks": {
+    "skew_symmetry": {
+      "canonical_A_I_max_defect": 0.0,
+      "max_v_A_v_quadratic_form": 1.3322676295501878e-15,
+      "pdf_faulty_matrix_defect": 3.0,
+      "status": "PASS"
+    },
+    "gradient_accuracy": {
+      "samples": 50,
+      "max_abs_diff_vs_autograd": 3.552713678800501e-15,
+      "status": "PASS"
+    },
+    "energy_dissipation": {
+      "max_vortex_energy_leak": 5.684341886080802e-14,
+      "strictly_non_increasing": true,
+      "status": "PASS"
+    },
+    "convergence_h_refinement": {
+      "h1": 0.01,
+      "h2": 0.005,
+      "h_ref": 0.000625,
+      "error_h1": 0.0005125094372213645,
+      "error_h2": 0.0001294734340941961,
+      "ratio_err1_div_err2": 3.9584138692462507,
+      "estimated_order_p": 1.9849224602616347,
+      "status": "PASS"
+    },
+    "multi_cell_48D": {
+      "n_cells": 6,
+      "dimension": 48,
+      "steps": 50,
+      "initial_energies": [
+        1.8744061632932576,
+        3.8802463389907995,
+        5.107424285820042,
+        3.0738261078421676,
+        1.6539683298377086,
+        8.45310788871936
+      ],
+      "final_energies": [
+        1.4463480652789875,
+        2.6586203907857984,
+        3.2724707651753393,
+        2.0474786789478046,
+        1.2618172343453682,
+        6.175989345087905
+      ],
+      "stepwise_monotonic": true,
+      "all_cells_decreased_energy": true,
+      "status": "PASS"
+    },
+    "fail_fast_nan_protection": {
+      "nan_caught_as_NonFiniteStateError": true,
+      "status": "PASS"
+    }
+  },
+  "overall_verdict": "PASS"
+}
