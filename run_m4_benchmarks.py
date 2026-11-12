@@ -24,6 +24,7 @@ from pqt_qcat.dream.m4_exploratory import (
     benchmark_exp_m4_qctx_causal_t5,
     benchmark_exp_m4_t5_compositional_generalization,
 )
+from pqt_qcat.dream.control_audit import run_empirical_control_audit
 from pqt_qcat.memory.m3_diagnostics import (
     benchmark_frozen_b_twin_histories,
     benchmark_multi_rule_sequential_return,
@@ -52,7 +53,8 @@ def run_t4_benchmark(seed: int = CALIBRATION_SEED) -> dict:
 
     results = {}
     for pol in policies:
-        cfg = SixEchelonConfig(enable_vortex=True, integrator_mode="fixed")
+        enable_v = bool("noA" not in pol)
+        cfg = SixEchelonConfig(enable_vortex=enable_v, integrator_mode="fixed")
         core = SixEchelonCore(config=cfg, seed=seed)
         core.W_readout.fill(0.0)
         for c in range(1, 5):
@@ -164,25 +166,6 @@ def run_t5_benchmark(seed: int = CALIBRATION_SEED) -> dict:
     }
 
 
-def audit_control_models() -> dict:
-    """Audit symmetric properties and equity across all 6 sleep/consolidation policies."""
-    policies = ["no_replay", "state_only", "naive_replay", "guarded_replay", "noA_dream", "PQT_dream"]
-    audit = {}
-    for pol in policies:
-        audit[pol] = {
-            "policy": pol,
-            "idle_ticks_budget": 1000,
-            "external_sensory_drive": "u_ext = 0 (zero during consolidation)",
-            "readout_matrix": "W_readout strictly frozen",
-            "three_gate_protection": bool(pol in ("guarded_replay", "noA_dream", "PQT_dream")),
-            "anchor_guard_active": bool(pol in ("guarded_replay", "noA_dream", "PQT_dream")),
-            "vortex_enabled": bool(pol == "PQT_dream"),
-            "noise_schedule": "Identical sigma=0.05 * sqrt(h_base) across active-state policies",
-            "audit_verdict": "COMPLIANT",
-        }
-    return audit
-
-
 def main():
     print("================================================================================")
     print("Running Milestone M4 DREAM & Witness Ledger Benchmarks...")
@@ -214,9 +197,9 @@ def main():
     qctx_causal_results = benchmark_exp_m4_qctx_causal_t5(CALIBRATION_SEED)
     t5_exploratory_generalization = benchmark_exp_m4_t5_compositional_generalization(CALIBRATION_SEED)
 
-    # 5. Independent Control Models Audit
-    print("[5/5] Running Independent Audit of Control Models...")
-    control_audit = audit_control_models()
+    # 5. Independent Control Models Audit (Empirical Runtime Verification per CONTROL-FIX-001)
+    print("[5/5] Running Independent Empirical Audit of Control Models...")
+    control_audit = run_empirical_control_audit(CALIBRATION_SEED)
 
     elapsed = time.perf_counter() - t0
     print(f"All benchmarks finished in {elapsed:.2f} seconds.")
@@ -281,9 +264,15 @@ def main():
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
 
+    audit_file = Path(__file__).parent / "results" / "control_audit_results.json"
+    with open(audit_file, "w", encoding="utf-8") as f:
+        json.dump(control_audit, f, indent=2)
+
     print(f"\nSaved verification artifact to {out_file}")
+    print(f"Saved control audit artifact to {audit_file}")
     print(f"Engineering Verdict: {report['engineering_verdict']}")
     print(f"Scientific Hypotheses Verdict: {report['scientific_hypotheses_verdict']}")
+    print(f"Control Audit Verdict: {control_audit['overall_control_verdict']}")
 
 
 if __name__ == "__main__":

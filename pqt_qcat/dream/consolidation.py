@@ -19,6 +19,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from ..core.six_echelon import SixEchelonCore
+from ..core.vortex import VortexParameters
 from ..memory.witness import (
     WitnessLedger,
     DreamHypothesis,
@@ -86,6 +87,14 @@ class DreamConsolidationEngine:
         dict
             Execution diagnostics including anchor retention, accepted/rejected updates, and core drift.
         """
+        # Strict enforcement of vortex ablation for noA policies across entire sleep trial
+        is_noA = bool("noA" in policy)
+        if is_noA:
+            core.config.enable_vortex = False
+            core.integrator.vortex_params = VortexParameters(0.0, 0.0, 0.0, beta_v=core.config.beta_v)
+        elif "PQT" in policy:
+            core.config.enable_vortex = True
+
         anchors = ledger.get_anchors()
         acc_before = self.anchor_guard.evaluate_anchors(core, anchors)
 
@@ -102,11 +111,9 @@ class DreamConsolidationEngine:
         )
 
         if policy == "no_replay":
-            # Pure idle ticks with write_gate=0.0: baseline passive forgetting
-            x_neutral = np.zeros(core.config.d_in)
-            x_neutral[0] = 1.0
+            # Pure idle ticks with write_gate=0.0 and zero sensory input: baseline passive forgetting
             for _ in range(idle_ticks):
-                core.step(x_neutral, write_gate=0.0)
+                core.step(x_t=None, write_gate=0.0)
 
         elif policy == "state_only":
             # Dynamic state runs with thermal noise, but core parameters are untouched
@@ -170,9 +177,12 @@ class DreamConsolidationEngine:
 
         elif policy in ("noA_dream", "PQT_dream", "noA_dream_K", "PQT_dream_K"):
             # Counterfactual Dream Generation & Gated Consolidation
-            # Set core vortex according to policy
-            saved_vortex = core.config.enable_vortex
-            core.config.enable_vortex = bool("PQT" in policy)
+            # Set core vortex strictly according to policy
+            if is_noA:
+                core.config.enable_vortex = False
+                core.integrator.vortex_params = VortexParameters(0.0, 0.0, 0.0, beta_v=core.config.beta_v)
+            elif "PQT" in policy:
+                core.config.enable_vortex = True
 
             # Generate counterfactual candidates via symmetric generator
             candidates = self.generator.generate_candidate_hypotheses(
@@ -216,10 +226,12 @@ class DreamConsolidationEngine:
                     rejected_count += 1
                     rejection_reasons.append("anchor_guard_rollback")
 
-            core.config.enable_vortex = saved_vortex
-            # Remaining idle ticks
+            # Remaining idle ticks run under the policy's genuine vortex setting (A=0 for noA, A=A_I for PQT)
             for _ in range(max(0, idle_ticks - self.config.dream_cycles * 10)):
                 core.step(x_t=None, write_gate=0.0)
+
+            if is_noA:
+                assert core.config.enable_vortex is False, "Ablation failure: enable_vortex was unexpectedly True in noA"
 
         else:
             raise ValueError(f"Unknown dream sleep policy: {policy}")

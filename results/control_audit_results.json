@@ -1,0 +1,146 @@
+{
+  "audit_type": "EMPIRICAL_RUNTIME_VERIFICATION",
+  "calibration_seed": 42,
+  "all_policies_compliant": true,
+  "overall_control_verdict": "COMPLIANT",
+  "policies": {
+    "no_replay": {
+      "policy": "no_replay",
+      "empirical_checks": {
+        "sleep_ticks_recorded": 1000,
+        "idle_ticks_budget": 1000,
+        "step_budget_exact": true,
+        "sensory_drive_strictly_zero": true,
+        "readout_strictly_frozen": true,
+        "delta_W_norm": 0.0,
+        "enable_vortex_flag": true,
+        "max_measured_vortex_force": 5.110281825533043,
+        "vortex_behavior_verified": true,
+        "anchor_accuracy_before": 1.0,
+        "anchor_accuracy_after": 1.0,
+        "measured_anchor_degradation": 0.0,
+        "rollback_mechanism_verified": true,
+        "gate_behavior_verified": true,
+        "provenance_isolated_verified": true,
+        "delta_K_norm": 0.0,
+        "delta_B_norm": 0.0
+      },
+      "audit_verdict": "COMPLIANT"
+    },
+    "state_only": {
+      "policy": "state_only",
+      "empirical_checks": {
+        "sleep_ticks_recorded": 1000,
+        "idle_ticks_budget": 1000,
+        "step_budget_exact": true,
+        "sensory_drive_strictly_zero": true,
+        "readout_strictly_frozen": true,
+        "delta_W_norm": 0.0,
+        "enable_vortex_flag": true,
+        "max_measured_vortex_force": 5.110281825533043,
+        "vortex_behavior_verified": true,
+        "anchor_accuracy_before": 1.0,
+        "anchor_accuracy_after": 1.0,
+        "measured_anchor_degradation": 0.0,
+        "rollback_mechanism_verified": true,
+        "gate_behavior_verified": true,
+        "provenance_isolated_verified": true,
+        "delta_K_norm": 0.0,
+        "delta_B_norm": 0.0
+      },
+      "audit_verdict": "COMPLIANT"
+    },
+    "naive_replay": {
+      "policy": "naive_replay",
+      "empirical_checks": {
+        "sleep_ticks_recorded": 750,
+        "idle_ticks_budget": 1000,
+        "step_budget_exact": true,
+        "sensory_drive_strictly_zero": true,
+        "readout_strictly_frozen": true,
+        "delta_W_norm": 0.0,
+        "enable_vortex_flag": true,
+        "max_measured_vortex_force": 5.110281825533043,
+        "vortex_behavior_verified": true,
+        "anchor_accuracy_before": 1.0,
+        "anchor_accuracy_after": 1.0,
+        "measured_anchor_degradation": 0.0,
+        "rollback_mechanism_verified": true,
+        "gate_behavior_verified": true,
+        "provenance_isolated_verified": true,
+        "delta_K_norm": 0.0,
+        "delta_B_norm": 0.6422616289332541
+      },
+      "audit_verdict": "COMPLIANT"
+    },
+    "guarded_replay": {
+      "policy": "guarded_replay",
+      "empirical_checks": {
+        "sleep_ticks_recorded": 750,
+        "idle_ticks_budget": 1000,
+        "step_budget_exact": true,
+        "sensory_drive_strictly_zero": true,
+        "readout_strictly_frozen": true,
+        "delta_W_norm": 0.0,
+        "enable_vortex_flag": true,
+        "max_measured_vortex_force": 5.110281825533043,
+        "vortex_behavior_verified": true,
+        "anchor_accuracy_before": 1.0,
+        "anchor_accuracy_after": 1.0,
+        "measured_anchor_degradation": 0.0,
+        "rollback_mechanism_verified": true,
+        "gate_behavior_verified": true,
+        "provenance_isolated_verified": true,
+        "delta_K_norm": 0.0,
+        "delta_B_norm": 0.3211308144666328
+      },
+      "audit_verdict": "COMPLIANT"
+    },
+    "noA_dream": {
+      "policy": "noA_dream",
+      "empirical_checks": {
+        "sleep_ticks_recorded": 1000,
+        "idle_ticks_budget": 1000,
+        "step_budget_exact": true,
+        "sensory_drive_strictly_zero": true,
+        "readout_strictly_frozen": true,
+        "delta_W_norm": 0.0,
+        "enable_vortex_flag": false,
+        "max_measured_vortex_force": 0.0,
+        "vortex_behavior_verified": true,
+        "anchor_accuracy_before": 1.0,
+        "anchor_accuracy_after": 1.0,
+        "measured_anchor_degradation": 0.0,
+        "rollback_mechanism_verified": true,
+        "gate_behavior_verified": true,
+        "provenance_isolated_verified": true,
+        "delta_K_norm": 0.0,
+        "delta_B_norm": 0.0722327394695488
+      },
+      "audit_verdict": "COMPLIANT"
+    },
+    "PQT_dream": {
+      "policy": "PQT_dream",
+      "empirical_checks": {
+        "sleep_ticks_recorded": 1000,
+        "idle_ticks_budget": 1000,
+        "step_budget_exact": true,
+        "sensory_drive_strictly_zero": true,
+        "readout_strictly_frozen": true,
+        "delta_W_norm": 0.0,
+        "enable_vortex_flag": true,
+        "max_measured_vortex_force": 5.110281825533043,
+        "vortex_behavior_verified": true,
+        "anchor_accuracy_before": 1.0,
+        "anchor_accuracy_after": 1.0,
+        "measured_anchor_degradation": 0.0,
+        "rollback_mechanism_verified": true,
+        "gate_behavior_verified": true,
+        "provenance_isolated_verified": true,
+        "delta_K_norm": 0.0,
+        "delta_B_norm": 0.06872782927813097
+      },
+      "audit_verdict": "COMPLIANT"
+    }
+  }
+}
