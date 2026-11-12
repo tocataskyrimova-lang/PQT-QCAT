@@ -99,7 +99,8 @@ class AdaptiveHeunIntegrator:
         self,
         z: np.ndarray,
         u: np.ndarray | None = None,
-        cell_idx: int = 0
+        cell_idx: int = 0,
+        vortex_params: VortexParameters | None = None,
     ) -> tuple[np.ndarray, np.ndarray, float]:
         """Compute deterministic drift b(z) = -(Gamma - A_I(w0)) grad E + u."""
         if z.shape != (8,):
@@ -117,11 +118,14 @@ class AdaptiveHeunIntegrator:
 
         w0 = float(z[6])
 
+        # Active vortex parameters: explicit parameter overrides instance setting
+        vparams = vortex_params if vortex_params is not None else self.vortex_params
+
         # Dissipative part: Gamma * grad_E
         dissipative = self.gamma_diag * grad_E
 
         # Vortex rotation part: A_I(w0) * grad_E
-        vortex = apply_vortex_A_I(grad_E, w0, self.vortex_params)
+        vortex = apply_vortex_A_I(grad_E, w0, vparams)
 
         # Net drift: -(Gamma - A_I) * grad_E = -Gamma * grad_E + A_I * grad_E
         drift = -dissipative + vortex
@@ -131,21 +135,33 @@ class AdaptiveHeunIntegrator:
 
         return drift, grad_E, E
 
+    def compute_vortex_force(
+        self,
+        z: np.ndarray,
+        vortex_params: VortexParameters | None = None,
+    ) -> np.ndarray:
+        """Compute the vortex rotational force A_I(w0) * grad_E alone."""
+        vparams = vortex_params if vortex_params is not None else self.vortex_params
+        grad_E = compute_grad_energy(z, self.cell_params)
+        w0 = float(z[6])
+        return apply_vortex_A_I(grad_E, w0, vparams)
+
     def _heun_substep(
         self,
         z: np.ndarray,
         dt: float,
         u: np.ndarray | None,
-        cell_idx: int
+        cell_idx: int,
+        vortex_params: VortexParameters | None = None,
     ) -> tuple[np.ndarray, float]:
         """Execute single Heun predictor-corrector step of length dt."""
-        b_curr, _, _ = self.compute_drift(z, u, cell_idx)
+        b_curr, _, _ = self.compute_drift(z, u, cell_idx, vortex_params=vortex_params)
         z_pred = z + dt * b_curr
 
         if not np.all(np.isfinite(z_pred)):
             raise NonFiniteStateError(f"Cell {cell_idx}: non-finite predictor state during Heun step")
 
-        b_pred, _, _ = self.compute_drift(z_pred, u, cell_idx)
+        b_pred, _, _ = self.compute_drift(z_pred, u, cell_idx, vortex_params=vortex_params)
         z_corr = z + (dt * 0.5) * (b_curr + b_pred)
 
         if not np.all(np.isfinite(z_corr)):
@@ -160,10 +176,11 @@ class AdaptiveHeunIntegrator:
         dt: float,
         u: np.ndarray | None,
         level: int,
-        cell_idx: int
+        cell_idx: int,
+        vortex_params: VortexParameters | None = None,
     ) -> tuple[np.ndarray, int, float]:
         """Recursive subdivision for local error control with strict convergence gate."""
-        z_corr, err = self._heun_substep(z, dt, u, cell_idx)
+        z_corr, err = self._heun_substep(z, dt, u, cell_idx, vortex_params=vortex_params)
 
         # If error is within tolerance, step is accepted
         if err <= self.config.tol:
@@ -178,8 +195,12 @@ class AdaptiveHeunIntegrator:
 
         # Subdivide interval into two halves
         half_dt = dt * 0.5
-        z_mid, count1, err1 = self._adaptive_step_recursive(z, half_dt, u, level + 1, cell_idx)
-        z_end, count2, err2 = self._adaptive_step_recursive(z_mid, half_dt, u, level + 1, cell_idx)
+        z_mid, count1, err1 = self._adaptive_step_recursive(
+            z, half_dt, u, level + 1, cell_idx, vortex_params=vortex_params
+        )
+        z_end, count2, err2 = self._adaptive_step_recursive(
+            z_mid, half_dt, u, level + 1, cell_idx, vortex_params=vortex_params
+        )
 
         return z_end, count1 + count2, max(err1, err2)
 
@@ -189,7 +210,8 @@ class AdaptiveHeunIntegrator:
         dt: float | None = None,
         u: np.ndarray | None = None,
         rng: np.random.Generator | None = None,
-        cell_idx: int = 0
+        cell_idx: int = 0,
+        vortex_params: VortexParameters | None = None,
     ) -> tuple[np.ndarray, StepDiagnostics]:
         """Advance single 8D cell state by dt."""
         dt = dt if dt is not None else self.config.h_base
@@ -201,17 +223,18 @@ class AdaptiveHeunIntegrator:
             raise ValueError(f"Cell {cell_idx}: invalid state shape {z.shape}, expected (8,)")
 
         u_sanitized = self._sanitize_input(u, cell_idx)
+        vparams = vortex_params if vortex_params is not None else self.vortex_params
 
         diag = StepDiagnostics()
         diag.initial_energy = float(compute_energy(z, self.cell_params))
 
         # 1. Choose stepper mode: adaptive or fixed
         if self.config.mode == "fixed":
-            z_next, max_err = self._heun_substep(z, dt, u_sanitized, cell_idx)
+            z_next, max_err = self._heun_substep(z, dt, u_sanitized, cell_idx, vortex_params=vparams)
             substeps = 1
         elif self.config.mode == "adaptive":
             z_next, substeps, max_err = self._adaptive_step_recursive(
-                z, dt, u_sanitized, level=0, cell_idx=cell_idx
+                z, dt, u_sanitized, level=0, cell_idx=cell_idx, vortex_params=vparams
             )
         else:
             raise ValueError(f"Unknown integrator mode '{self.config.mode}'. Use 'adaptive' or 'fixed'.")

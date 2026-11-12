@@ -34,6 +34,7 @@ from pqt_qcat.core.integrator import (
     NonFiniteStateError,
     IntegratorConvergenceError,
 )
+from pqt_qcat.core.six_echelon import SixEchelonCore, SixEchelonConfig
 
 
 # Calibration seed for development unit tests (SEEDS 101-105 STRICTLY FORBIDDEN)
@@ -384,4 +385,60 @@ def test_extended_energy_monotonicity_across_50_initial_states():
         for _ in range(5):
             z, diag = integrator.step_cell(z)
             assert diag.delta_energy <= 1e-6, f"State {i}: Energy increased by {diag.delta_energy}"
+
+
+def test_enable_vortex_false_zero_vortex_contribution_with_nonzero_gradient():
+    """Verify that when enable_vortex=False, the vortex contribution is identically zero.
+    
+    Requirements (M4-FIX-001):
+    - For non-zero energy gradient grad_E != 0 (e.g. in vortex-active regime w0 < 0),
+    - PQT core (enable_vortex=True) has non-zero vortex rotational force ||F_vortex|| > 0.
+    - noA core (enable_vortex=False) has identically zero vortex force: ||F_vortex|| == 0.0 to machine precision (< 1e-15).
+    - In drift computation b(z) = -(Gamma - A_I) grad_E, noA drift exactly equals -Gamma grad_E.
+    """
+    rng = np.random.default_rng(TEST_SEED + 99)
+
+    core_pqt = SixEchelonCore(SixEchelonConfig(enable_vortex=True), seed=TEST_SEED)
+    core_noa = SixEchelonCore(SixEchelonConfig(enable_vortex=False), seed=TEST_SEED)
+
+    # Sample random 48D state with w0 in vortex regime (w0 = -0.5) to ensure vortex latch is active
+    Z_test = rng.uniform(-1.0, 1.0, size=48)
+    for c in range(6):
+        Z_test[8 * c + 6] = -0.5  # w0 coordinate in vortex regime
+        Z_test[8 * c + 0] = 0.8   # ensure non-zero displacement in X
+        Z_test[8 * c + 3] = 0.8   # ensure non-zero displacement in W
+
+    core_pqt.Z = Z_test.copy()
+    core_noa.Z = Z_test.copy()
+
+    for c in range(6):
+        z_c = Z_test[8 * c : 8 * c + 8]
+        grad_E = compute_grad_energy(z_c, core_pqt.cell_params)
+        grad_norm = float(np.linalg.norm(grad_E))
+
+        # Gradient must be strictly non-zero
+        assert grad_norm > 0.1, f"Cell {c}: expected non-zero gradient, got {grad_norm}"
+
+        # Vortex force in PQT (enable_vortex=True)
+        F_vortex_pqt = core_pqt.compute_cell_vortex_force(c)
+        f_pqt_norm = float(np.linalg.norm(F_vortex_pqt))
+        assert f_pqt_norm > 1e-3, f"Cell {c}: expected non-zero vortex force in PQT, got {f_pqt_norm}"
+
+        # Vortex force in noA (enable_vortex=False)
+        F_vortex_noa = core_noa.compute_cell_vortex_force(c)
+        f_noa_max_abs = float(np.max(np.abs(F_vortex_noa)))
+        assert f_noa_max_abs < 1e-15, f"Cell {c}: noA vortex force defect: {f_noa_max_abs}"
+
+        # Drift verification: drift in noA must be strictly equal to -Gamma @ grad_E
+        drift_noa, grad_noa, _ = core_noa.integrator.compute_drift(z_c, cell_idx=c)
+        pure_dissipative = -core_noa.integrator.gamma_diag * grad_E
+        drift_defect = float(np.max(np.abs(drift_noa - pure_dissipative)))
+        assert drift_defect < 1e-15, f"Cell {c}: noA drift deviates from pure dissipation by {drift_defect}"
+
+        # Drift in PQT must differ from -Gamma @ grad_E by exactly F_vortex_pqt
+        drift_pqt, _, _ = core_pqt.integrator.compute_drift(z_c, cell_idx=c)
+        vortex_in_drift = drift_pqt - pure_dissipative
+        vortex_match_defect = float(np.max(np.abs(vortex_in_drift - F_vortex_pqt)))
+        assert vortex_match_defect < 1e-15, f"Cell {c}: vortex force in drift mismatch: {vortex_match_defect}"
+
 

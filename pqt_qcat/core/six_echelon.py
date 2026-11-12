@@ -71,10 +71,14 @@ class SixEchelonCore:
             tol=self.config.integrator_tol,
             enforce_monotonic_energy=False, # open system
         )
+        vparams_init = (
+            self.vortex_params if self.config.enable_vortex
+            else VortexParameters(0.0, 0.0, 0.0, beta_v=self.config.beta_v)
+        )
         self.integrator = AdaptiveHeunIntegrator(
             config=int_cfg,
             cell_params=self.cell_params,
-            vortex_params=self.vortex_params,
+            vortex_params=vparams_init,
         )
 
         # Dissipation matrices: normal vs hold
@@ -168,21 +172,34 @@ class SixEchelonCore:
             )
 
             # Vortex parameters handling (noA ablation vs PQT)
-            saved_vparams = self.vortex_params
             if not self.config.enable_vortex:
-                self.vortex_params = VortexParameters(0.0, 0.0, 0.0, beta_v=self.config.beta_v)
+                vparams_c = VortexParameters(0.0, 0.0, 0.0, beta_v=self.config.beta_v)
             elif c == 3 and write_gate == 0.0:
                 # In pause, Hold-Deep operates in low-vortex regime per specification
-                self.vortex_params = VortexParameters(0.1, 0.1, 0.0, beta_v=self.config.beta_v)
+                vparams_c = VortexParameters(0.1, 0.1, 0.0, beta_v=self.config.beta_v)
+            else:
+                vparams_c = self.vortex_params
 
-            z_c_next, diag_c = self.integrator.step_cell(z_c, dt=dt, u=u_c, cell_idx=c)
-            self.vortex_params = saved_vparams
+            self.integrator.vortex_params = vparams_c
+            z_c_next, diag_c = self.integrator.step_cell(
+                z_c, dt=dt, u=u_c, cell_idx=c, vortex_params=vparams_c
+            )
 
             Z_next[idx:idx+8] = z_c_next
             diags.append(diag_c)
 
         self.Z = Z_next
         return self.Z.copy(), diags
+
+    def compute_cell_vortex_force(self, cell_idx: int) -> np.ndarray:
+        """Compute the vortex force A_I(w0) * grad_E for cell c given current state Z."""
+        idx = 8 * cell_idx
+        z_c = self.Z[idx:idx+8]
+        if not self.config.enable_vortex:
+            vparams = VortexParameters(0.0, 0.0, 0.0, beta_v=self.config.beta_v)
+        else:
+            vparams = self.vortex_params
+        return self.integrator.compute_vortex_force(z_c, vortex_params=vparams)
 
     def predict(self) -> np.ndarray:
         """Compute output logits via frozen readout projection W_readout @ Z."""

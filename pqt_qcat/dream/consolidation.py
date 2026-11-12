@@ -35,6 +35,15 @@ class ConsolidationConfig:
     eta_dream: float = 0.05             # Learning rate for dream consolidation
     anchor_max_degradation: float = 0.02 # Strict anchor protection threshold (<= 2%)
     dream_cycles: int = 25              # Number of dream exploration cycles
+    target_matrix: str = "B"            # Target matrix for plasticity: 'B' (sensory) or 'K' (inter-cell coupling)
+
+
+def _get_quiescent_psi() -> np.ndarray:
+    """Quiescent state tanh(Z) where w0 = 1.0 for all 6 cells and other coords are 0."""
+    z_0 = np.zeros(48, dtype=np.float64)
+    for c in range(6):
+        z_0[8 * c + 6] = 1.0
+    return np.tanh(z_0)
 
 
 class DreamConsolidationEngine:
@@ -87,6 +96,11 @@ class DreamConsolidationEngine:
         rejected_count = 0
         rejection_reasons: list[str] = []
 
+        is_k_consolidation = bool(
+            self.config.target_matrix == "K"
+            or policy.endswith("_K")
+        )
+
         if policy == "no_replay":
             # Pure idle ticks with write_gate=0.0: baseline passive forgetting
             x_neutral = np.zeros(core.config.d_in)
@@ -110,26 +124,42 @@ class DreamConsolidationEngine:
                 for _ in range(self.config.dream_cycles):
                     ev = rng.choice(real_events)
                     # Naive gradient update without gates
-                    delta_B = np.zeros_like(core.B)
-                    delta_B[31 + ev.target_token, ev.input_token] = self.config.eta_dream
-                    core.B += delta_B
+                    if is_k_consolidation:
+                        delta_K = np.zeros_like(core.K)
+                        src_idx = ev.input_token - 1 if ev.input_token > 0 else 0
+                        tgt_idx = 31 + ev.target_token
+                        delta_K[tgt_idx, src_idx] = self.config.eta_dream
+                        core.K += delta_K
+                    else:
+                        delta_B = np.zeros_like(core.B)
+                        delta_B[31 + ev.target_token, ev.input_token] = self.config.eta_dream
+                        core.B += delta_B
                     accepted_count += 1
             # Remaining idle ticks
             for _ in range(max(0, idle_ticks - self.config.dream_cycles * 10)):
                 core.step(x_t=None, write_gate=0.0)
 
-        elif policy == "guarded_replay":
+        elif policy in ("guarded_replay", "guarded_replay_K"):
             # Replay exclusively real events from B_real with anchor protection
             rng = np.random.default_rng(self.seed)
             real_events = ledger.real_events
             if real_events:
                 for _ in range(self.config.dream_cycles):
                     ev = rng.choice(real_events)
-                    delta_B = np.zeros_like(core.B)
-                    delta_B[31 + ev.target_token, ev.input_token] = self.config.eta_dream * 0.5
-                    passed, _, _ = self.anchor_guard.check_and_apply(
-                        core, anchors, proposed_delta_K=np.zeros_like(core.K), proposed_delta_B=delta_B
-                    )
+                    if is_k_consolidation:
+                        delta_K = np.zeros_like(core.K)
+                        src_idx = ev.input_token - 1 if ev.input_token > 0 else 0
+                        tgt_idx = 31 + ev.target_token
+                        delta_K[tgt_idx, src_idx] = self.config.eta_dream * 0.5
+                        passed, _, _ = self.anchor_guard.check_and_apply(
+                            core, anchors, proposed_delta_K=delta_K, proposed_delta_B=np.zeros_like(core.B)
+                        )
+                    else:
+                        delta_B = np.zeros_like(core.B)
+                        delta_B[31 + ev.target_token, ev.input_token] = self.config.eta_dream * 0.5
+                        passed, _, _ = self.anchor_guard.check_and_apply(
+                            core, anchors, proposed_delta_K=np.zeros_like(core.K), proposed_delta_B=delta_B
+                        )
                     if passed:
                         accepted_count += 1
                     else:
@@ -138,11 +168,11 @@ class DreamConsolidationEngine:
             for _ in range(max(0, idle_ticks - self.config.dream_cycles * 10)):
                 core.step(x_t=None, write_gate=0.0)
 
-        elif policy in ("noA_dream", "PQT_dream"):
+        elif policy in ("noA_dream", "PQT_dream", "noA_dream_K", "PQT_dream_K"):
             # Counterfactual Dream Generation & Gated Consolidation
             # Set core vortex according to policy
             saved_vortex = core.config.enable_vortex
-            core.config.enable_vortex = bool(policy == "PQT_dream")
+            core.config.enable_vortex = bool("PQT" in policy)
 
             # Generate counterfactual candidates via symmetric generator
             candidates = self.generator.generate_candidate_hypotheses(
@@ -164,15 +194,21 @@ class DreamConsolidationEngine:
                     continue
 
                 # Propose candidate parameter adjustment weighted by w_Maya(C)
-                # Maya weight scales the update magnitude
                 update_scale = self.config.eta_dream * cand.maya_weight
-                delta_B = np.zeros_like(core.B)
-                delta_B[31 + cand.pred_token, cand.input_token] = update_scale
-
-                # Gate 3: Anchor Guard Shadow Test
-                passed, _, _ = self.anchor_guard.check_and_apply(
-                    core, anchors, proposed_delta_K=np.zeros_like(core.K), proposed_delta_B=delta_B
-                )
+                if is_k_consolidation:
+                    delta_K = np.zeros_like(core.K)
+                    src_idx = cand.input_token - 1 if cand.input_token > 0 else 0
+                    tgt_idx = 31 + cand.pred_token
+                    delta_K[tgt_idx, src_idx] = update_scale
+                    passed, _, _ = self.anchor_guard.check_and_apply(
+                        core, anchors, proposed_delta_K=delta_K, proposed_delta_B=np.zeros_like(core.B)
+                    )
+                else:
+                    delta_B = np.zeros_like(core.B)
+                    delta_B[31 + cand.pred_token, cand.input_token] = update_scale
+                    passed, _, _ = self.anchor_guard.check_and_apply(
+                        core, anchors, proposed_delta_K=np.zeros_like(core.K), proposed_delta_B=delta_B
+                    )
 
                 if passed:
                     accepted_count += 1

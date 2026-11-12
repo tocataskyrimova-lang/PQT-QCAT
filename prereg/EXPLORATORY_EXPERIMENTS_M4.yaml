@@ -1,0 +1,70 @@
+protocol_version: "LIFE002-EXPLORATORY-M4-001"
+date: "2026-11-12"
+status: "EXPLORATORY_M4"
+parent_prereg: "prereg/LIFE002_PREREG_001.yaml"
+target_branch: "pqt-qcat-life-002"
+
+description: >
+  Exploratory extensions authorized under ILORI M4 Review (M4-FIX-003).
+  These exploratory experiments are strictly registered as new exploratory protocols
+  without modifying or rewriting the original preregistration LIFE002_PREREG_001.yaml.
+  All sealed evaluation seeds (101-105) remain 100% untouched and sealed until M5.
+
+experiments:
+  EXP_M4_K_CONSOLIDATION:
+    name: "Inter-cell Coupling K Consolidation with Frozen Sensory B"
+    rationale: >
+      Tests whether synaptic consolidation during dream sleep can operate strictly
+      within the internal structural coupling matrix K (connecting sensory E1 to
+      context/readout E5), while the sensory input projection B remains 100% frozen.
+    constraints:
+      delta_B_norm_allowed: 0.0
+      anchor_protection_threshold: 0.02
+      centered_presynaptic_activation: true
+    policies:
+      - "guarded_replay_K"
+      - "noA_dream_K"
+      - "PQT_dream_K"
+    metrics:
+      - "anchor_degradation"
+      - "delta_K_norm"
+      - "delta_B_norm"
+      - "passed_h3_sleep_safe"
+
+  EXP_M4_QCTX_CAUSAL_T5:
+    name: "Causal Role of Endogenous Context q_ctx in Scenario T5 Generalization"
+    rationale: >
+      Measures whether endogenous context representations q_ctx maintained in cells
+      E5 (Z_ctx_1) and E6 (Z_ctx_2) exert a causal influence on multi-step composite
+      generalization in Scenario T5 graph environments.
+    interventions:
+      - condition: "intact"
+        description: "Standard continuous evolution across all 6 cells"
+      - condition: "zeroed_ctx"
+        description: "Clamping E5 and E6 (Z[32:48]) to 0.0 during query integration"
+      - condition: "scrambled_ctx"
+        description: "Random permutation of coordinates in E5 and E6"
+    environments:
+      - "relational_chain"
+      - "branching_non_bijective"
+    metrics:
+      - "accuracy_intact"
+      - "accuracy_zeroed_ctx"
+      - "accuracy_scrambled_ctx"
+      - "causal_drop_zeroed"
+      - "causal_drop_scrambled"
+
+  EXP_M4_T5_COMPOSITIONAL_GENERALIZATION:
+    name: "Compositional Generalization Across Consolidation Targets and Vortex Ablation"
+    rationale: >
+      Directly compares multi-hop compositional accuracy and false-positive rates
+      on distractor edges across B-consolidation and K-consolidation under PQT (A=A_I)
+      and noA (A=0).
+    environments:
+      - "relational_chain"
+      - "branching_non_bijective"
+    metrics:
+      - "comp_acc"
+      - "fp_rate"
+      - "anchor_degradation"
+      - "accepted_vs_rejected_updates"
