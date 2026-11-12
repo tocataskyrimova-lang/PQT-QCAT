@@ -78,24 +78,28 @@ def audit_single_policy(policy: str, seed: int = 42, idle_ticks: int = 1000) -> 
     res = engine.run_sleep_policy(policy=policy, core=core, ledger=ledger, idle_ticks=idle_ticks)
     core.step = original_step  # restore
 
-    # 1. Check sensory drive during sleep (calls where write_gate == 0.0)
+    # 1. Check sensory drive and physical sleep budget during sleep (calls where write_gate == 0.0)
     # Under protocol, idle sleep periods must have strictly zero sensory input
     sleep_calls = [c for c in calls_recorded if c[1] == 0.0]
     sleep_calls_with_sensory = [c for c in sleep_calls if c[0] is not None and np.any(c[0] != 0.0)]
     sensory_drive_strictly_zero = bool(len(sleep_calls_with_sensory) == 0)
 
-    # In no_replay, state_only: exactly idle_ticks must be executed with write_gate=0.0
-    if policy in ("no_replay", "state_only"):
-        step_budget_exact = bool(len(sleep_calls) == idle_ticks)
-    else:
-        # In replay / dream policies: dream cycles run plus remainder ticks = idle_ticks
-        step_budget_exact = bool(len(sleep_calls) >= idle_ticks - 250)
+    # EXACT PHYSICAL BUDGET: Every policy must execute exactly idle_ticks physical integration steps (CONTROL-FIX-002)
+    physical_integration_ticks = len(sleep_calls)
+    step_budget_exact = bool(physical_integration_ticks == idle_ticks)
 
     # 2. Check readout strictly frozen
     readout_strictly_frozen = bool(np.array_equal(core.W_readout, initial_W))
     delta_W_norm = float(np.linalg.norm(core.W_readout - initial_W))
 
-    # 3. Check vortex configuration and forces
+    # 3. Check vortex configuration and forces (CONTROL-FIX-002: no default vortex_verified=True)
+    expected_enable_vortex = bool("noA" not in policy)
+    actual_enable_vortex = bool(core.config.enable_vortex)
+    all_sleep_steps_match = bool(
+        len(vortex_states_during_sleep) > 0
+        and all(v == expected_enable_vortex for v in vortex_states_during_sleep)
+    )
+
     z_test = np.array([0.8, -0.5, 0.4, 0.8, -0.4, 0.5, -0.5, 0.2], dtype=np.float64)
     vortex_forces = []
     for c in range(6):
@@ -104,23 +108,18 @@ def audit_single_policy(policy: str, seed: int = 42, idle_ticks: int = 1000) -> 
 
     max_vortex_force = float(np.max([np.linalg.norm(f) for f in vortex_forces]))
 
-    if "noA" in policy:
-        # Throughout ALL sleep steps, enable_vortex must have been continuously False
-        all_sleep_steps_noA = all(v is False for v in vortex_states_during_sleep)
+    if expected_enable_vortex:
         vortex_verified = bool(
-            core.config.enable_vortex is False
-            and all_sleep_steps_noA
-            and max_vortex_force < 1e-15
-        )
-    elif "PQT" in policy:
-        all_sleep_steps_pqt = all(v is True for v in vortex_states_during_sleep)
-        vortex_verified = bool(
-            core.config.enable_vortex is True
-            and all_sleep_steps_pqt
+            actual_enable_vortex is True
+            and all_sleep_steps_match
             and max_vortex_force > 1e-3
         )
     else:
-        vortex_verified = True
+        vortex_verified = bool(
+            actual_enable_vortex is False
+            and all_sleep_steps_match
+            and max_vortex_force < 1e-15
+        )
 
     # 4. Check gate behavior and anchor guard
     anchors = ledger.get_anchors()
@@ -179,7 +178,9 @@ def audit_single_policy(policy: str, seed: int = 42, idle_ticks: int = 1000) -> 
             "sensory_drive_strictly_zero": sensory_drive_strictly_zero,
             "readout_strictly_frozen": readout_strictly_frozen,
             "delta_W_norm": delta_W_norm,
+            "expected_enable_vortex": expected_enable_vortex,
             "enable_vortex_flag": core.config.enable_vortex,
+            "all_sleep_steps_vortex_matched": all_sleep_steps_match,
             "max_measured_vortex_force": max_vortex_force,
             "vortex_behavior_verified": vortex_verified,
             "anchor_accuracy_before": res["anchor_accuracy_before"],
@@ -190,6 +191,8 @@ def audit_single_policy(policy: str, seed: int = 42, idle_ticks: int = 1000) -> 
             "provenance_isolated_verified": provenance_isolated,
             "delta_K_norm": res["delta_K_norm"],
             "delta_B_norm": res["delta_B_norm"],
+            "budget_metrics": res.get("budget_metrics", {}),
+            "rng_fingerprints": res.get("rng_fingerprints", {}),
         },
         "audit_verdict": "COMPLIANT" if compliant else "NON_COMPLIANT",
     }

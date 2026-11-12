@@ -16,6 +16,7 @@ Implements:
 """
 from __future__ import annotations
 from dataclasses import dataclass
+import hashlib
 import numpy as np
 
 from ..core.six_echelon import SixEchelonCore
@@ -68,6 +69,7 @@ class DreamConsolidationEngine:
         core: SixEchelonCore,
         ledger: WitnessLedger,
         idle_ticks: int = 1000,
+        dream_seed: int | None = None,
     ) -> dict:
         """Run an autonomous sleep session under a specified policy.
         
@@ -81,12 +83,17 @@ class DreamConsolidationEngine:
             Audit ledger containing B_real observations and anchors.
         idle_ticks : int
             Total physical idle duration (default 1000 ticks per protocol H3-SLEEP-SAFE).
+        dream_seed : int | None
+            Explicit RNG seed for paired comparisons (CONTROL-FIX-002).
             
         Returns
         -------
         dict
-            Execution diagnostics including anchor retention, accepted/rejected updates, and core drift.
+            Execution diagnostics including anchor retention, accepted/rejected updates, core drift,
+            budget metrics, and cryptographic RNG fingerprints.
         """
+        run_seed = self.seed if dream_seed is None else dream_seed
+
         # Strict enforcement of vortex ablation for noA policies across entire sleep trial
         is_noA = bool("noA" in policy)
         if is_noA:
@@ -95,41 +102,69 @@ class DreamConsolidationEngine:
         elif "PQT" in policy:
             core.config.enable_vortex = True
 
+        initial_K = core.K.copy()
+        initial_B = core.B.copy()
+
+        # Compute initial state hash for paired comparison verification at trial entry
+        init_state_bytes = (
+            core.Z.tobytes() +
+            initial_K.tobytes() +
+            initial_B.tobytes() +
+            core.W_readout.tobytes()
+        )
+        initial_state_hash = hashlib.sha256(init_state_bytes).hexdigest()
+
         anchors = ledger.get_anchors()
         acc_before = self.anchor_guard.evaluate_anchors(core, anchors)
 
-        initial_K = core.K.copy()
-        initial_B = core.B.copy()
+        # Compute training observations hash
+        real_events_str = ";".join(f"{e.event_id}:{e.input_token}->{e.target_token}" for e in ledger.b_real)
+        training_events_hash = hashlib.sha256(real_events_str.encode("utf-8")).hexdigest()
 
         accepted_count = 0
         rejected_count = 0
         rejection_reasons: list[str] = []
+
+        # Granular budget accounting (CONTROL-FIX-002)
+        physical_integration_ticks = 0
+        event_presentations = 0
+        consolidation_steps = 0
+        total_compute_steps = 0
 
         is_k_consolidation = bool(
             self.config.target_matrix == "K"
             or policy.endswith("_K")
         )
 
+        dream_seed_events_hash = ""
+        dream_noise_stream_hash = ""
+
         if policy == "no_replay":
             # Pure idle ticks with write_gate=0.0 and zero sensory input: baseline passive forgetting
             for _ in range(idle_ticks):
                 core.step(x_t=None, write_gate=0.0)
+                physical_integration_ticks += 1
+                total_compute_steps += 1
 
         elif policy == "state_only":
             # Dynamic state runs with thermal noise, but core parameters are untouched
-            rng = np.random.default_rng(self.seed)
+            rng = np.random.default_rng(run_seed)
             for _ in range(idle_ticks):
                 noise = rng.normal(0.0, 0.05, size=48) * np.sqrt(core.config.h_base)
                 core.Z += noise
                 core.step(x_t=None, write_gate=0.0)
+                physical_integration_ticks += 1
+                total_compute_steps += 1
 
         elif policy == "naive_replay":
             # Replay observed events without anchor guard protection (negative control)
-            rng = np.random.default_rng(self.seed)
+            rng = np.random.default_rng(run_seed)
             real_events = ledger.real_events
             if real_events:
                 for _ in range(self.config.dream_cycles):
                     ev = rng.choice(real_events)
+                    event_presentations += 1
+                    consolidation_steps += 1
                     # Naive gradient update without gates
                     if is_k_consolidation:
                         delta_K = np.zeros_like(core.K)
@@ -142,17 +177,22 @@ class DreamConsolidationEngine:
                         delta_B[31 + ev.target_token, ev.input_token] = self.config.eta_dream
                         core.B += delta_B
                     accepted_count += 1
-            # Remaining idle ticks
-            for _ in range(max(0, idle_ticks - self.config.dream_cycles * 10)):
+
+            # Physical rest ticks: exactly idle_ticks (1000 ticks) of physical integration
+            for _ in range(idle_ticks):
                 core.step(x_t=None, write_gate=0.0)
+                physical_integration_ticks += 1
+                total_compute_steps += 1
 
         elif policy in ("guarded_replay", "guarded_replay_K"):
             # Replay exclusively real events from B_real with anchor protection
-            rng = np.random.default_rng(self.seed)
+            rng = np.random.default_rng(run_seed)
             real_events = ledger.real_events
             if real_events:
                 for _ in range(self.config.dream_cycles):
                     ev = rng.choice(real_events)
+                    event_presentations += 1
+                    consolidation_steps += 1
                     if is_k_consolidation:
                         delta_K = np.zeros_like(core.K)
                         src_idx = ev.input_token - 1 if ev.input_token > 0 else 0
@@ -172,25 +212,35 @@ class DreamConsolidationEngine:
                     else:
                         rejected_count += 1
                         rejection_reasons.append("anchor_degradation")
-            for _ in range(max(0, idle_ticks - self.config.dream_cycles * 10)):
+
+            # Physical rest ticks: exactly idle_ticks (1000 ticks) of physical integration
+            for _ in range(idle_ticks):
                 core.step(x_t=None, write_gate=0.0)
+                physical_integration_ticks += 1
+                total_compute_steps += 1
 
         elif policy in ("noA_dream", "PQT_dream", "noA_dream_K", "PQT_dream_K"):
             # Counterfactual Dream Generation & Gated Consolidation
-            # Set core vortex strictly according to policy
             if is_noA:
                 core.config.enable_vortex = False
                 core.integrator.vortex_params = VortexParameters(0.0, 0.0, 0.0, beta_v=core.config.beta_v)
             elif "PQT" in policy:
                 core.config.enable_vortex = True
 
-            # Generate counterfactual candidates via symmetric generator
+            # Generate counterfactual candidates via symmetric generator with deterministic RNG
             candidates = self.generator.generate_candidate_hypotheses(
-                core, ledger, cycle_count=self.config.dream_cycles
+                core, ledger, cycle_count=self.config.dream_cycles, reset_seed=run_seed
             )
+            physical_integration_ticks += self.generator.last_integrated_ticks
+            event_presentations += self.generator.last_presentation_ticks
+            total_compute_steps += (self.generator.last_integrated_ticks + self.generator.last_presentation_ticks)
+
+            dream_seed_events_hash = str(self.generator.last_rng_fingerprints.get("dream_seed_events_hash", ""))
+            dream_noise_stream_hash = str(self.generator.last_rng_fingerprints.get("dream_noise_stream_hash", ""))
 
             # Process candidates through the 3 gates
             for cand in candidates:
+                consolidation_steps += 1
                 # Gate 1: Provenance and consistency
                 if not self.provenance_gate.check(cand, ledger):
                     rejected_count += 1
@@ -227,8 +277,12 @@ class DreamConsolidationEngine:
                     rejection_reasons.append("anchor_guard_rollback")
 
             # Remaining idle ticks run under the policy's genuine vortex setting (A=0 for noA, A=A_I for PQT)
-            for _ in range(max(0, idle_ticks - self.config.dream_cycles * 10)):
+            # Reaches EXACTLY idle_ticks physical integration steps
+            remaining_ticks = max(0, idle_ticks - self.generator.last_integrated_ticks)
+            for _ in range(remaining_ticks):
                 core.step(x_t=None, write_gate=0.0)
+                physical_integration_ticks += 1
+                total_compute_steps += 1
 
             if is_noA:
                 assert core.config.enable_vortex is False, "Ablation failure: enable_vortex was unexpectedly True in noA"
@@ -252,4 +306,19 @@ class DreamConsolidationEngine:
             "rejection_reasons": rejection_reasons,
             "delta_K_norm": delta_K_norm,
             "delta_B_norm": delta_B_norm,
+            "budget_metrics": {
+                "idle_ticks_target": idle_ticks,
+                "physical_integration_ticks": physical_integration_ticks,
+                "event_presentations": event_presentations,
+                "consolidation_steps": consolidation_steps,
+                "accepted_updates": accepted_count,
+                "rejected_updates": rejected_count,
+                "total_compute_steps": total_compute_steps,
+            },
+            "rng_fingerprints": {
+                "initial_state_hash": initial_state_hash,
+                "training_events_hash": training_events_hash,
+                "dream_seed_events_hash": dream_seed_events_hash,
+                "dream_noise_stream_hash": dream_noise_stream_hash,
+            },
         }

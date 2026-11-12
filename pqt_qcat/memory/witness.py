@@ -255,20 +255,24 @@ class AnchorGuardGate:
         if not anchors:
             return 1.0
 
+        saved_z = core.Z.copy()
         corr = 0
-        for anc in anchors:
-            core.Z.fill(0.0)
-            for c in range(6):
-                core.Z[8 * c + 6] = 1.0
-            x = np.zeros(core.config.d_in)
-            x[anc.input_token] = 1.0
-            for _ in range(ticks_per_token):
-                core.step(x, write_gate=1.0)
-            logits = core.predict()
-            pred = int(np.argmax(logits[1:5])) + 1
-            if pred == anc.target_token:
-                corr += 1
-        return corr / len(anchors)
+        try:
+            for anc in anchors:
+                core.Z.fill(0.0)
+                for c in range(6):
+                    core.Z[8 * c + 6] = 1.0
+                x = np.zeros(core.config.d_in)
+                x[anc.input_token] = 1.0
+                for _ in range(ticks_per_token):
+                    core.step(x, write_gate=1.0)
+                logits = core.predict()
+                pred = int(np.argmax(logits[1:5])) + 1
+                if pred == anc.target_token:
+                    corr += 1
+            return corr / len(anchors)
+        finally:
+            core.Z[:] = saved_z
 
     def check_and_apply(
         self,

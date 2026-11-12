@@ -73,7 +73,7 @@ def run_t4_benchmark(seed: int = CALIBRATION_SEED) -> dict:
                 context_basin=1,
             )
 
-        res = engine.run_sleep_policy(policy=pol, core=core, ledger=ledger, idle_ticks=1000)
+        res = engine.run_sleep_policy(policy=pol, core=core, ledger=ledger, idle_ticks=1000, dream_seed=seed)
         ledger.assert_no_unverified_promotions()
         results[pol] = res
 
@@ -111,7 +111,7 @@ def run_t5_benchmark(seed: int = CALIBRATION_SEED) -> dict:
                     confidence=0.98,
                 )
 
-            sleep_diag = engine.run_sleep_policy(pol, core, ledger, idle_ticks=300)
+            sleep_diag = engine.run_sleep_policy(pol, core, ledger, idle_ticks=300, dream_seed=seed)
             ledger.assert_no_unverified_promotions()
 
             # Evaluate hidden test edges post-sleep

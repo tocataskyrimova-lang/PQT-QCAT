@@ -13,7 +13,9 @@
         "sensory_drive_strictly_zero": true,
         "readout_strictly_frozen": true,
         "delta_W_norm": 0.0,
+        "expected_enable_vortex": true,
         "enable_vortex_flag": true,
+        "all_sleep_steps_vortex_matched": true,
         "max_measured_vortex_force": 5.110281825533043,
         "vortex_behavior_verified": true,
         "anchor_accuracy_before": 1.0,
@@ -23,7 +25,22 @@
         "gate_behavior_verified": true,
         "provenance_isolated_verified": true,
         "delta_K_norm": 0.0,
-        "delta_B_norm": 0.0
+        "delta_B_norm": 0.0,
+        "budget_metrics": {
+          "idle_ticks_target": 1000,
+          "physical_integration_ticks": 1000,
+          "event_presentations": 0,
+          "consolidation_steps": 0,
+          "accepted_updates": 0,
+          "rejected_updates": 0,
+          "total_compute_steps": 1000
+        },
+        "rng_fingerprints": {
+          "initial_state_hash": "8e8cd2bf75aada0d71f5186eff1597f572b29091f9eceec2f46f5f4822e45ac7",
+          "training_events_hash": "38f3e75e659001a164fd16fa8c7fe867742da0a30d421701b4b24c8210a5f8cf",
+          "dream_seed_events_hash": "",
+          "dream_noise_stream_hash": ""
+        }
       },
       "audit_verdict": "COMPLIANT"
     },
@@ -36,7 +53,9 @@
         "sensory_drive_strictly_zero": true,
         "readout_strictly_frozen": true,
         "delta_W_norm": 0.0,
+        "expected_enable_vortex": true,
         "enable_vortex_flag": true,
+        "all_sleep_steps_vortex_matched": true,
         "max_measured_vortex_force": 5.110281825533043,
         "vortex_behavior_verified": true,
         "anchor_accuracy_before": 1.0,
@@ -46,20 +65,37 @@
         "gate_behavior_verified": true,
         "provenance_isolated_verified": true,
         "delta_K_norm": 0.0,
-        "delta_B_norm": 0.0
+        "delta_B_norm": 0.0,
+        "budget_metrics": {
+          "idle_ticks_target": 1000,
+          "physical_integration_ticks": 1000,
+          "event_presentations": 0,
+          "consolidation_steps": 0,
+          "accepted_updates": 0,
+          "rejected_updates": 0,
+          "total_compute_steps": 1000
+        },
+        "rng_fingerprints": {
+          "initial_state_hash": "8e8cd2bf75aada0d71f5186eff1597f572b29091f9eceec2f46f5f4822e45ac7",
+          "training_events_hash": "38f3e75e659001a164fd16fa8c7fe867742da0a30d421701b4b24c8210a5f8cf",
+          "dream_seed_events_hash": "",
+          "dream_noise_stream_hash": ""
+        }
       },
       "audit_verdict": "COMPLIANT"
     },
     "naive_replay": {
       "policy": "naive_replay",
       "empirical_checks": {
-        "sleep_ticks_recorded": 750,
+        "sleep_ticks_recorded": 1000,
         "idle_ticks_budget": 1000,
         "step_budget_exact": true,
         "sensory_drive_strictly_zero": true,
         "readout_strictly_frozen": true,
         "delta_W_norm": 0.0,
+        "expected_enable_vortex": true,
         "enable_vortex_flag": true,
+        "all_sleep_steps_vortex_matched": true,
         "max_measured_vortex_force": 5.110281825533043,
         "vortex_behavior_verified": true,
         "anchor_accuracy_before": 1.0,
@@ -69,20 +105,37 @@
         "gate_behavior_verified": true,
         "provenance_isolated_verified": true,
         "delta_K_norm": 0.0,
-        "delta_B_norm": 0.6422616289332541
+        "delta_B_norm": 0.6422616289332541,
+        "budget_metrics": {
+          "idle_ticks_target": 1000,
+          "physical_integration_ticks": 1000,
+          "event_presentations": 25,
+          "consolidation_steps": 25,
+          "accepted_updates": 25,
+          "rejected_updates": 0,
+          "total_compute_steps": 1000
+        },
+        "rng_fingerprints": {
+          "initial_state_hash": "8e8cd2bf75aada0d71f5186eff1597f572b29091f9eceec2f46f5f4822e45ac7",
+          "training_events_hash": "38f3e75e659001a164fd16fa8c7fe867742da0a30d421701b4b24c8210a5f8cf",
+          "dream_seed_events_hash": "",
+          "dream_noise_stream_hash": ""
+        }
       },
       "audit_verdict": "COMPLIANT"
     },
     "guarded_replay": {
       "policy": "guarded_replay",
       "empirical_checks": {
-        "sleep_ticks_recorded": 750,
+        "sleep_ticks_recorded": 1000,
         "idle_ticks_budget": 1000,
         "step_budget_exact": true,
         "sensory_drive_strictly_zero": true,
         "readout_strictly_frozen": true,
         "delta_W_norm": 0.0,
+        "expected_enable_vortex": true,
         "enable_vortex_flag": true,
+        "all_sleep_steps_vortex_matched": true,
         "max_measured_vortex_force": 5.110281825533043,
         "vortex_behavior_verified": true,
         "anchor_accuracy_before": 1.0,
@@ -92,7 +145,22 @@
         "gate_behavior_verified": true,
         "provenance_isolated_verified": true,
         "delta_K_norm": 0.0,
-        "delta_B_norm": 0.3211308144666328
+        "delta_B_norm": 0.3211308144666328,
+        "budget_metrics": {
+          "idle_ticks_target": 1000,
+          "physical_integration_ticks": 1000,
+          "event_presentations": 25,
+          "consolidation_steps": 25,
+          "accepted_updates": 25,
+          "rejected_updates": 0,
+          "total_compute_steps": 1000
+        },
+        "rng_fingerprints": {
+          "initial_state_hash": "8e8cd2bf75aada0d71f5186eff1597f572b29091f9eceec2f46f5f4822e45ac7",
+          "training_events_hash": "38f3e75e659001a164fd16fa8c7fe867742da0a30d421701b4b24c8210a5f8cf",
+          "dream_seed_events_hash": "",
+          "dream_noise_stream_hash": ""
+        }
       },
       "audit_verdict": "COMPLIANT"
     },
@@ -105,7 +173,9 @@
         "sensory_drive_strictly_zero": true,
         "readout_strictly_frozen": true,
         "delta_W_norm": 0.0,
+        "expected_enable_vortex": false,
         "enable_vortex_flag": false,
+        "all_sleep_steps_vortex_matched": true,
         "max_measured_vortex_force": 0.0,
         "vortex_behavior_verified": true,
         "anchor_accuracy_before": 1.0,
@@ -115,7 +185,22 @@
         "gate_behavior_verified": true,
         "provenance_isolated_verified": true,
         "delta_K_norm": 0.0,
-        "delta_B_norm": 0.0722327394695488
+        "delta_B_norm": 0.0722327394695488,
+        "budget_metrics": {
+          "idle_ticks_target": 1000,
+          "physical_integration_ticks": 1000,
+          "event_presentations": 25,
+          "consolidation_steps": 25,
+          "accepted_updates": 15,
+          "rejected_updates": 10,
+          "total_compute_steps": 1025
+        },
+        "rng_fingerprints": {
+          "initial_state_hash": "8e8cd2bf75aada0d71f5186eff1597f572b29091f9eceec2f46f5f4822e45ac7",
+          "training_events_hash": "38f3e75e659001a164fd16fa8c7fe867742da0a30d421701b4b24c8210a5f8cf",
+          "dream_seed_events_hash": "71a6666481681692f46cbf3f80a7751ba2c4a91f05fea181e17ddec3c9790fcc",
+          "dream_noise_stream_hash": "ae536b779d4d331c57264571150e07d08358949536d184070edd484ccb3cf2aa"
+        }
       },
       "audit_verdict": "COMPLIANT"
     },
@@ -128,7 +213,9 @@
         "sensory_drive_strictly_zero": true,
         "readout_strictly_frozen": true,
         "delta_W_norm": 0.0,
+        "expected_enable_vortex": true,
         "enable_vortex_flag": true,
+        "all_sleep_steps_vortex_matched": true,
         "max_measured_vortex_force": 5.110281825533043,
         "vortex_behavior_verified": true,
         "anchor_accuracy_before": 1.0,
@@ -138,7 +225,22 @@
         "gate_behavior_verified": true,
         "provenance_isolated_verified": true,
         "delta_K_norm": 0.0,
-        "delta_B_norm": 0.06872782927813097
+        "delta_B_norm": 0.06872782927813097,
+        "budget_metrics": {
+          "idle_ticks_target": 1000,
+          "physical_integration_ticks": 1000,
+          "event_presentations": 25,
+          "consolidation_steps": 25,
+          "accepted_updates": 14,
+          "rejected_updates": 11,
+          "total_compute_steps": 1025
+        },
+        "rng_fingerprints": {
+          "initial_state_hash": "8e8cd2bf75aada0d71f5186eff1597f572b29091f9eceec2f46f5f4822e45ac7",
+          "training_events_hash": "38f3e75e659001a164fd16fa8c7fe867742da0a30d421701b4b24c8210a5f8cf",
+          "dream_seed_events_hash": "71a6666481681692f46cbf3f80a7751ba2c4a91f05fea181e17ddec3c9790fcc",
+          "dream_noise_stream_hash": "ae536b779d4d331c57264571150e07d08358949536d184070edd484ccb3cf2aa"
+        }
       },
       "audit_verdict": "COMPLIANT"
     }
