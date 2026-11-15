@@ -1,5 +1,6 @@
 {
   ".gitattributes": "90577dd896cb616ccd4dd2959b5bcb1f49e7f5183799ead856789263f6666649",
+  ".github/workflows/ci.yml": "03de2cdfe047d09d9e5fcec270e9abf8fecf8055191474deef2ca695f9a04121",
   ".gitignore": "a3fa2e657229534b2ff4d0065e0068451267fa0d6c7a3ea984943c42b87d85d0",
   "ARCHITECTURE_LIFE_002.md": "58daebaadee042d8f176b8cfb68b634effbf898c7d1adab18d7bd5554a725d20",
   "CONTROL_FIX_001_REPORT.md": "f6a8ebe8489fcad8d03f1a1383ed3d530f789320065e7c331dc5c10eb5629136",
@@ -50,6 +51,8 @@
   "prereg/LIFE002_PREREG_001.yaml": "2cf53f0c7004358140e96b5decb84782a015044617764400dc5c82812ce3e272",
   "prereg/PDF_CODE_DISCREPANCIES.md": "894f28f16f1481acd448df21ca89e64f0e34337b2d3b2d7ca7fce486e8f45a77",
   "prereg/prereg.lock.json": "8c64f0906f8bd1dbddcfd1ea3725eb2dc467eeb4f1ef33149adb88d25f72fd99",
+  "README.md": "9f31db01ba9243606b28885d874e32e2d362a3ae56ff94238bdb5733751e8638",
+  "requirements.txt": "7fc2b6526c7ab0957dbd5ae670904c9882351cef863c2f22d9ad7d97b1a69309",
   "run_m1_benchmarks.py": "94a2b8fcb84cfcca538f9e1710d12ccab60018eef7ff1d0fb0ec38342c1252c4",
   "run_m2_benchmarks.py": "2905d1b0e531d509555f903509b9ec1b20c322f5e7cb312cffe7044e21243b93",
   "run_m3_benchmarks.py": "acf0504a5c8a5184db6cf93827239d243e3c1851e305f56a8bd8a1a5f927337e",
