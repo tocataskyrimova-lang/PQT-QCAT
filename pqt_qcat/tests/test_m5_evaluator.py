@@ -11,7 +11,11 @@ from pqt_qcat.evaluator.independent_evaluator import (
     SEALED_SEEDS,
     CALIBRATION_SEEDS,
 )
-from pqt_qcat.evaluator.manifest import generate_sha256_manifest, verify_sha256_manifest
+from pqt_qcat.evaluator.manifest import (
+    generate_sha256_manifest,
+    verify_sha256_manifest,
+    compute_file_sha256,
+)
 
 
 def test_sealed_seeds_protection():
@@ -77,3 +81,18 @@ def test_sha256_manifest_and_verification():
     assert success is True
     assert len(mismatches) == 0
     assert count == gen_res["total_files_hashed"]
+
+
+def test_cross_platform_line_ending_manifest_invariance(tmp_path):
+    """Verify that SHA-256 computation is strictly invariant to CRLF vs LF line endings."""
+    test_file_lf = tmp_path / "test_lf.py"
+    test_file_crlf = tmp_path / "test_crlf.py"
+
+    code_content = "def hello():\n    return 'world'\n"
+    test_file_lf.write_bytes(code_content.encode("utf-8"))
+    test_file_crlf.write_bytes(code_content.replace("\n", "\r\n").encode("utf-8"))
+
+    hash_lf = compute_file_sha256(test_file_lf)
+    hash_crlf = compute_file_sha256(test_file_crlf)
+
+    assert hash_lf == hash_crlf, "SHA-256 must be identical across CRLF and LF checkouts"

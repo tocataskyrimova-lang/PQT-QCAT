@@ -25,14 +25,51 @@ EXCLUDE_EXTS = {
     ".jsonl",
 }
 
+TEXT_EXTS = {
+    ".py",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".md",
+    ".txt",
+    ".sh",
+    ".gitignore",
+    ".gitattributes",
+}
+
+
+def is_text_file(path: Path) -> bool:
+    """Check if file is a known text file or contains no null bytes."""
+    p = Path(path)
+    if p.suffix.lower() in TEXT_EXTS or p.name in {".gitignore", ".gitattributes"}:
+        return True
+    try:
+        with open(p, "rb") as f:
+            chunk = f.read(1024)
+            return b"\x00" not in chunk
+    except Exception:
+        return False
+
 
 def compute_file_sha256(path: Path) -> str:
-    """Compute SHA-256 hash of a file."""
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        while chunk := f.read(65536):
-            h.update(chunk)
-    return h.hexdigest()
+    """Compute canonical SHA-256 hash of a file.
+    
+    For text files, normalizes CRLF to LF to guarantee consistent cross-platform
+    hashes regardless of checkout environment (Ubuntu vs Windows).
+    For binary files, hashes raw bytes directly.
+    """
+    p = Path(path)
+    if is_text_file(p):
+        with open(p, "rb") as f:
+            content = f.read()
+        canonical_content = content.replace(b"\r\n", b"\n")
+        return hashlib.sha256(canonical_content).hexdigest()
+    else:
+        h = hashlib.sha256()
+        with open(p, "rb") as f:
+            while chunk := f.read(65536):
+                h.update(chunk)
+        return h.hexdigest()
 
 
 def generate_sha256_manifest(root_dir: Path | str | None = None) -> dict:
@@ -58,15 +95,16 @@ def generate_sha256_manifest(root_dir: Path | str | None = None) -> dict:
         sha256_hash = compute_file_sha256(path)
         manifest[str(rel_path).replace("\\", "/")] = sha256_hash
 
-    # Save to JSON and TXT
+    # Save to JSON and TXT with explicit LF newlines
     json_path = root / "prereg" / "MANIFEST_SHA256_LIFE002.json"
     txt_path = root / "prereg" / "MANIFEST_SHA256_LIFE002.txt"
 
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(json_path, "w", encoding="utf-8") as f:
+    with open(json_path, "w", encoding="utf-8", newline="\n") as f:
         json.dump(manifest, f, indent=2)
+        f.write("\n")
 
-    with open(txt_path, "w", encoding="utf-8") as f:
+    with open(txt_path, "w", encoding="utf-8", newline="\n") as f:
         for file_path, h in manifest.items():
             f.write(f"{h}  {file_path}\n")
 
