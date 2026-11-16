@@ -1,0 +1,370 @@
+{
+  "seed": 42,
+  "epochs": 25,
+  "b_frozen_verified": true,
+  "delta_B_norm_twin1": 0.0,
+  "delta_B_norm_twin2": 0.0,
+  "W_readout_frozen_verified": true,
+  "delta_W_norm_twin1": 0.0,
+  "delta_W_norm_twin2": 0.0,
+  "K_initial_norm": 4.325490072246746,
+  "delta_K_norm_twin1_relative": 13.628999612265153,
+  "delta_K_norm_twin2_relative": 14.055708885675246,
+  "B_initial_sha256": "b81935df60c59d0c0422e1a4617dc1872a7f5fa5bbbb92244934a760508a9c3a",
+  "W_initial_sha256": "b264190fe152f0921a8b596b590af30f8d972851884600b940ed340da5d1bb25",
+  "K_initial_sha256": "358a6284f6c2919dc1aa1306ccd3a015c1b045351d0016274fe3313e504977b1",
+  "K1_trained_sha256": "e1d10e31b4d6dfa50983ceffb33f824ad0635eab43c8c74a607f29b417d0108e",
+  "K2_trained_sha256": "0833a34ae960cda60efba0e9acd43ea02c05f517cd6f531ac72ef8e75cd9d3e4",
+  "accuracies": {
+    "pre_swap": {
+      "twin1_on_task_a": 1.0,
+      "twin1_on_task_b": 0.0,
+      "twin2_on_task_b": 1.0,
+      "twin2_on_task_a": 0.0
+    },
+    "post_swap": {
+      "twin1_with_k2_on_task_b": 1.0,
+      "twin1_with_k2_on_task_a": 0.0,
+      "twin2_with_k1_on_task_a": 1.0,
+      "twin2_with_k1_on_task_b": 0.0
+    },
+    "return_swap": {
+      "twin1_restored_on_task_a": 1.0,
+      "twin1_restored_on_task_b": 0.0,
+      "twin2_restored_on_task_b": 1.0,
+      "twin2_restored_on_task_a": 0.0
+    }
+  },
+  "query_details": {
+    "pre_swap": [
+      {
+        "token": 1,
+        "target_a": 2,
+        "target_b": 4,
+        "twin1": {
+          "logits": [
+            -0.011274618016274255,
+            0.08567096440237038,
+            -0.010947062894193034,
+            -0.07439634638609612
+          ],
+          "pred": 2,
+          "correct_a": true,
+          "correct_b": false
+        },
+        "twin2": {
+          "logits": [
+            -0.12243928576653815,
+            -0.11144791993700638,
+            0.016609072045613148,
+            0.23388720570354454
+          ],
+          "pred": 4,
+          "correct_a": false,
+          "correct_b": true
+        }
+      },
+      {
+        "token": 2,
+        "target_a": 3,
+        "target_b": 1,
+        "twin1": {
+          "logits": [
+            -0.013281015455151157,
+            -0.016176807410862824,
+            0.09020482004611868,
+            0.02945782286601398
+          ],
+          "pred": 3,
+          "correct_a": true,
+          "correct_b": false
+        },
+        "twin2": {
+          "logits": [
+            0.07047943022447233,
+            -0.019720125069692993,
+            0.0057052435916951,
+            -0.05075930515477933
+          ],
+          "pred": 1,
+          "correct_a": false,
+          "correct_b": true
+        }
+      },
+      {
+        "token": 3,
+        "target_a": 4,
+        "target_b": 2,
+        "twin1": {
+          "logits": [
+            -0.10386346028860251,
+            -0.10674152382880939,
+            -0.0004217185589152142,
+            0.2106049841174119
+          ],
+          "pred": 4,
+          "correct_a": true,
+          "correct_b": false
+        },
+        "twin2": {
+          "logits": [
+            -0.030390607314776275,
+            0.0807602075706549,
+            0.0057387363969258485,
+            -0.050369600255878624
+          ],
+          "pred": 2,
+          "correct_a": false,
+          "correct_b": true
+        }
+      },
+      {
+        "token": 4,
+        "target_a": 1,
+        "target_b": 3,
+        "twin1": {
+          "logits": [
+            0.0631975322078367,
+            -0.014246453366552133,
+            0.00458831508055312,
+            -0.04895107884128457
+          ],
+          "pred": 1,
+          "correct_a": true,
+          "correct_b": false
+        },
+        "twin2": {
+          "logits": [
+            -0.03149988238122531,
+            -0.020346929282362265,
+            0.09601308700494746,
+            0.05184681166358757
+          ],
+          "pred": 3,
+          "correct_a": false,
+          "correct_b": true
+        }
+      }
+    ],
+    "post_swap": [
+      {
+        "token": 1,
+        "target_a": 2,
+        "target_b": 4,
+        "twin1_with_k2": {
+          "logits": [
+            -0.12243928576653815,
+            -0.11144791993700638,
+            0.016609072045613148,
+            0.23388720570354454
+          ],
+          "pred": 4,
+          "correct_a": false,
+          "correct_b": true
+        },
+        "twin2_with_k1": {
+          "logits": [
+            -0.011274618016274255,
+            0.08567096440237038,
+            -0.010947062894193034,
+            -0.07439634638609612
+          ],
+          "pred": 2,
+          "correct_a": true,
+          "correct_b": false
+        }
+      },
+      {
+        "token": 2,
+        "target_a": 3,
+        "target_b": 1,
+        "twin1_with_k2": {
+          "logits": [
+            0.07047943022447233,
+            -0.019720125069692993,
+            0.0057052435916951,
+            -0.05075930515477933
+          ],
+          "pred": 1,
+          "correct_a": false,
+          "correct_b": true
+        },
+        "twin2_with_k1": {
+          "logits": [
+            -0.013281015455151157,
+            -0.016176807410862824,
+            0.09020482004611868,
+            0.02945782286601398
+          ],
+          "pred": 3,
+          "correct_a": true,
+          "correct_b": false
+        }
+      },
+      {
+        "token": 3,
+        "target_a": 4,
+        "target_b": 2,
+        "twin1_with_k2": {
+          "logits": [
+            -0.030390607314776275,
+            0.0807602075706549,
+            0.0057387363969258485,
+            -0.050369600255878624
+          ],
+          "pred": 2,
+          "correct_a": false,
+          "correct_b": true
+        },
+        "twin2_with_k1": {
+          "logits": [
+            -0.10386346028860251,
+            -0.10674152382880939,
+            -0.0004217185589152142,
+            0.2106049841174119
+          ],
+          "pred": 4,
+          "correct_a": true,
+          "correct_b": false
+        }
+      },
+      {
+        "token": 4,
+        "target_a": 1,
+        "target_b": 3,
+        "twin1_with_k2": {
+          "logits": [
+            -0.03149988238122531,
+            -0.020346929282362265,
+            0.09601308700494746,
+            0.05184681166358757
+          ],
+          "pred": 3,
+          "correct_a": false,
+          "correct_b": true
+        },
+        "twin2_with_k1": {
+          "logits": [
+            0.0631975322078367,
+            -0.014246453366552133,
+            0.00458831508055312,
+            -0.04895107884128457
+          ],
+          "pred": 1,
+          "correct_a": true,
+          "correct_b": false
+        }
+      }
+    ],
+    "return_swap": [
+      {
+        "token": 1,
+        "target_a": 2,
+        "target_b": 4,
+        "twin1_restored": {
+          "logits": [
+            -0.011274618016274255,
+            0.08567096440237038,
+            -0.010947062894193034,
+            -0.07439634638609612
+          ],
+          "pred": 2,
+          "correct_a": true,
+          "correct_b": false
+        },
+        "twin2_restored": {
+          "logits": [
+            -0.12243928576653815,
+            -0.11144791993700638,
+            0.016609072045613148,
+            0.23388720570354454
+          ],
+          "pred": 4,
+          "correct_a": false,
+          "correct_b": true
+        }
+      },
+      {
+        "token": 2,
+        "target_a": 3,
+        "target_b": 1,
+        "twin1_restored": {
+          "logits": [
+            -0.013281015455151157,
+            -0.016176807410862824,
+            0.09020482004611868,
+            0.02945782286601398
+          ],
+          "pred": 3,
+          "correct_a": true,
+          "correct_b": false
+        },
+        "twin2_restored": {
+          "logits": [
+            0.07047943022447233,
+            -0.019720125069692993,
+            0.0057052435916951,
+            -0.05075930515477933
+          ],
+          "pred": 1,
+          "correct_a": false,
+          "correct_b": true
+        }
+      },
+      {
+        "token": 3,
+        "target_a": 4,
+        "target_b": 2,
+        "twin1_restored": {
+          "logits": [
+            -0.10386346028860251,
+            -0.10674152382880939,
+            -0.0004217185589152142,
+            0.2106049841174119
+          ],
+          "pred": 4,
+          "correct_a": true,
+          "correct_b": false
+        },
+        "twin2_restored": {
+          "logits": [
+            -0.030390607314776275,
+            0.0807602075706549,
+            0.0057387363969258485,
+            -0.050369600255878624
+          ],
+          "pred": 2,
+          "correct_a": false,
+          "correct_b": true
+        }
+      },
+      {
+        "token": 4,
+        "target_a": 1,
+        "target_b": 3,
+        "twin1_restored": {
+          "logits": [
+            0.0631975322078367,
+            -0.014246453366552133,
+            0.00458831508055312,
+            -0.04895107884128457
+          ],
+          "pred": 1,
+          "correct_a": true,
+          "correct_b": false
+        },
+        "twin2_restored": {
+          "logits": [
+            -0.03149988238122531,
+            -0.020346929282362265,
+            0.09601308700494746,
+            0.05184681166358757
+          ],
+          "pred": 3,
+          "correct_a": false,
+          "correct_b": true
+        }
+      }
+    ]
+  }
+}
