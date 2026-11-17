@@ -81,7 +81,7 @@ def test_diagnostic_probes_do_not_mutate():
     acc_n, _, _ = evaluate_query_accuracy(core, [4, 5, 6], task_map)
     
     assert np.array_equal(core.K, K_before), "K matrix modified during evaluation!"
-    # Note: query resets Z, but K and weights must be completely untouched
+    assert np.array_equal(core.Z, Z_before), "Evaluation changed the live Z"
 
 
 def test_exact_compute_budgets():
@@ -149,3 +149,103 @@ def test_rollback_exactness():
     
     assert np.array_equal(logits_post, logits_restored), "Logits did not match bit-for-bit after rollback restoration!"
     assert pred_post == pred_restored
+
+
+def test_carry_query_preserves_and_uses_state():
+    import copy
+    core = setup_fresh_core(42)
+    core.Z[32:35] = [0.7, -0.3, 0.1]
+    snapshot = copy.deepcopy(core.snapshot())
+    manual = copy.deepcopy(core)
+    x = np.zeros(8)
+    x[1] = 1
+    for _ in range(8):
+        manual.step(x, write_gate=1)
+    carried = query_core_prediction(core, 1, reset_state=False)[1]
+    reset = query_core_prediction(core, 1, reset_state=True)[1]
+    assert np.array_equal(carried, manual.predict()[1:5])
+    assert not np.array_equal(carried, reset)
+    for name in ('Z', 'K', 'B', 'W_readout'):
+        assert np.array_equal(getattr(core, name), snapshot[name])
+    assert core.rng.bit_generator.state == snapshot['rng_state']
+    # Each token begins from the same snapshot, irrespective of query order.
+    before = query_core_prediction(core, 2, reset_state=False)[1]
+    query_core_prediction(core, 1, reset_state=False)
+    assert np.array_equal(before, query_core_prediction(core, 2, reset_state=False)[1])
+
+
+def test_target_margin_is_negative_for_wrong_answer():
+    core = setup_fresh_core(42)
+    predicted, logits, _, _ = query_core_prediction(core, 1)
+    wrong_target = predicted % 4 + 1
+    accuracy, margin, _ = evaluate_query_accuracy(core, [1], {1: wrong_target})
+    assert accuracy == 0
+    assert margin < 0
+    assert margin == logits[wrong_target - 1] - max(np.delete(logits, wrong_target - 1))
+
+
+def test_instrumented_budget_and_paired_randomness(monkeypatch):
+    import copy
+    calls = 0
+    original = SixEchelonCore.step
+    def counted(self, *args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return original(self, *args, **kwargs)
+    monkeypatch.setattr(SixEchelonCore, 'step', counted)
+    base = setup_fresh_core(42)
+    events = [ObservedEvent(t, t, t % 4 + 1, 1, 'test') for t in range(1, 7)]
+    anchors = {e.token_in: e.target_token for e in events}
+    adapter = SleepAdapterNeed001(candidate_slots=2)
+    fingerprints = []
+    for policy in ('dream', 'replay', 'sham_dream', 'idle'):
+        calls = 0
+        records = []
+        core = copy.deepcopy(base)
+        metrics = adapter.run_sleep_session(policy, core, events, anchors, 987, records)
+        assert metrics['active_ticks'] == 1000
+        assert metrics['diagnostic_ticks'] == 96
+        assert calls == metrics['total_compute_ticks']
+        assert calls == (1096 if policy == 'idle' else 1288)
+        if policy != 'idle':
+            fingerprints.append([(r['grounding_event_id'], r['noise_sha256']) for r in records])
+        else:
+            manual = copy.deepcopy(base)
+            for _ in range(1000):
+                original(manual, x_t=None, write_gate=0)
+            assert np.array_equal(core.Z, manual.Z), 'Anchor checks changed idle dynamics'
+    assert fingerprints[0] == fingerprints[1] == fingerprints[2]
+
+
+def test_history_integration_pairs_policies_and_saves_actual_state(tmp_path):
+    import json
+    from pqt_qcat.memory.exp_sleep_need_001 import run_single_history_experiment
+    class CapturingAdapter(SleepAdapterNeed001):
+        def __init__(self):
+            super().__init__(candidate_slots=1)
+            self.end_states = {}
+        def run_sleep_session(self, **kwargs):
+            result = super().run_sleep_session(**kwargs)
+            self.end_states[kwargs['policy']] = kwargs['core'].Z.copy()
+            return result
+    adapter = CapturingAdapter()
+    logs = []
+    result = run_single_history_experiment(42, 0, generate_task_panel()[0], 'blocked',
+        12345, adapter, [], [], logs, [], tmp_path)
+    assert all(r['rollback_exact'] for r in result['policies'].values())
+    assert {r['run_seed'] for r in logs} == {12345}
+    assert len({(r['grounding_event_id'], r['noise_sha256']) for r in logs}) == 1
+    for policy, expected_z in adapter.end_states.items():
+        with np.load(tmp_path / f'post_seed42_task0_blocked_{policy}.npz', allow_pickle=False) as data:
+            assert np.array_equal(data['Z'], expected_z)
+            metadata = json.loads(str(data['metadata_json']))
+            assert metadata['run_seed'] == 12345
+            assert len(metadata['observed_events']) == 201
+
+
+def test_sealed_seeds_rejected_before_output(tmp_path):
+    from pqt_qcat.memory.exp_sleep_need_001 import run_stage_experiment
+    output = tmp_path / 'forbidden'
+    with pytest.raises(ValueError, match='sealed'):
+        run_stage_experiment('calibration', [101], generate_task_panel()[:1], output, {})
+    assert not output.exists()

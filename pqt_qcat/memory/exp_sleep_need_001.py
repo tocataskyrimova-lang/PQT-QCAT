@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import argparse
 import csv
-from dataclasses import dataclass
+import copy
+from dataclasses import asdict, dataclass
 import hashlib
 import itertools
 import json
@@ -90,14 +91,19 @@ def query_core_prediction(
     core: SixEchelonCore,
     token: int,
     ticks: int = 8,
+    *,
+    reset_state: bool = True,
 ) -> tuple[int, np.ndarray, float, float]:
-    """Execute evaluation query on token for 8 ticks from quiescent Z.
-    
-    Returns: (predicted_class, logits_1_to_4, margin, nll).
+    """Read an isolated copy; never change the supplied state or RNG.
+
+    reset_state=False starts EACH query from the supplied Z (carry-state).
+    Returns (class, logits_1_to_4, top-two margin, max probability).
     """
-    core.Z.fill(0.0)
-    for c in range(6):
-        core.Z[8 * c + 6] = 1.0
+    core = copy.deepcopy(core)
+    if reset_state:
+        core.Z.fill(0.0)
+        for c in range(6):
+            core.Z[8 * c + 6] = 1.0
         
     x = np.zeros(8)
     x[token] = 1.0
@@ -107,6 +113,8 @@ def query_core_prediction(
         
     logits = core.predict()
     logits_4 = logits[1:5].copy()
+    if not np.isfinite(logits_4).all():
+        raise FloatingPointError("Non-finite evaluation logits")
     pred = int(np.argmax(logits_4)) + 1
     
     # Softmax probabilities
@@ -125,6 +133,8 @@ def evaluate_query_accuracy(
     tokens: list[int],
     task_map: dict[int, int],
     ticks: int = 8,
+    *,
+    reset_state: bool = True,
 ) -> tuple[float, float, float]:
     """Evaluate accuracy, mean margin, and mean NLL on a set of tokens."""
     correct = 0
@@ -132,11 +142,11 @@ def evaluate_query_accuracy(
     nlls = []
     
     for tok in tokens:
-        pred, logits_4, margin, _ = query_core_prediction(core, tok, ticks=ticks)
+        pred, logits_4, _, _ = query_core_prediction(core, tok, ticks=ticks, reset_state=reset_state)
         target = task_map[tok]
         if pred == target:
             correct += 1
-        margins.append(margin)
+        margins.append(float(logits_4[target - 1] - np.max(np.delete(logits_4, target - 1))))
         
         # Target NLL
         z = logits_4 - np.max(logits_4)
@@ -218,6 +228,8 @@ class SleepAdapterNeed001:
         self.thermal_noise_sigma = thermal_noise_sigma
         self.h_base = h_base
         self.eta_sleep = eta_sleep
+        if not 0 <= candidate_slots <= 90:
+            raise ValueError("candidate_slots must fit in the 1000 active tick budget")
 
     def evaluate_anchors_accuracy(
         self,
@@ -244,6 +256,12 @@ class SleepAdapterNeed001:
     ) -> dict:
         """Execute autonomous sleep session under strict matched compute budget."""
         t_start = time.perf_counter()
+        if len(anchors) != self.anchor_count or not anchors:
+            raise ValueError("anchor_count must equal the nonempty anchor set")
+        if not observed_events:
+            raise ValueError("Observed history must be nonempty")
+        if not np.isclose(core.config.h_base, self.h_base, rtol=0, atol=0):
+            raise ValueError("Noise scaling h must equal the integrator h_base")
         initial_K = core.K.copy()
         
         acc_before = self.evaluate_anchors_accuracy(core, anchors, ticks_per_token=8)
@@ -322,12 +340,10 @@ class SleepAdapterNeed001:
                 
                 # Gate 3: Anchor Guard Evaluation
                 # Always run exactly 96 shadow ticks (48 baseline + 48 proposed) to equalize shadow compute!
-                shadow_core = core.snapshot()
                 acc_anc_before = self.evaluate_anchors_accuracy(core, anchors, ticks_per_token=8)
                 shadow_ticks += len(anchors) * 8
                 
-                test_core = SixEchelonCore(config=core.config)
-                test_core.restore(shadow_core)
+                test_core = copy.deepcopy(core)
                 test_core.K += delta_K
                 acc_anc_after = self.evaluate_anchors_accuracy(test_core, anchors, ticks_per_token=8)
                 shadow_ticks += len(anchors) * 8
@@ -359,6 +375,10 @@ class SleepAdapterNeed001:
                     rejection_reasons.append(rejection_reason)
                     
                 sleep_log_records.append({
+                    "run_seed": run_seed,
+                    "grounding_event_id": seed_event.event_id,
+                    "noise_sha256": hashlib.sha256(noise_block.tobytes()).hexdigest(),
+                    "proposed_delta_K_sha256": hashlib.sha256(delta_K.tobytes()).hexdigest(),
                     "slot": slot_idx,
                     "policy": policy,
                     "token_in": token_in,
@@ -373,8 +393,8 @@ class SleepAdapterNeed001:
                     "rejection_reason": rejection_reason,
                 })
                 
-            # 725 free relaxation padding ticks to reach EXACTLY 1000 active ticks
-            for _ in range(725):
+            # Padding depends on slot count; diagnostic queries run on copies.
+            for _ in range(1000 - active_ticks):
                 core.step(x_t=None, write_gate=0.0)
                 active_ticks += 1
                 
@@ -396,6 +416,8 @@ class SleepAdapterNeed001:
             "rejection_reasons": rejection_reasons,
             "active_ticks": active_ticks,
             "shadow_ticks": shadow_ticks,
+            "diagnostic_ticks": 2 * len(anchors) * 8,
+            "total_compute_ticks": active_ticks + shadow_ticks + 2 * len(anchors) * 8,
             "delta_K_norm": delta_K_norm,
             "delta_K_ratio": delta_K_ratio,
             "wall_time": time.perf_counter() - t_start,
@@ -447,6 +469,8 @@ def run_single_history_experiment(
             "token_in": token,
             "target": target,
             "predicted": pred,
+            "logits": logits_4.tolist(),
+            "delta_K_sha256": hashlib.sha256(delta_K.tobytes()).hexdigest(),
             "delta_K_norm": float(np.linalg.norm(delta_K)),
         })
         return ev
@@ -534,7 +558,9 @@ def run_single_history_experiment(
         core_sleep = SixEchelonCore(config=core.config)
         core_sleep.restore(pre_sleep_snapshot)
         
-        pol_seed = run_seed + pol_idx * 503
+        # Common random numbers: the three proposal policies see identical draws.
+        pol_seed = run_seed
+        first_sleep_record = len(sleep_log_records)
         sleep_metrics = adapter.run_sleep_session(
             policy=policy,
             core=core_sleep,
@@ -543,15 +569,19 @@ def run_single_history_experiment(
             run_seed=pol_seed,
             sleep_log_records=sleep_log_records,
         )
+        for record in sleep_log_records[first_sleep_record:]:
+            record.update(seed=seed, task_id=task_id, history=history_type)
         
         K_post = core_sleep.K.copy()
         
         # Rollback check: K_post -> K_pre -> K_post
+        post_logits = np.stack([query_core_prediction(core_sleep, t)[1] for t in range(1, 7)])
         core_sleep.K = K_pre_sleep.copy()
         roll_acc, _, _ = evaluate_query_accuracy(core_sleep, [1, 2, 3], task_map)
         core_sleep.K = K_post.copy()
         restored_acc, _, _ = evaluate_query_accuracy(core_sleep, [1, 2, 3], task_map)
-        rollback_exact = bool(np.isclose(restored_acc, sleep_metrics["anchor_acc_after"]))
+        restored_logits = np.stack([query_core_prediction(core_sleep, t)[1] for t in range(1, 7)])
+        rollback_exact = bool(np.array_equal(post_logits, restored_logits))
         
         # Evaluation 1: Structural Recipient (Primary)
         # Clean recipient core with initial B, W, Z0, but K_post
@@ -574,21 +604,20 @@ def run_single_history_experiment(
                 "target": tgt,
                 "predicted": p_pred,
                 "correct": bool(p_pred == tgt),
-                "margin": p_margin,
+                "margin": float(p_logits[tgt - 1] - np.max(np.delete(p_logits, tgt - 1))),
                 "logits": p_logits.tolist(),
             })
             
         # Evaluation 2: Carry-State (Secondary)
         # Snapshot of sleep core evaluated directly
-        acc_o_post_carry, m_o_post_carry, nll_o_post_carry = evaluate_query_accuracy(core_sleep, [1, 2, 3], task_map)
-        acc_n_post_carry, m_n_post_carry, nll_n_post_carry = evaluate_query_accuracy(core_sleep, [4, 5, 6], task_map)
+        acc_o_post_carry, m_o_post_carry, nll_o_post_carry = evaluate_query_accuracy(core_sleep, [1, 2, 3], task_map, reset_state=False)
+        acc_n_post_carry, m_n_post_carry, nll_n_post_carry = evaluate_query_accuracy(core_sleep, [4, 5, 6], task_map, reset_state=False)
         
         # Evaluation 3: 1000 Idle ticks delay stability check
-        delay_core = SixEchelonCore(config=core.config)
-        delay_core.restore(core_sleep.snapshot())
+        delay_core = copy.deepcopy(core_sleep)
         for _ in range(1000):
             delay_core.step(x_t=None, write_gate=0.0)
-        acc_o_delay, _, _ = evaluate_query_accuracy(delay_core, [1, 2, 3], task_map)
+        acc_o_delay, _, _ = evaluate_query_accuracy(delay_core, [1, 2, 3], task_map, reset_state=False)
         
         gain_old_struct = acc_o_post_struct - q_old_pre
         gain_new_struct = acc_n_post_struct - q_new_pre
@@ -610,6 +639,8 @@ def run_single_history_experiment(
             "rejected_updates": sleep_metrics["rejected_count"],
             "active_ticks": sleep_metrics["active_ticks"],
             "shadow_ticks": sleep_metrics["shadow_ticks"],
+            "diagnostic_ticks": sleep_metrics["diagnostic_ticks"],
+            "sleep_total_compute_ticks": sleep_metrics["total_compute_ticks"],
             "rollback_exact": rollback_exact,
         }
         
@@ -621,6 +652,20 @@ def run_single_history_experiment(
                 B=core_sleep.B,
                 W_readout=core_sleep.W_readout,
                 Z=core_sleep.Z,
+                K_initial=K_initial,
+                K_prefix=K_prefix,
+                K_pre_sleep=K_pre_sleep,
+                Z_pre_sleep=pre_sleep_snapshot['Z'],
+                metadata_json=np.array(safe_json_dumps({
+                    'seed': seed, 'task_id': task_id, 'history': history_type,
+                    'policy': policy, 'run_seed': pol_seed,
+                    'config': asdict(core_sleep.config),
+                    'cell_params': asdict(core_sleep.cell_params),
+                    'vortex_params': asdict(core_sleep.vortex_params),
+                    'rng_state': core_sleep.rng.bit_generator.state,
+                    'observed_events': [asdict(ev) for ev in observed_events],
+                    'snapshot_phase': 'actual_sleep_end_before_nonmutating_evaluation',
+                })),
             )
             
     return {
@@ -657,6 +702,8 @@ def run_stage_experiment(
     config: dict,
 ) -> dict:
     """Execute complete stage (Calibration or Replication) across all histories and policies."""
+    if set(seeds) & {101, 102, 103, 104, 105} or config.get('run_m5', False):
+        raise ValueError('Final M5 seeds are sealed; this is an exploratory stand')
     t_start = time.perf_counter()
     output_stage_dir.mkdir(parents=True, exist_ok=True)
     snapshots_dir = output_stage_dir / "snapshots"
@@ -728,6 +775,8 @@ def run_stage_experiment(
                         "rejected_updates": pdata["rejected_updates"],
                         "active_ticks": pdata["active_ticks"],
                         "shadow_ticks": pdata["shadow_ticks"],
+                        "diagnostic_ticks": pdata["diagnostic_ticks"],
+                        "sleep_total_compute_ticks": pdata["sleep_total_compute_ticks"],
                         "rollback_exact": pdata["rollback_exact"],
                     })
                     
@@ -844,8 +893,11 @@ def run_stage_experiment(
     
     # Verdict computation
     # Tolerance / equivalence bound: [-0.05, +0.05]
-    if D_ci[0] > 0.05:
-        D_verdict = "DREAM_NEED_SUPPORTED"
+    if not (I_mean >= 0.10 and I_ci[0] > 0.0):
+        D_verdict = "TASK_NOT_INFORMATIVE"
+    elif D_ci[0] > 0.05:
+        # Positive-control / retention gates are not implemented in this legacy runner.
+        D_verdict = "EXPLORATORY_POSITIVE_CONTRAST_REQUIRES_GATES"
     elif D_ci[0] >= -0.05 and D_ci[1] <= 0.05:
         D_verdict = "EQUIVALENT"
     else:

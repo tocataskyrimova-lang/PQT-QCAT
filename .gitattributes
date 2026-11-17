@@ -15,3 +15,6 @@
 *.png binary
 *.gz binary
 *.zip binary
+
+# Preserve exact experimental evidence bytes, including source-hash snapshots.
+results/exploratory/K_RESPONSE_001/** -text
