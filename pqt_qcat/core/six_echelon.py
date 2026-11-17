@@ -20,6 +20,7 @@ from .energy import CellParameters, compute_energy, compute_grad_energy
 from .vortex import VortexParameters, apply_vortex_A_I
 from .integrator import AdaptiveHeunIntegrator, IntegratorConfig, StepDiagnostics
 from .errors import NonFiniteStateError
+from .security import check_seed_safety
 
 
 @dataclass
@@ -47,6 +48,8 @@ class SixEchelonCore:
         seed: int = 42,
     ):
         self.config = config or SixEchelonConfig()
+        if seed is not None:
+            check_seed_safety(seed, allow_quarantined=True)
         self.cell_params = cell_params or CellParameters()
         self.vortex_params = vortex_params or VortexParameters(beta_v=self.config.beta_v)
         self.rng = np.random.default_rng(seed)

@@ -135,32 +135,39 @@ def main():
     print("\n--- PHASE 2: WAKE CALIBRATION (24 histories) ---")
     cal_dir = run_dir / "calibration"
     
-    # Decide whether to execute sleep
-    run_sleep_now = (args.stage == "all" and args.force_sleep) or (args.stage == "sleep_only")
-    
     wake_cal_contrasts = run_stage_experiment(
         stage_name="calibration",
         seeds=cal_seeds,
         panel_maps=cal_maps,
         output_stage_dir=cal_dir,
         config=config,
-        execute_sleep=run_sleep_now,
+        execute_sleep=False,
     )
-    generate_russian_report("calibration", wake_cal_contrasts, cal_dir, n_branches=len(cal_seeds) * len(cal_maps) * 2 * (4 if run_sleep_now else 1))
+    generate_russian_report("calibration", wake_cal_contrasts, cal_dir, n_branches=len(cal_seeds) * len(cal_maps) * 2)
 
     # Evaluate Preconditions for Sleep
     i_contrast = wake_cal_contrasts["interference_contrast_pre_tail"]
     passed_interference = i_contrast["passed_threshold"]
     passed_joint = joint_control_res["passed"]
+    prefix_data = wake_cal_contrasts.get("prefix_old_accuracy", {})
+    passed_prefix = prefix_data.get("passed_threshold", False)
+    mean_prefix = prefix_data.get("mean", 0.0)
 
-    can_proceed_to_sleep = passed_interference and passed_joint
+    can_proceed_to_sleep = passed_interference and passed_joint and passed_prefix
     
     print("\n=================================================================")
     print("GATE EVALUATION FOR SLEEP STAGE:")
     print(f"  1. Joint Positive Control (>=0.75): {passed_joint} ({joint_control_res['mean_joint_accuracy']:.4f})")
-    print(f"  2. Pre-tail Interference Contrast (>=0.10): {passed_interference} ({i_contrast['mean']:+.4f}, 95% CI: {i_contrast['ci_95']})")
+    print(f"  2. Prefix Old Accuracy (>=0.80): {passed_prefix} ({mean_prefix:.4f})")
+    print(f"  3. Pre-tail Interference Contrast (>=0.10): {passed_interference} ({i_contrast['mean']:+.4f}, 95% CI: {i_contrast['ci_95']})")
     print(f"  Overall Sleep Gate Passed: {can_proceed_to_sleep}")
     print("=================================================================")
+
+    if args.stage == "sleep_only" and not (can_proceed_to_sleep or args.force_sleep):
+        raise RuntimeError(
+            "Sleep stage gate FAILED: Joint, Prefix, and Interference preconditions not met. "
+            "Cannot run --stage sleep_only without --force-sleep."
+        )
 
     if not can_proceed_to_sleep and not args.force_sleep:
         print("\n[GATE BLOCKED]: Preconditions for sleep stage not met.")
@@ -170,33 +177,36 @@ def main():
         print("\n[WAKE-ONLY]: User specified --stage wake_only. Halting before sleep stage.")
         final_status = "WAKE_CALIBRATION_COMPLETE"
     else:
-        if not run_sleep_now:
-            print("\n--- PHASE 3: SLEEP CONSOLIDATION STAGE (192 sleep branches) ---")
-            sleep_contrasts = run_stage_experiment(
-                stage_name="calibration",
-                seeds=cal_seeds,
-                panel_maps=cal_maps,
-                output_stage_dir=cal_dir,
-                config=config,
-                execute_sleep=True,
-            )
-            generate_russian_report("calibration", sleep_contrasts, cal_dir, n_branches=len(cal_seeds) * len(cal_maps) * 2 * 4)
-            final_status = sleep_contrasts.get("D_primary_contrast", {}).get("verdict", "SLEEP_COMPLETE")
+        print("\n--- PHASE 3: SLEEP CONSOLIDATION STAGE (192 sleep branches) ---")
+        sleep_contrasts = run_stage_experiment(
+            stage_name="calibration",
+            seeds=cal_seeds,
+            panel_maps=cal_maps,
+            output_stage_dir=cal_dir,
+            config=config,
+            execute_sleep=True,
+        )
+        generate_russian_report("calibration", sleep_contrasts, cal_dir, n_branches=len(cal_seeds) * len(cal_maps) * 2 * 4)
+        if args.force_sleep and not can_proceed_to_sleep:
+            final_status = "EXPLORATORY_FORCED_COMPLETE"
         else:
-            final_status = wake_cal_contrasts.get("D_primary_contrast", {}).get("verdict", "SLEEP_COMPLETE")
+            final_status = sleep_contrasts.get("D_primary_contrast", {}).get("verdict", "SLEEP_COMPLETE")
 
     status_summary = {
         "run_id": run_id,
         "date": datetime.datetime.now().isoformat(),
         "git_commit": git_sha,
         "joint_positive_control": joint_control_res,
+        "prefix_old_accuracy": prefix_data,
         "interference_contrast_pre_tail": i_contrast,
         "sleep_gate_passed": can_proceed_to_sleep,
         "forced_sleep": args.force_sleep,
         "final_status": final_status,
     }
-    with open(run_dir / "status_summary.json", "w", encoding="utf-8") as f:
+    tmp_status = run_dir / "status_summary.json.tmp"
+    with open(tmp_status, "w", encoding="utf-8") as f:
         json.dump(status_summary, f, indent=2)
+    os.replace(tmp_status, run_dir / "status_summary.json")
 
     # Compute full manifest
     manifest = compute_manifest_sha256(run_dir)

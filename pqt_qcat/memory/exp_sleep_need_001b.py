@@ -23,6 +23,7 @@ import numpy as np
 import scipy.stats as stats
 
 from pqt_qcat.core.six_echelon import SixEchelonConfig, SixEchelonCore
+from pqt_qcat.core.security import FORBIDDEN_FINAL_SEEDS, validate_config_seed_integrity
 from pqt_qcat.memory.exp_sleep_need_001 import (
     CLASSES,
     ObservedEvent,
@@ -187,19 +188,37 @@ def run_wake_history_with_B(
         elif event.is_post_new_pre_tail:
             probe_at("post_new_pre_tail")
             # Fixed delay: 1000 ticks of free integration from saved live Z
+            z_start = core.Z.copy()
             delay_core = copy.deepcopy(core)
             x_zero = np.zeros(8, dtype=np.float64)
             for _ in range(1000):
                 delay_core.step(x_zero, write_gate=0.0)
-            acc_del, margin_del, nll_del = evaluate_query_accuracy(
+            z_end = delay_core.Z.copy()
+            
+            acc_del_o, margin_del_o, nll_del_o = evaluate_query_accuracy(
                 delay_core, [1, 2, 3], task_map, reset_state=False
             )
-            endpoints["post_new_pre_tail"]["delay1000"] = {
-                "acc_old": acc_del,
-                "margin_old": margin_del,
-                "nll_old": nll_del,
+            acc_del_n, margin_del_n, nll_del_n = evaluate_query_accuracy(
+                delay_core, [4, 5, 6], task_map, reset_state=False
+            )
+            logits_o = [query_core_prediction(delay_core, t, reset_state=False)[1].tolist() for t in [1, 2, 3]]
+            logits_n = [query_core_prediction(delay_core, t, reset_state=False)[1].tolist() for t in [4, 5, 6]]
+            
+            delay1000_data = {
+                "acc_old": acc_del_o,
+                "acc_new": acc_del_n,
+                "margin_old": margin_del_o,
+                "margin_new": margin_del_n,
+                "nll_old": nll_del_o,
+                "nll_new": nll_del_n,
+                "logits_old": logits_o,
+                "logits_new": logits_n,
+                "Z_start": z_start.tolist(),
+                "Z_end": z_end.tolist(),
+                "Z_drift": float(np.linalg.norm(z_end - z_start)),
             }
-        elif event.is_tail and event.event_idx == 200:
+            endpoints["post_new_pre_tail"]["delay1000"] = delay1000_data
+        elif event.is_tail and event.event_idx == 201:
             probe_at("post_tail")
             
     # Compute interference metrics (primary: pre_tail, secondary: post_tail)
@@ -212,17 +231,21 @@ def run_wake_history_with_B(
         i_pre_tail = float(q_old_pre - q_old_post_pre_tail)
         i_post_tail = float(q_old_pre - q_old_post_tail)
         
-        res_modes[mode] = {
+        mode_data = {
             "endpoints": {k: endpoints[k][mode] for k in endpoints},
             "I_pre_tail": i_pre_tail,
             "I_post_tail": i_post_tail,
         }
+        if mode == "carry_state" and "delay1000" in endpoints["post_new_pre_tail"]:
+            mode_data["endpoints"]["post_new_pre_tail"]["delay1000"] = endpoints["post_new_pre_tail"]["delay1000"]
+        res_modes[mode] = mode_data
         
     return {
         "seed": seed,
         "task_id": task_id,
         "history_type": history_type,
         "modes": res_modes,
+        "delay1000": endpoints["post_new_pre_tail"].get("delay1000"),
     }
 
 
@@ -249,15 +272,15 @@ def run_load_experiment(
     histories_res = []
     for s_idx, seed in enumerate(seeds):
         for task_id, task_map in enumerate(panel_maps):
+            pair_run_seed = 100000 + s_idx * 100 + task_id * 10
             for h_type in ["blocked", "interleaved"]:
-                run_seed = 100000 + s_idx * 100 + task_id * 10 + (0 if h_type == "blocked" else 1)
                 h_res = run_wake_history_with_B(
                     seed=seed,
                     task_id=task_id,
                     task_map=task_map,
                     history_type=h_type,
                     B_matrix=B_matrix,
-                    run_seed=run_seed,
+                    run_seed=pair_run_seed,
                     eval_modes=eval_modes,
                 )
                 histories_res.append(h_res)
@@ -309,12 +332,20 @@ def run_load_experiment(
         }
         
     # Fixed delay summary
-    delays = [
-        h["modes"]["carry_state"]["endpoints"]["post_new_pre_tail"].get("delay1000", {}).get("acc_old")
-        for h in histories_res if h["history_type"] == "blocked" and "delay1000" in h["modes"]["carry_state"]["endpoints"]["post_new_pre_tail"]
+    delays_old = [
+        h.get("delay1000", {}).get("acc_old")
+        for h in histories_res
+        if h["history_type"] == "blocked" and h.get("delay1000") is not None
     ]
-    if delays and all(d is not None for d in delays):
-        summary["mean_acc_old_delay1000"] = float(np.mean(delays))
+    delays_new = [
+        h.get("delay1000", {}).get("acc_new")
+        for h in histories_res
+        if h["history_type"] == "blocked" and h.get("delay1000") is not None
+    ]
+    if delays_old and all(d is not None for d in delays_old):
+        summary["mean_acc_old_delay1000"] = float(np.mean(delays_old))
+    if delays_new and all(d is not None for d in delays_new):
+        summary["mean_acc_new_delay1000"] = float(np.mean(delays_new))
         
     return {
         "load_id": load_id,
@@ -333,12 +364,7 @@ def main():
     with open(args.config, "r", encoding="utf-8") as f:
         config = json.load(f)
         
-    # Check forbidden seeds and run_m5
-    if config.get("run_m5", False):
-        raise ValueError("run_m5 must be False")
-    for s in config.get("selection_seeds", []) + config.get("held_out_seeds", []):
-        if s in FORBIDDEN_SEEDS:
-            raise ValueError(f"Forbidden seed {s} detected!")
+    validate_config_seed_integrity(config)
             
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     out_dir = Path(args.output) if args.output else Path(f"results/exploratory/SLEEP_NEED_001B/RUN_{timestamp}")

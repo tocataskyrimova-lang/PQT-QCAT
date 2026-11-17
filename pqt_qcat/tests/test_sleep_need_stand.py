@@ -290,7 +290,7 @@ def test_config_validation_schema_and_sealed_seeds():
     # Sealed seed
     bad_cfg2 = copy.deepcopy(valid_cfg)
     bad_cfg2["calibration_seeds"] = [101]
-    with pytest.raises(ValueError, match="sealed M5 seeds"):
+    with pytest.raises(ValueError, match="(?i)sealed M5 seeds"):
         validate_config(bad_cfg2)
 
     # run_m5 True
@@ -304,6 +304,18 @@ def test_config_validation_schema_and_sealed_seeds():
     bad_cfg4["sleep"]["candidate_slots"] = 100
     with pytest.raises(ValueError, match="candidate_slots"):
         validate_config(bad_cfg4)
+
+    # weaken forbidden_seeds
+    bad_cfg5 = copy.deepcopy(valid_cfg)
+    bad_cfg5["forbidden_seeds"] = []
+    with pytest.raises(ValueError, match="weakened forbidden_seeds"):
+        validate_config(bad_cfg5)
+
+    # evaluation prefix threshold too low
+    bad_cfg6 = copy.deepcopy(valid_cfg)
+    bad_cfg6["evaluation"]["prefix_old_accuracy_threshold"] = 0.50
+    with pytest.raises(ValueError, match="prefix_old_accuracy_threshold"):
+        validate_config(bad_cfg6)
 
 
 def test_schedule_generator_decoupling_and_endpoints():
@@ -321,17 +333,31 @@ def test_schedule_generator_decoupling_and_endpoints():
     tokens_i = sorted([e.token_in for e in sched_i])
     assert tokens_b == tokens_i, "BLOCKED and INTERLEAVED have different event multisets!"
     
-    # Check endpoints in BLOCKED
+    # Check endpoints in BLOCKED: exactly one single-event endpoint
     pre_new_events = [e for e in sched_b if e.is_pre_new]
-    assert len(pre_new_events) == 3
-    assert all(e.epoch_idx == 45 for e in pre_new_events)
+    assert len(pre_new_events) == 1
+    assert pre_new_events[0].epoch_idx == 45
+    assert pre_new_events[0].event_idx == 135
     
     post_new_events = [e for e in sched_b if e.is_post_new_pre_tail]
-    assert len(post_new_events) == 3
-    assert all(e.epoch_idx == 65 for e in post_new_events)
+    assert len(post_new_events) == 1
+    assert post_new_events[0].epoch_idx == 65
+    assert post_new_events[0].event_idx == 195
+    
+    # Check endpoints in INTERLEAVED: exactly one single-event endpoint
+    pre_new_i = [e for e in sched_i if e.is_pre_new]
+    assert len(pre_new_i) == 1
+    assert pre_new_i[0].epoch_idx == 25
+    assert pre_new_i[0].event_idx == 75
+    
+    post_new_i = [e for e in sched_i if e.is_post_new_pre_tail]
+    assert len(post_new_i) == 1
+    assert post_new_i[0].epoch_idx == 65
+    assert post_new_i[0].event_idx == 195
     
     tail_events = [e for e in sched_b if e.is_tail]
     assert len(tail_events) == 6
+    assert [e.event_idx for e in tail_events] == list(range(196, 202))
 
 
 def test_joint_positive_control_execution():

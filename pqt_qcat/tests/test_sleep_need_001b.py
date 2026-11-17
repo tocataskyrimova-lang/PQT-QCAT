@@ -1,4 +1,5 @@
 """Unit tests for EXP-SLEEP-NEED-001B stand and overlapping B matrices."""
+import copy
 import numpy as np
 import pytest
 
@@ -36,17 +37,45 @@ def test_b_overlap_norm_and_orthogonality():
 
 
 def test_forbidden_seeds_rejected_001b():
-    """Verify sealed seeds 101-105 are rejected before any execution."""
+    """Verify sealed seeds 101-105 are rejected before any execution on a full valid schema."""
+    valid_base = {
+        "protocol_id": "EXP-SLEEP-NEED-001",
+        "version": "0.1",
+        "forbidden_seeds": [101, 102, 103, 104, 105],
+        "calibration_seeds": [42],
+        "panel": {
+            "total_distinct_mappings": 6,
+            "old_sources": [1, 2, 3],
+            "new_sources": [4, 5, 6],
+        },
+        "wake": {
+            "events_per_life": 201,
+            "prefix_old_epochs": 25,
+            "day_epochs_per_group": 20,
+            "tail_epochs_per_group": 1,
+            "eta": 0.8,
+            "ticks_per_query": 8,
+            "coordinate_clip": 0.5,
+        },
+        "sleep": {
+            "candidate_slots": 25,
+            "active_ticks": 1000,
+            "anchor_count": 6,
+            "eta": 0.05,
+        },
+        "evaluation": {
+            "prefix_old_accuracy_threshold": 0.80,
+            "joint_positive_control_accuracy_threshold": 0.75,
+            "ticks_per_query": 8,
+        },
+        "analysis": {},
+    }
     for s in FORBIDDEN_SEEDS:
-        with pytest.raises(ValueError):
+        bad_cfg = copy.deepcopy(valid_base)
+        bad_cfg["calibration_seeds"] = [s]
+        with pytest.raises(ValueError, match="FORBIDDEN_FINAL_SEEDS|sealed M5 seeds"):
             from pqt_qcat.memory.exp_sleep_need_001 import validate_config
-            validate_config({
-                "run_m5": False,
-                "forbidden_seeds": [101, 102, 103, 104, 105],
-                "calibration_seeds": [s],
-                "panel": {"calibration_first_n": 1},
-                "wake": {}, "sleep": {}, "evaluation": {}, "analysis": {},
-            })
+            validate_config(bad_cfg)
 
 
 def test_evaluation_modes_structural_reset_vs_carry():

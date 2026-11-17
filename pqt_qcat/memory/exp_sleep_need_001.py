@@ -35,9 +35,10 @@ if str(root_dir) not in sys.path:
 import numpy as np
 
 from pqt_qcat.core.six_echelon import SixEchelonCore, SixEchelonConfig
+from pqt_qcat.core.security import FORBIDDEN_FINAL_SEEDS, check_seed_safety, validate_config_seed_integrity
 from pqt_qcat.memory.m3_diagnostics import CLASSES, _get_quiescent_psi
 
-FORBIDDEN_SEEDS = [101, 102, 103, 104, 105]
+FORBIDDEN_SEEDS = list(FORBIDDEN_FINAL_SEEDS)
 
 
 def safe_json_dumps(obj: dict | list | any) -> str:
@@ -65,6 +66,8 @@ def validate_config(config: dict) -> None:
     
     Raises ValueError with descriptive reason if invalid.
     """
+    validate_config_seed_integrity(config)
+
     required_sections = [
         "protocol_id", "version", "calibration_seeds", "panel", "wake", "sleep", "evaluation", "analysis"
     ]
@@ -100,6 +103,19 @@ def validate_config(config: dict) -> None:
         raise ValueError("tail_epochs_per_group must be 1")
     if wake.get("eta", 0) <= 0:
         raise ValueError("wake eta must be positive")
+    if wake.get("ticks_per_query", 8) <= 0:
+        raise ValueError("wake ticks_per_query must be positive")
+    if wake.get("coordinate_clip", 0.5) <= 0:
+        raise ValueError("wake coordinate_clip must be positive")
+
+    # Evaluation checks
+    ev = config.get("evaluation", {})
+    if ev.get("prefix_old_accuracy_threshold", 0.80) < 0.80:
+        raise ValueError("prefix_old_accuracy_threshold must be at least 0.80")
+    if ev.get("joint_positive_control_accuracy_threshold", 0.75) < 0.75:
+        raise ValueError("joint_positive_control_accuracy_threshold must be at least 0.75")
+    if ev.get("ticks_per_query", 8) <= 0:
+        raise ValueError("evaluation ticks_per_query must be positive")
 
     # Sleep checks
     sl = config["sleep"]
@@ -300,10 +316,12 @@ def generate_wake_schedule(
     for ep in range(25):
         for tok in prefix_perms[ep]:
             idx += 1
+            is_last_in_epoch = (tok == prefix_perms[ep][-1])
             events.append(ScheduledWakeEvent(
                 event_idx=idx, epoch_idx=ep + 1, group="prefix_old",
                 token_in=tok, target_token=task_map[tok],
-                is_prefix=True, is_pre_new=(ep == 24 and history_type == "interleaved"),
+                is_prefix=True,
+                is_pre_new=(ep == 24 and is_last_in_epoch and history_type == "interleaved"),
                 is_post_new_pre_tail=False, is_tail=False
             ))
 
@@ -312,20 +330,23 @@ def generate_wake_schedule(
         for ep in range(20):
             for tok in day_O_perms[ep]:
                 idx += 1
+                is_last_in_epoch = (tok == day_O_perms[ep][-1])
                 events.append(ScheduledWakeEvent(
                     event_idx=idx, epoch_idx=25 + ep + 1, group="day_old",
                     token_in=tok, target_token=task_map[tok],
-                    is_prefix=False, is_pre_new=(ep == 19),
+                    is_prefix=False,
+                    is_pre_new=(ep == 19 and is_last_in_epoch),
                     is_post_new_pre_tail=False, is_tail=False
                 ))
         for ep in range(20):
             for tok in day_N_perms[ep]:
                 idx += 1
+                is_last_in_epoch = (tok == day_N_perms[ep][-1])
                 events.append(ScheduledWakeEvent(
                     event_idx=idx, epoch_idx=45 + ep + 1, group="day_new",
                     token_in=tok, target_token=task_map[tok],
                     is_prefix=False, is_pre_new=False,
-                    is_post_new_pre_tail=(ep == 19), is_tail=False
+                    is_post_new_pre_tail=(ep == 19 and is_last_in_epoch), is_tail=False
                 ))
     elif history_type == "interleaved":
         for ep in range(20):
@@ -339,11 +360,12 @@ def generate_wake_schedule(
                 ))
             for tok in day_N_perms[ep]:
                 idx += 1
+                is_last_in_epoch = (tok == day_N_perms[ep][-1])
                 events.append(ScheduledWakeEvent(
                     event_idx=idx, epoch_idx=25 + 2 * ep + 2, group="day_new",
                     token_in=tok, target_token=task_map[tok],
                     is_prefix=False, is_pre_new=False,
-                    is_post_new_pre_tail=(ep == 19), is_tail=False
+                    is_post_new_pre_tail=(ep == 19 and is_last_in_epoch), is_tail=False
                 ))
     else:
         raise ValueError(f"Unknown history type: {history_type}")
@@ -653,6 +675,9 @@ def run_single_history_experiment(
     query_log_records: list[dict],
     save_snapshots_dir: Path | None = None,
     execute_sleep: bool = True,
+    eta_K: float = 0.8,
+    delta_core_max: float = 0.5,
+    ticks: int = 8,
 ) -> dict:
     """Execute complete life for one (seed, task, history) combination across all 4 sleep policies."""
     psi_0 = _get_quiescent_psi()
@@ -667,8 +692,8 @@ def run_single_history_experiment(
     def take_diagnostic_probe(stage_name: str, epoch_num: int):
         nonlocal probe_count
         probe_count += 1
-        acc_o, m_o, nll_o = evaluate_query_accuracy(core, [1, 2, 3], task_map, reset_state=True)
-        acc_n, m_n, nll_n = evaluate_query_accuracy(core, [4, 5, 6], task_map, reset_state=True)
+        acc_o, m_o, nll_o = evaluate_query_accuracy(core, [1, 2, 3], task_map, ticks=ticks, reset_state=True)
+        acc_n, m_n, nll_n = evaluate_query_accuracy(core, [4, 5, 6], task_map, ticks=ticks, reset_state=True)
         k_hash = hashlib.sha256(core.K.tobytes()).hexdigest()
         probe_log_records.append({
             "seed": seed,
@@ -696,7 +721,10 @@ def run_single_history_experiment(
 
     # Execute wake schedule
     for ev in schedule:
-        pred, logits_4, delta_K = wake_train_step(core, ev.token_in, ev.target_token, psi_0)
+        pred, logits_4, delta_K = wake_train_step(
+            core, ev.token_in, ev.target_token, psi_0,
+            eta_K=eta_K, delta_core_max=delta_core_max, ticks=ticks
+        )
         obs_ev = ObservedEvent(ev.event_idx, ev.token_in, ev.target_token, ev.epoch_idx, ev.group)
         observed_events.append(obs_ev)
         
@@ -730,10 +758,10 @@ def run_single_history_experiment(
     K_pre_sleep = core.K.copy()
     q_old_post_tail, q_new_post_tail = take_diagnostic_probe("post_tail_pre_sleep", 67)
     
-    # Primary forgetting measure taken BEFORE tail
-    I_pre_tail = q_old_prefix - q_old_post_new_pre_tail
-    # Post-tail forgetting measure
-    I_post_tail = q_old_prefix - q_old_post_tail
+    # Primary forgetting measure taken BEFORE tail: I = Q_old(pre_new) - Q_old(post_new_pre_tail)
+    I_pre_tail = float(q_old_pre_new - q_old_post_new_pre_tail)
+    I_prefix = float(q_old_prefix - q_old_post_new_pre_tail)
+    I_post_tail = float(q_old_pre_new - q_old_post_tail)
     
     pre_sleep_snapshot = core.snapshot()
     anchors = {x: task_map[x] for x in range(1, 7)}
@@ -761,20 +789,20 @@ def run_single_history_experiment(
             K_post = core_sleep.K.copy()
             
             # Exact rollback check on all 4 logits across all 6 queries
-            post_logits = np.stack([query_core_prediction(core_sleep, t)[1] for t in range(1, 7)])
+            post_logits = np.stack([query_core_prediction(core_sleep, t, ticks=ticks)[1] for t in range(1, 7)])
             core_sleep.K = K_pre_sleep.copy()
             core_sleep.K = K_post.copy()
-            restored_logits = np.stack([query_core_prediction(core_sleep, t)[1] for t in range(1, 7)])
+            restored_logits = np.stack([query_core_prediction(core_sleep, t, ticks=ticks)[1] for t in range(1, 7)])
             rollback_exact = bool(np.array_equal(post_logits, restored_logits))
             
             # Evaluation 1: Structural Recipient (Primary)
             struct_core = setup_fresh_core(seed=seed, enable_vortex=True)
             struct_core.K = K_post.copy()
-            acc_o_post_struct, m_o_post_struct, nll_o_post_struct = evaluate_query_accuracy(struct_core, [1, 2, 3], task_map)
-            acc_n_post_struct, m_n_post_struct, nll_n_post_struct = evaluate_query_accuracy(struct_core, [4, 5, 6], task_map)
+            acc_o_post_struct, m_o_post_struct, nll_o_post_struct = evaluate_query_accuracy(struct_core, [1, 2, 3], task_map, ticks=ticks)
+            acc_n_post_struct, m_n_post_struct, nll_n_post_struct = evaluate_query_accuracy(struct_core, [4, 5, 6], task_map, ticks=ticks)
             
             for tok in range(1, 7):
-                p_pred, p_logits, p_margin, _ = query_core_prediction(struct_core, tok)
+                p_pred, p_logits, p_margin, _ = query_core_prediction(struct_core, tok, ticks=ticks)
                 tgt = task_map[tok]
                 other_logits = np.delete(p_logits, tgt - 1)
                 signed_margin = float(p_logits[tgt - 1] - np.max(other_logits))
@@ -793,26 +821,27 @@ def run_single_history_experiment(
                 })
                 
             # Evaluation 2: Carry-State (Secondary)
-            acc_o_post_carry, m_o_post_carry, nll_o_post_carry = evaluate_query_accuracy(core_sleep, [1, 2, 3], task_map, reset_state=False)
-            acc_n_post_carry, m_n_post_carry, nll_n_post_carry = evaluate_query_accuracy(core_sleep, [4, 5, 6], task_map, reset_state=False)
+            acc_o_post_carry, m_o_post_carry, nll_o_post_carry = evaluate_query_accuracy(core_sleep, [1, 2, 3], task_map, ticks=ticks, reset_state=False)
+            acc_n_post_carry, m_n_post_carry, nll_n_post_carry = evaluate_query_accuracy(core_sleep, [4, 5, 6], task_map, ticks=ticks, reset_state=False)
             
             # Evaluation 3: 1000 Idle ticks delay stability check
             delay_core = copy.deepcopy(core_sleep)
             for _ in range(1000):
                 delay_core.step(x_t=None, write_gate=0.0)
-            acc_o_delay, _, _ = evaluate_query_accuracy(delay_core, [1, 2, 3], task_map, reset_state=False)
+            acc_o_delay, _, _ = evaluate_query_accuracy(delay_core, [1, 2, 3], task_map, ticks=ticks, reset_state=False)
             
             gain_old_struct = acc_o_post_struct - q_old_post_new_pre_tail
             gain_new_struct = acc_n_post_struct - q_new_post_new_pre_tail
             
             # Compute ticks accounting
-            wake_ticks = 201 * 8
-            probe_ticks = probe_count * 6 * 8
+            wake_ticks = 201 * ticks
+            probe_ticks = probe_count * 6 * ticks
             guard_ticks = sleep_metrics["shadow_ticks"]
             sleep_active = sleep_metrics["active_ticks"]
             delay_ticks = 1000
-            rollback_ticks = 6 * 8 * 2  # 96 ticks
-            total_life_ticks = wake_ticks + probe_ticks + sleep_metrics["total_compute_ticks"] + delay_ticks + rollback_ticks
+            rollback_ticks = 12 * ticks
+            eval_query_ticks = (6 + 6 + 3 + 12) * ticks
+            total_life_ticks = wake_ticks + probe_ticks + sleep_metrics["total_compute_ticks"] + delay_ticks + (eval_query_ticks - rollback_ticks)
             
             policy_results[policy] = {
                 "acc_old_pre_tail": q_old_post_new_pre_tail,
@@ -838,6 +867,7 @@ def run_single_history_experiment(
                 "sleep_session_compute_ticks": sleep_metrics["total_compute_ticks"],
                 "total_life_ticks": total_life_ticks,
                 "rollback_exact": rollback_exact,
+                "idle_unmatched": bool(policy == "idle"),
             }
             
             if save_snapshots_dir:
@@ -877,6 +907,7 @@ def run_single_history_experiment(
         "q_old_post_tail": q_old_post_tail,
         "q_new_post_tail": q_new_post_tail,
         "interference_I_pre_tail": I_pre_tail,
+        "interference_I_prefix": I_prefix,
         "interference_I_post_tail": I_post_tail,
         "policies": policy_results,
     }
@@ -928,7 +959,12 @@ def run_stage_experiment(
         eta_sleep=config["sleep"]["eta"],
     )
     
-    run_seed_counter = 42000
+    wake_cfg = config.get("wake", {})
+    eval_cfg = config.get("evaluation", {})
+    eta_K = wake_cfg.get("eta", 0.8)
+    delta_core_max = wake_cfg.get("coordinate_clip", 0.5)
+    ticks = eval_cfg.get("ticks_per_query", wake_cfg.get("ticks_per_query", 8))
+    
     all_history_results = []
     
     print(f"[{stage_name.upper()}] Starting execution: {len(seeds)} seeds x {len(panel_maps)} maps x 2 histories (execute_sleep={execute_sleep}).")
@@ -936,14 +972,14 @@ def run_stage_experiment(
     for s_idx, seed in enumerate(seeds):
         t_seed_start = time.perf_counter()
         for m_idx, task_map in enumerate(panel_maps):
+            pair_run_seed = 42000 + s_idx * 1000 + m_idx * 10
             for hist in ["blocked", "interleaved"]:
-                run_seed_counter += 1
                 res = run_single_history_experiment(
                     seed=seed,
                     task_id=m_idx,
                     task_map=task_map,
                     history_type=hist,
-                    run_seed=run_seed_counter,
+                    run_seed=pair_run_seed,
                     adapter=adapter,
                     wake_log_records=wake_records,
                     probe_log_records=probe_records,
@@ -951,6 +987,9 @@ def run_stage_experiment(
                     query_log_records=query_records,
                     save_snapshots_dir=snapshots_dir if execute_sleep else None,
                     execute_sleep=execute_sleep,
+                    eta_K=eta_K,
+                    delta_core_max=delta_core_max,
+                    ticks=ticks,
                 )
                 all_history_results.append(res)
                 
@@ -1009,32 +1048,42 @@ def run_stage_experiment(
                     
         print(f"  Completed seed {seed} ({s_idx+1}/{len(seeds)}) in {time.perf_counter() - t_seed_start:.1f}s")
 
-    # Save JSONL logs
+    # Save JSONL logs atomically
     print(f"[{stage_name.upper()}] Writing logs...")
-    with open(output_stage_dir / "wake.jsonl", "w", encoding="utf-8") as f:
+    tmp_wake = output_stage_dir / "wake.jsonl.tmp"
+    with open(tmp_wake, "w", encoding="utf-8") as f:
         for r in wake_records:
             f.write(safe_json_dumps(r) + "\n")
+    os.replace(tmp_wake, output_stage_dir / "wake.jsonl")
             
-    with open(output_stage_dir / "pressure_probes.jsonl", "w", encoding="utf-8") as f:
+    tmp_probes = output_stage_dir / "pressure_probes.jsonl.tmp"
+    with open(tmp_probes, "w", encoding="utf-8") as f:
         for r in probe_records:
             f.write(safe_json_dumps(r) + "\n")
+    os.replace(tmp_probes, output_stage_dir / "pressure_probes.jsonl")
             
     if execute_sleep:
-        with open(output_stage_dir / "sleep.jsonl", "w", encoding="utf-8") as f:
+        tmp_sleep = output_stage_dir / "sleep.jsonl.tmp"
+        with open(tmp_sleep, "w", encoding="utf-8") as f:
             for r in sleep_records:
                 f.write(safe_json_dumps(r) + "\n")
+        os.replace(tmp_sleep, output_stage_dir / "sleep.jsonl")
                 
-        with open(output_stage_dir / "queries.jsonl", "w", encoding="utf-8") as f:
+        tmp_queries = output_stage_dir / "queries.jsonl.tmp"
+        with open(tmp_queries, "w", encoding="utf-8") as f:
             for r in query_records:
                 f.write(safe_json_dumps(r) + "\n")
+        os.replace(tmp_queries, output_stage_dir / "queries.jsonl")
                 
-    # Save CSV
+    # Save CSV atomically
     csv_file = output_stage_dir / "metrics_per_history.csv"
     if history_metrics_rows:
-        with open(csv_file, "w", newline="", encoding="utf-8") as f:
+        tmp_csv = output_stage_dir / "metrics_per_history.csv.tmp"
+        with open(tmp_csv, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=list(history_metrics_rows[0].keys()))
             writer.writeheader()
             writer.writerows(history_metrics_rows)
+        os.replace(tmp_csv, csv_file)
             
     # Compute contrasts per seed
     seed_stats = []
@@ -1101,7 +1150,17 @@ def run_stage_experiment(
     
     passed_interference = bool(I_mean >= 0.10 and I_ci[0] > 0.0)
 
+    prefix_accs = [r["q_old_prefix"] for r in all_history_results]
+    mean_prefix_acc = float(np.mean(prefix_accs)) if prefix_accs else 0.0
+    passed_prefix = bool(mean_prefix_acc >= eval_cfg.get("prefix_old_accuracy_threshold", 0.80))
+
     contrasts_data = {
+        "mean_prefix_acc": mean_prefix_acc,
+        "prefix_old_accuracy": {
+            "mean": mean_prefix_acc,
+            "threshold": eval_cfg.get("prefix_old_accuracy_threshold", 0.80),
+            "passed_threshold": passed_prefix,
+        },
         "interference_contrast_pre_tail": {
             "definition": "I_contrast = I_blocked_pre_tail - I_interleaved_pre_tail",
             "mean": I_mean,
@@ -1175,8 +1234,23 @@ def run_stage_experiment(
         contrasts_data["status"] = "WAKE_ONLY_CALIBRATION"
         contrasts_data["verdict"] = "INTERFERENCE_CONFIRMED" if passed_interference else "TASK_NOT_INFORMATIVE"
 
-    with open(output_stage_dir / "contrasts.json", "w", encoding="utf-8") as f:
+    # Save resolved config atomically
+    resolved_config = copy.deepcopy(config)
+    resolved_config.setdefault("wake", {})["eta"] = eta_K
+    resolved_config.setdefault("wake", {})["coordinate_clip"] = delta_core_max
+    resolved_config.setdefault("evaluation", {})["ticks_per_query"] = ticks
+    
+    tmp_cfg = output_stage_dir / "resolved_config.json.tmp"
+    with open(tmp_cfg, "w", encoding="utf-8") as f:
+        json.dump(resolved_config, f, indent=2)
+    os.replace(tmp_cfg, output_stage_dir / "resolved_config.json")
+
+    tmp_contrasts = output_stage_dir / "contrasts.json.tmp"
+    with open(tmp_contrasts, "w", encoding="utf-8") as f:
         json.dump(contrasts_data, f, indent=2)
+    os.replace(tmp_contrasts, output_stage_dir / "contrasts.json")
+
+    return contrasts_data
 
     return contrasts_data
 

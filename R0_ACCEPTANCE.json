@@ -1,0 +1,90 @@
+{
+  "stage": "R0",
+  "name": "Repair and acceptance",
+  "date": "2026-11-18",
+  "status": "PASS",
+  "worktree": "C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_LIFE_ACCESS_001",
+  "branch": "fix/life-access-001",
+  "base_commit": "72e476e9773b50f803fb955018f3c0658efbc044",
+  "test_suite": "pqt_qcat/tests/test_r0_acceptance.py",
+  "suite_summary": {
+    "total_tests": 12,
+    "passed": 12,
+    "failed": 0,
+    "pass_rate": 1.0
+  },
+  "defects_resolved": {
+    "F01": {
+      "title": "Seed Protection",
+      "status": "PASS",
+      "summary": "Hardened check_seed_safety and validate_config_seed_integrity in pqt_qcat/core/security.py. Forbidden list [101-105] cannot be weakened by config. Core instantiation and config validator reject sealed seeds unconditionally.",
+      "evidence": "test_r0_acceptance.py::test_f01_seed_protection_in_core_and_config"
+    },
+    "F02": {
+      "title": "Seed Incident 100-111 Quarantine",
+      "status": "PASS",
+      "summary": "Created SEED_INCIDENT.md documenting external reader seed leakage on Nov 17. Quarantined seeds 100-111 are excluded from all future confirmatory sets. M5 preregistration integrity is preserved.",
+      "evidence": "test_r0_acceptance.py::test_f02_quarantined_seeds_and_incident_file"
+    },
+    "F03": {
+      "title": "Config Plumbing",
+      "status": "PASS",
+      "summary": "Plumbed wake.eta, wake.ticks_per_query, wake.coordinate_clip into wake_train_step and evaluate_query_accuracy. Resolved config is saved atomically upon execution.",
+      "evidence": "test_r0_acceptance.py::test_f03_config_plumbing"
+    },
+    "F04": {
+      "title": "Endpoint Timing",
+      "status": "PASS",
+      "summary": "generate_wake_schedule tags is_pre_new and is_post_new_pre_tail on exactly 1 event (the final event of the epoch). Tail probe occurs strictly at event 201.",
+      "evidence": "test_r0_acceptance.py::test_f04_endpoints_exact_single_events"
+    },
+    "F05": {
+      "title": "Delay Metrics Preservation",
+      "status": "PASS",
+      "summary": "Preserved both immediate carry and delay1000 with complete metrics (acc, margin, nll, logits, Z_start, Z_end, Z_drift) across both old and new queries; retained in serialized JSON.",
+      "evidence": "test_r0_acceptance.py::test_f05_delay_metrics_preserved_and_serialized"
+    },
+    "F06": {
+      "title": "Paired History Randomness",
+      "status": "PASS",
+      "summary": "Paired histories share exact pair_run_seed = 42000 + s_idx * 1000 + m_idx * 10. Thermal noise draws and semantic grounding are identical between BLOCKED and INTERLEAVED.",
+      "evidence": "test_r0_acceptance.py::test_f06_paired_histories_share_run_seed_and_noise"
+    },
+    "F07": {
+      "title": "Preconditions and Gating",
+      "status": "PASS",
+      "summary": "Enforced Joint >= 75%, Prefix >= 80%, Interference >= 10% gate before sleep consolidation stage. Disallowed unforced sleep_only bypassing.",
+      "evidence": "test_r0_acceptance.py::test_f07_preconditions_and_gate_enforcement"
+    },
+    "F08": {
+      "title": "Baseline Definition",
+      "status": "PASS",
+      "summary": "Interference defined strictly as I_pre_tail = Q_old(pre_new) - Q_old(post_new_pre_tail). Prefix accuracy tracked separately.",
+      "evidence": "test_r0_acceptance.py::test_f08_baseline_definition"
+    },
+    "F09": {
+      "title": "Tick Accounting",
+      "status": "PASS",
+      "summary": "Instrumented accounting of all physical steps: wake, probes, guards, sleep active, delay, rollback, and query evaluations. Idle policy explicitly marked idle_unmatched.",
+      "evidence": "test_r0_acceptance.py::test_f09_tick_accounting_and_idle_unmatched"
+    },
+    "F10": {
+      "title": "Provenance and Atomic Writes",
+      "status": "PASS",
+      "summary": "Atomic file writes implemented with .tmp staging and os.replace. Unique run directories, git commit SHA, diff patch, dependencies, and RNG states recorded.",
+      "evidence": "test_r0_acceptance.py::test_f10_provenance_and_atomic_writes"
+    },
+    "F11": {
+      "title": "Mathematical Observability",
+      "status": "PASS",
+      "summary": "Active parameter subspace aligned with E5 plastic update rows 32:35 (p=144). Directional derivative verified with fixed v across epsilons with mixed tolerance. Rank bounded by 18.",
+      "evidence": "test_r0_acceptance.py::test_f11_mathematical_observability_rows_and_fixed_v"
+    },
+    "F12": {
+      "title": "Retractions and Reporting",
+      "status": "PASS",
+      "summary": "Published ADDENDUM_RETRACTION_20261118.md formally retracting 99.2% hidden memory, physical capacity limit, vortex necessity, and correcting external reader majority baseline.",
+      "evidence": "test_r0_acceptance.py::test_f12_retraction_document_exists"
+    }
+  }
+}
