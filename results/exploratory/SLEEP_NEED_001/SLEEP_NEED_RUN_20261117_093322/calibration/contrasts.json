@@ -1,0 +1,91 @@
+{
+  "D_primary_contrast": {
+    "definition": "D = (G_dream - G_replay)_blocked - (G_dream - G_replay)_interleaved",
+    "mean": 0.0,
+    "sem": 0.0,
+    "ci_95": [
+      0.0,
+      0.0
+    ],
+    "seed_means": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "verdict": "EQUIVALENT"
+  },
+  "interference_contrast": {
+    "definition": "I_contrast = I_blocked - I_interleaved",
+    "mean": 0.0,
+    "sem": 0.0,
+    "ci_95": [
+      0.0,
+      0.0
+    ],
+    "seed_means": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "target_threshold": 0.1,
+    "passed_threshold": false
+  },
+  "I_blocked": {
+    "mean": 0.0,
+    "sem": 0.0,
+    "ci_95": [
+      0.0,
+      0.0
+    ],
+    "seed_means": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "I_interleaved": {
+    "mean": 0.0,
+    "sem": 0.0,
+    "ci_95": [
+      0.0,
+      0.0
+    ],
+    "seed_means": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "gain_dream_blocked": {
+    "mean": 0.0,
+    "sem": 0.0,
+    "ci_95": [
+      0.0,
+      0.0
+    ],
+    "seed_means": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "gain_replay_blocked": {
+    "mean": 0.0,
+    "sem": 0.0,
+    "ci_95": [
+      0.0,
+      0.0
+    ],
+    "seed_means": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+}

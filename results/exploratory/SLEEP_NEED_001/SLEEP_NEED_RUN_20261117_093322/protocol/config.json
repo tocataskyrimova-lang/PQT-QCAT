@@ -1,0 +1,122 @@
+{
+  "protocol_id": "EXP-SLEEP-NEED-001",
+  "version": "0.1",
+  "status": "research_brief_not_executed",
+  "date": "2026-11-17",
+  "base_commit": "59066812578f3fb246426566df8fa369bba249a5",
+  "run_m5": false,
+  "forbidden_seeds": [
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "calibration_seeds": [
+    42,
+    11,
+    12,
+    13
+  ],
+  "replication_seeds": [
+    171001,
+    171002,
+    171003,
+    171004,
+    171005,
+    171006,
+    171007,
+    171008
+  ],
+  "panel": {
+    "generator_seed": 170700,
+    "total_distinct_mappings": 12,
+    "calibration_first_n": 6,
+    "old_sources": [
+      1,
+      2,
+      3
+    ],
+    "new_sources": [
+      4,
+      5,
+      6
+    ],
+    "target_classes": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "sampling": "uniform_iid_targets_conditioned_on_all_4_classes_present_then_reject_duplicate_maps",
+    "publish_before_run": true
+  },
+  "wake": {
+    "prefix_old_epochs": 25,
+    "day_epochs_per_group": 20,
+    "tail_epochs_per_group": 1,
+    "histories": [
+      "blocked",
+      "interleaved"
+    ],
+    "events_per_life": 201,
+    "ticks_per_query": 8,
+    "a_enabled": true,
+    "eta": 0.8,
+    "coordinate_clip": 0.5,
+    "update_rule": "EXP0_target_only_error",
+    "fixed_B": "B[x-1,x]=8_for_x1_to6_zero_elsewhere",
+    "fixed_W": "EXP0_CLASSES_on_coordinates_32_to34",
+    "prefix_old_accuracy_threshold": 0.8,
+    "joint_positive_control_epochs": 25,
+    "joint_positive_control_accuracy_threshold": 0.75
+  },
+  "sleep": {
+    "policies": [
+      "dream",
+      "replay",
+      "sham_dream",
+      "idle"
+    ],
+    "candidate_slots": 25,
+    "active_ticks": 1000,
+    "presentation_ticks_per_slot": 1,
+    "noise_ticks_per_slot": 10,
+    "padding_ticks": 725,
+    "sigma": 0.05,
+    "h": 0.01,
+    "eta": 0.05,
+    "target_matrix": "K",
+    "a_enabled": true,
+    "anchor_count": 6,
+    "anchor_ticks_per_query": 8,
+    "matched_shadow_ticks_minimum": 2400,
+    "anchor_max_degradation": 0.02,
+    "idle_compute_matched": false
+  },
+  "evaluation": {
+    "primary_mode": "structural_recipient",
+    "secondary_mode": "carry_state",
+    "a_read": true,
+    "query_ticks": 8,
+    "delay_ticks_secondary": 1000,
+    "a_hold": true,
+    "plasticity": false,
+    "invalid_counts_as_error": true
+  },
+  "analysis": {
+    "pressure": "Q_old_prefix - Q_old_pre_sleep",
+    "pressure_contrast": "I_blocked - I_interleaved",
+    "pressure_practical_difference": 0.1,
+    "primary_contrast": "(gain_dream_old - gain_replay_old)_blocked - (gain_dream_old - gain_replay_old)_interleaved",
+    "practical_gain": 0.05,
+    "new_skill_mean_loss_tolerance": 0.02,
+    "equivalence_margin": 0.05,
+    "confidence_level": 0.95,
+    "aggregation": "paired_history_contrasts_then_seed_means",
+    "interval": "Student_t_on_seed_means",
+    "pool_stages": false,
+    "main_sleep_branch_cap": 960
+  },
+  "automatic_followups": false
+}
