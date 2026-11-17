@@ -1,0 +1,120 @@
+{
+  "protocol_id": "MEMORY-TRACE-001/EXP-1",
+  "status": "implementation_spec_not_executed",
+  "date": "2026-11-16",
+  "source_commit": "aaa0f2cb45a877eb38f6b86aab72725af364ca0d",
+  "historical_prereg_commit": "e7fbb5a1a39aade8a8a09c9d08d261b1a53803c6",
+  "forbidden_model_seeds": [
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "run_m5": false,
+  "calibration_seeds": [
+    42,
+    11,
+    12,
+    13
+  ],
+  "replication_seeds": [
+    160601,
+    160602,
+    160603,
+    160604
+  ],
+  "graph": {
+    "alphabet": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "population": "all_24_permutations_lexicographic",
+    "calibration_selection": "first_3_disjoint_donor_pairs_lexicographic",
+    "donor_output": "1 + ((target - 1 + 2) % 4)",
+    "query_semantics": "one_hop_only"
+  },
+  "wake": {
+    "epochs": 5,
+    "swap_replication_epochs": 25,
+    "a_enabled": true,
+    "learning_rate": 0.8,
+    "coordinate_clip": 0.5,
+    "update_rule": "historical_EXP0_target_only_error",
+    "ticks_per_query": 8,
+    "freeze_B": true,
+    "freeze_W": true
+  },
+  "sleep": {
+    "policies": [
+      "dream",
+      "replay",
+      "sham_dream",
+      "idle"
+    ],
+    "a_write_values": [
+      true,
+      false
+    ],
+    "a_write_scope": "sleep_only_shared_wake_snapshot",
+    "target_matrix": "K",
+    "learning_rate": 0.05,
+    "candidate_slots": 25,
+    "presentation_ticks_per_slot": 1,
+    "noise_ticks_per_slot": 10,
+    "total_active_ticks_including_presentations": 1000,
+    "h": 0.01,
+    "noise_sigma": 0.05,
+    "anchor_ticks_per_query": 8,
+    "anchor_max_accuracy_degradation": 0.02,
+    "match_shadow_compute_for": [
+      "dream",
+      "replay",
+      "sham_dream"
+    ],
+    "replay_rule": "same_slot_update_and_weight_with_OBSERVED_target",
+    "idle_compute_matched": false
+  },
+  "evaluation": {
+    "a_read_values": [
+      true,
+      false
+    ],
+    "primary_a_read": true,
+    "primary_mode": "structural_standard_recipient",
+    "additional_mode": "carry_state",
+    "delays": [
+      0,
+      1000
+    ],
+    "delay_a_hold": true,
+    "snapshots": [
+      "K_initial",
+      "K_pre",
+      "K_post"
+    ],
+    "interventions": [
+      "restore_K_pre",
+      "donor_K_post",
+      "return_own_K_post"
+    ],
+    "teacher_available": false,
+    "plasticity_enabled": false,
+    "invalid_counts_as_error": true
+  },
+  "analysis": {
+    "primary_metric": "mean_four_query_accuracy_per_history_structural_read_on",
+    "primary_dream_contrast": "gain_dream_ON - gain_replay_ON",
+    "primary_A_contrast": "gain_dream_ON - gain_dream_OFF",
+    "practical_gain_fraction": 0.05,
+    "retention_loss_tolerance_fraction": 0.02,
+    "equivalence_margin_fraction": 0.05,
+    "confidence_level": 0.95,
+    "interval": "student_t_on_seed_means_over_fixed_graph_panel",
+    "pool_calibration_and_replication": false,
+    "primary_sleep_branch_cap": 960
+  },
+  "reserved_composition_stage": "EXP-1C_separate_protocol_no_automatic_run"
+}

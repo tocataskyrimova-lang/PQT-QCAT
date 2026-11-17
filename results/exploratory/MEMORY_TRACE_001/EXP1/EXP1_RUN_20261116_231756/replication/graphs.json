@@ -1,0 +1,388 @@
+{
+  "permutations": [
+    {
+      "graph_id": "perm_00_1234",
+      "permutation": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "donor_permutation": [
+        3,
+        4,
+        1,
+        2
+      ],
+      "donor_graph_id": "perm_16_3412"
+    },
+    {
+      "graph_id": "perm_01_1243",
+      "permutation": [
+        1,
+        2,
+        4,
+        3
+      ],
+      "donor_permutation": [
+        3,
+        4,
+        2,
+        1
+      ],
+      "donor_graph_id": "perm_17_3421"
+    },
+    {
+      "graph_id": "perm_02_1324",
+      "permutation": [
+        1,
+        3,
+        2,
+        4
+      ],
+      "donor_permutation": [
+        3,
+        1,
+        4,
+        2
+      ],
+      "donor_graph_id": "perm_13_3142"
+    },
+    {
+      "graph_id": "perm_03_1342",
+      "permutation": [
+        1,
+        3,
+        4,
+        2
+      ],
+      "donor_permutation": [
+        3,
+        1,
+        2,
+        4
+      ],
+      "donor_graph_id": "perm_12_3124"
+    },
+    {
+      "graph_id": "perm_04_1423",
+      "permutation": [
+        1,
+        4,
+        2,
+        3
+      ],
+      "donor_permutation": [
+        3,
+        2,
+        4,
+        1
+      ],
+      "donor_graph_id": "perm_15_3241"
+    },
+    {
+      "graph_id": "perm_05_1432",
+      "permutation": [
+        1,
+        4,
+        3,
+        2
+      ],
+      "donor_permutation": [
+        3,
+        2,
+        1,
+        4
+      ],
+      "donor_graph_id": "perm_14_3214"
+    },
+    {
+      "graph_id": "perm_06_2134",
+      "permutation": [
+        2,
+        1,
+        3,
+        4
+      ],
+      "donor_permutation": [
+        4,
+        3,
+        1,
+        2
+      ],
+      "donor_graph_id": "perm_22_4312"
+    },
+    {
+      "graph_id": "perm_07_2143",
+      "permutation": [
+        2,
+        1,
+        4,
+        3
+      ],
+      "donor_permutation": [
+        4,
+        3,
+        2,
+        1
+      ],
+      "donor_graph_id": "perm_23_4321"
+    },
+    {
+      "graph_id": "perm_08_2314",
+      "permutation": [
+        2,
+        3,
+        1,
+        4
+      ],
+      "donor_permutation": [
+        4,
+        1,
+        3,
+        2
+      ],
+      "donor_graph_id": "perm_19_4132"
+    },
+    {
+      "graph_id": "perm_09_2341",
+      "permutation": [
+        2,
+        3,
+        4,
+        1
+      ],
+      "donor_permutation": [
+        4,
+        1,
+        2,
+        3
+      ],
+      "donor_graph_id": "perm_18_4123"
+    },
+    {
+      "graph_id": "perm_10_2413",
+      "permutation": [
+        2,
+        4,
+        1,
+        3
+      ],
+      "donor_permutation": [
+        4,
+        2,
+        3,
+        1
+      ],
+      "donor_graph_id": "perm_21_4231"
+    },
+    {
+      "graph_id": "perm_11_2431",
+      "permutation": [
+        2,
+        4,
+        3,
+        1
+      ],
+      "donor_permutation": [
+        4,
+        2,
+        1,
+        3
+      ],
+      "donor_graph_id": "perm_20_4213"
+    },
+    {
+      "graph_id": "perm_12_3124",
+      "permutation": [
+        3,
+        1,
+        2,
+        4
+      ],
+      "donor_permutation": [
+        1,
+        3,
+        4,
+        2
+      ],
+      "donor_graph_id": "perm_03_1342"
+    },
+    {
+      "graph_id": "perm_13_3142",
+      "permutation": [
+        3,
+        1,
+        4,
+        2
+      ],
+      "donor_permutation": [
+        1,
+        3,
+        2,
+        4
+      ],
+      "donor_graph_id": "perm_02_1324"
+    },
+    {
+      "graph_id": "perm_14_3214",
+      "permutation": [
+        3,
+        2,
+        1,
+        4
+      ],
+      "donor_permutation": [
+        1,
+        4,
+        3,
+        2
+      ],
+      "donor_graph_id": "perm_05_1432"
+    },
+    {
+      "graph_id": "perm_15_3241",
+      "permutation": [
+        3,
+        2,
+        4,
+        1
+      ],
+      "donor_permutation": [
+        1,
+        4,
+        2,
+        3
+      ],
+      "donor_graph_id": "perm_04_1423"
+    },
+    {
+      "graph_id": "perm_16_3412",
+      "permutation": [
+        3,
+        4,
+        1,
+        2
+      ],
+      "donor_permutation": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "donor_graph_id": "perm_00_1234"
+    },
+    {
+      "graph_id": "perm_17_3421",
+      "permutation": [
+        3,
+        4,
+        2,
+        1
+      ],
+      "donor_permutation": [
+        1,
+        2,
+        4,
+        3
+      ],
+      "donor_graph_id": "perm_01_1243"
+    },
+    {
+      "graph_id": "perm_18_4123",
+      "permutation": [
+        4,
+        1,
+        2,
+        3
+      ],
+      "donor_permutation": [
+        2,
+        3,
+        4,
+        1
+      ],
+      "donor_graph_id": "perm_09_2341"
+    },
+    {
+      "graph_id": "perm_19_4132",
+      "permutation": [
+        4,
+        1,
+        3,
+        2
+      ],
+      "donor_permutation": [
+        2,
+        3,
+        1,
+        4
+      ],
+      "donor_graph_id": "perm_08_2314"
+    },
+    {
+      "graph_id": "perm_20_4213",
+      "permutation": [
+        4,
+        2,
+        1,
+        3
+      ],
+      "donor_permutation": [
+        2,
+        4,
+        3,
+        1
+      ],
+      "donor_graph_id": "perm_11_2431"
+    },
+    {
+      "graph_id": "perm_21_4231",
+      "permutation": [
+        4,
+        2,
+        3,
+        1
+      ],
+      "donor_permutation": [
+        2,
+        4,
+        1,
+        3
+      ],
+      "donor_graph_id": "perm_10_2413"
+    },
+    {
+      "graph_id": "perm_22_4312",
+      "permutation": [
+        4,
+        3,
+        1,
+        2
+      ],
+      "donor_permutation": [
+        2,
+        1,
+        3,
+        4
+      ],
+      "donor_graph_id": "perm_06_2134"
+    },
+    {
+      "graph_id": "perm_23_4321",
+      "permutation": [
+        4,
+        3,
+        2,
+        1
+      ],
+      "donor_permutation": [
+        2,
+        1,
+        4,
+        3
+      ],
+      "donor_graph_id": "perm_07_2143"
+    }
+  ]
+}
