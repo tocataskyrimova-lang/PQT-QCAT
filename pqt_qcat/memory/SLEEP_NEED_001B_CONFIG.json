@@ -1,0 +1,78 @@
+{
+  "protocol_id": "EXP-SLEEP-NEED-001B",
+  "version": "1.0",
+  "status": "preregistered_exploratory_calibration",
+  "date": "2026-11-17",
+  "base_commit": "2291e34ad330427bce16f9b314dff6c43a5dc8f9",
+  "run_m5": false,
+  "forbidden_seeds": [101, 102, 103, 104, 105],
+  "selection_seeds": [11, 12],
+  "held_out_seeds": [13, 42],
+  "panel": {
+    "generator_seed": 170700,
+    "total_calibration_maps": 6,
+    "old_sources": [1, 2, 3],
+    "new_sources": [4, 5, 6],
+    "target_classes": [1, 2, 3, 4]
+  },
+  "wake": {
+    "prefix_old_epochs": 25,
+    "day_epochs_per_group": 20,
+    "tail_epochs_per_group": 1,
+    "histories": ["blocked", "interleaved"],
+    "events_per_life": 201,
+    "ticks_per_query": 8,
+    "a_enabled": true,
+    "eta": 0.8,
+    "coordinate_clip": 0.5,
+    "update_rule": "EXP0_target_only_error",
+    "norm_B": 8.0,
+    "fixed_W": "EXP0_CLASSES_on_coordinates_32_to34",
+    "prefix_old_accuracy_threshold": 0.80,
+    "joint_positive_control_epochs": 25,
+    "joint_positive_control_accuracy_threshold": 0.75
+  },
+  "loads": [
+    {
+      "load_id": "load_0_rho_0.00",
+      "rho": 0.0,
+      "description": "Baseline orthogonal B-codes (zero overlap, control)"
+    },
+    {
+      "load_id": "load_1_rho_0.25",
+      "rho": 0.25,
+      "description": "Mild B-code overlap (rho=0.25, equal norm 8.0)"
+    },
+    {
+      "load_id": "load_2_rho_0.50",
+      "rho": 0.50,
+      "description": "Moderate B-code overlap (rho=0.50, equal norm 8.0)"
+    },
+    {
+      "load_id": "load_3_rho_0.70",
+      "rho": 0.70,
+      "description": "Substantial B-code overlap (rho=0.70, equal norm 8.0)"
+    },
+    {
+      "load_id": "load_4_rho_0.80",
+      "rho": 0.80,
+      "description": "Severe B-code overlap (rho=0.80, equal norm 8.0)"
+    }
+  ],
+  "evaluation": {
+    "modes": ["structural_reset", "carry_state"],
+    "query_ticks": 8,
+    "delay_ticks_secondary": 1000,
+    "a_read": true,
+    "a_hold": true,
+    "plasticity": false,
+    "metrics": ["accuracy", "signed_target_margin", "nll"]
+  },
+  "selection_rule": {
+    "gate_joint_learnability_min": 0.75,
+    "gate_prefix_old_accuracy_min": 0.80,
+    "interference_metric": "mean_I_pre_tail_blocked",
+    "held_out_interference_min": 0.10,
+    "held_out_new_acc_min": 0.80
+  }
+}
