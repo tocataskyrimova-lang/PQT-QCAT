@@ -13,6 +13,7 @@ for fname in [
     "IMPLEMENTATION_CHANGELOG.md",
     "SEED_INCIDENT.md",
     "ADDENDUM_RETRACTION_20261118.md",
+    "ADDENDUM_CAMPAIGN_REVIEW_20261118.md",
     "R0_ACCEPTANCE.json",
 ]:
     p = root / fname
@@ -26,20 +27,23 @@ for mod in [
     "pqt_qcat/memory/exp_life_access_001.py",
     "pqt_qcat/memory/exp_k_observability_v2.py",
     "pqt_qcat/memory/exp_stateful_online_001.py",
+    "pqt_qcat/memory/exp_online_calibration_001.py",
     "pqt_qcat/memory/exp_long_life_001.py",
     "pqt_qcat/tests/test_r0_acceptance.py",
     "pqt_qcat/tests/test_r3_r4_smoke.py",
+    "pqt_qcat/tests/test_agent_exact_resume.py",
 ]:
     p = root / mod
     if p.exists():
         files_to_hash.append(p)
 
-# Results from R1, R2, R3, R4
+# Results from R1, R2, R3, R4, and CALIBRATION_001
 for pattern in [
     "results/exploratory/LIFE_ACCESS_001/RUN_20261118_040220/*",
     "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/*",
     "results/exploratory/STATEFUL_ONLINE_001/RUN_20261118_051107/*",
     "results/exploratory/LONG_LIFE_001/RUN_20261118_064048/*",
+    "results/exploratory/CALIBRATION_001/*",
 ]:
     for p in root.glob(pattern):
         if p.is_file() and not p.name.endswith(".tmp"):

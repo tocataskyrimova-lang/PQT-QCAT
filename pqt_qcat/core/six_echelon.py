@@ -233,4 +233,6 @@ class SixEchelonCore:
         self.K = snap["K"].copy()
         self.B = snap["B"].copy()
         self.W_readout = snap["W_readout"].copy()
+        if "enable_vortex" in snap:
+            self.config.enable_vortex = snap["enable_vortex"]
         self.rng.bit_generator.state = snap["rng_state"]

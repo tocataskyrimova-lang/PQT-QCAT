@@ -1,6 +1,7 @@
 {
   "campaign_id": "PQT_QCAT_LIFE_ACCESS_CAMPAIGN_001",
   "created_at": "2026-11-18T07:38:00+05:00",
+  "updated_at": "2026-11-18T10:20:00+05:00",
   "base_commit": "72e476e9773b50f803fb955018f3c0658efbc044",
   "branch": "fix/life-access-001",
   "runs": [
@@ -9,14 +10,16 @@
       "name": "Defects repair and mathematical acceptance",
       "status": "COMPLETED",
       "verdict": "PASS",
-      "tests_passed": 31,
-      "tests_total": 31,
-      "commit": "262dd92",
+      "tests_passed": 105,
+      "tests_total": 105,
+      "commit": "HEAD",
       "artifacts": [
         "R0_ACCEPTANCE.json",
         "SEED_INCIDENT.md",
         "ADDENDUM_RETRACTION_20261118.md",
-        "IMPLEMENTATION_CHANGELOG.md"
+        "ADDENDUM_CAMPAIGN_REVIEW_20261118.md",
+        "IMPLEMENTATION_CHANGELOG.md",
+        "pqt_qcat/tests/test_agent_exact_resume.py"
       ]
     },
     {
@@ -24,9 +27,10 @@
       "name": "LIFE-ACCESS-001 continuous reading & settling",
       "run_dir": "results/exploratory/LIFE_ACCESS_001/RUN_20261118_040220",
       "status": "COMPLETED",
-      "verdict": "LIFE_ACCESS_SUPPORTED",
+      "verdict": "PARTIAL_POSITIVE_ACCESS_SIGNAL",
       "candidate_selected": "QUERY32",
       "gain_over_idle": "+38.54 p.p. (95% CI: [+32.88%, +44.20%])",
+      "note": "New accuracy loss CI upper bound (+2.19 p.p.) slightly exceeds strict 2.0 p.p. bound",
       "development_seeds": [730001, 730002, 730003, 730004],
       "confirmation_seeds": [730101, 730102, 730103, 730104, 730105, 730106, 730107, 730108],
       "commit": "29156ae",
@@ -41,7 +45,7 @@
       "name": "Observability and decoder controls",
       "run_dir": "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850",
       "status": "COMPLETED",
-      "verdict": "DECODABILITY_CONFIRMED",
+      "verdict": "CONFIRMED_DECODABILITY",
       "r2a_jacobian": {
         "p": 144,
         "numerical_rank": 18,
@@ -51,20 +55,68 @@
         "guard_analysis": "Nullspace perturbations at eps <= 1.0 produce 0.0% class changes"
       },
       "r2b_reader": {
-        "fit_sessions": 32,
-        "tune_sessions": 16,
-        "k_after_tune_accuracy": 1.0,
-        "delta_k_tune_accuracy": 1.0,
-        "k_initial_tune_accuracy": 0.2604,
-        "majority_baseline": 0.2396,
-        "permutation_p_value": 0.0000,
-        "primary_contrast": "+73.96 p.p."
+        "development_seeds": [730001, 730002, 730003, 730004],
+        "confirmation_seeds": [730201, 730202, 730203, 730204, 730205, 730206, 730207, 730208],
+        "dev_sessions": 192,
+        "conf_sessions": 128,
+        "k_after_conf_accuracy": 1.0,
+        "delta_k_conf_accuracy": 1.0,
+        "k_initial_conf_accuracy": 0.2370,
+        "majority_baseline": 0.3438,
+        "permutation_plus_one_p": 0.00498,
+        "primary_contrast": "+76.30 p.p.",
+        "passed_minimum_gain": true,
+        "note": "100.0% out-of-fold accuracy on 8 fresh confirmation seeds x 16 fresh mappings with frozen RidgeClassifier"
       },
-      "commit": "5af2d32",
+      "commit": "HEAD",
       "artifacts": [
         "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/r2a_jacobian_results.json",
         "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/r2b_reader_results.json",
-        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/R2_REPORT_RU.md"
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/R2_REPORT_RU.md",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/conf_predictions.npz",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/J_stack_initial.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/J_stack_prefix.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/J_stack_post_new.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/S_stack_initial.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/S_stack_prefix.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/S_stack_post_new.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/singular_values_initial.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/singular_values_prefix.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/singular_values_post_new.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/U_initial.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/U_prefix.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/U_post_new.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/Vt_initial.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/Vt_prefix.npy",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/Vt_post_new.npy"
+      ]
+    },
+    {
+      "stage": "CALIBRATION_001",
+      "name": "Wake interface calibration (write_gate x t_query)",
+      "run_dir": "results/exploratory/CALIBRATION_001",
+      "status": "COMPLETED",
+      "verdict": "TOPOLOGICAL_ISOLATION_IDENTIFIED",
+      "development_seeds": [730001, 730002, 730003, 730004],
+      "single_rule_late_acc": {
+        "g0_t8": "29.17% +- 13.82%",
+        "g0_t32": "39.58% +- 7.70%",
+        "g1_t8": "37.50% +- 13.82%",
+        "g1_t32": "31.94% +- 8.22%"
+      },
+      "joint_rule_late_acc": {
+        "g0_t8": "22.92% +- 3.61%",
+        "g0_t32": "22.92% +- 3.61%",
+        "g1_t8": "21.53% +- 3.61%",
+        "g1_t32": "20.83% +- 5.73%"
+      },
+      "context_blind_baseline": "21.53% - 22.92%",
+      "commit": "HEAD",
+      "artifacts": [
+        "results/exploratory/CALIBRATION_001/config.json",
+        "results/exploratory/CALIBRATION_001/calibration_summary.json",
+        "results/exploratory/CALIBRATION_001/calibration_events.jsonl",
+        "results/exploratory/CALIBRATION_001/CALIBRATION_REPORT_RU.md"
       ]
     },
     {
@@ -72,7 +124,7 @@
       "name": "Stateful online learning and A factorial",
       "run_dir": "results/exploratory/STATEFUL_ONLINE_001/RUN_20261118_051107",
       "status": "COMPLETED",
-      "verdict": "A_WRITE_NULL_EFFECT",
+      "verdict": "TASK_NOT_INFORMATIVE",
       "joint_learnability": {
         "mean_accuracy": 0.5258,
         "passed_75_gate": false,
@@ -83,7 +135,8 @@
         "mean_gain": 0.0382,
         "ci_gain": [0.0095, 0.0669],
         "threshold": 0.05,
-        "supported": false
+        "supported": false,
+        "status": "PRACTICAL_EFFECT_INCONCLUSIVE"
       },
       "development_seeds": [730001, 730002, 730003, 730004],
       "confirmation_seeds": [730301, 730302, 730303, 730304, 730305, 730306, 730307, 730308],
@@ -99,14 +152,15 @@
       "name": "Long continuous life",
       "run_dir": "results/exploratory/LONG_LIFE_001/RUN_20261118_064048",
       "status": "COMPLETED",
-      "verdict": "CONTINUOUS_LIFE_STABILITY_CONFIRMED",
+      "verdict": "TECHNICAL_STRESS_TEST_STABLE",
       "candidate_evaluated": "CARRY_TRAIN",
       "horizon_events": 5000,
-      "retention_preserved_noninferiority": true,
+      "retention_preserved_noninferiority": false,
       "mean_retention_drop": 0.0000,
       "ci_retention_drop": [0.0000, 0.0000],
       "a_write_retention_advantage": 0.0000,
       "state_stability": "Bounded Z norm across all lives, zero divergence or NaNs",
+      "note": "Retention at cycle 0 and cycle 4 both at 16.67% (chance baseline); functional retention not demonstrated",
       "development_seeds": [730001, 730002, 730003, 730004],
       "confirmation_seeds": [730401, 730402, 730403, 730404, 730405, 730406, 730407, 730408],
       "commit": "6d2988f",

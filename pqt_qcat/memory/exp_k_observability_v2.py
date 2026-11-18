@@ -26,7 +26,7 @@ if str(root_dir) not in sys.path:
 
 import numpy as np
 import scipy.linalg as linalg
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, RidgeClassifier
 
 from pqt_qcat.core.six_echelon import SixEchelonConfig, SixEchelonCore
 from pqt_qcat.core.security import (
@@ -223,6 +223,9 @@ def analyze_rank_aware_svd(J_stack: np.ndarray) -> dict[str, Any]:
         "energy_fraction_top3": energy_top3,
         "row_basis": Vt[:rank, :], # (rank x 144)
         "null_basis": Vt[rank:, :], # (null_dim x 144)
+        "U": U,
+        "s": s,
+        "Vt": Vt,
     }
 
 
@@ -369,6 +372,12 @@ def run_stage_r2a_jacobian_battery(
             "guard_analysis": guard_res,
             "elapsed_seconds": time.perf_counter() - t0,
         }
+        if output_dir:
+            np.save(output_dir / f"J_stack_{ckpt}.npy", J_stack)
+            np.save(output_dir / f"S_stack_{ckpt}.npy", S_stack)
+            np.save(output_dir / f"singular_values_{ckpt}.npy", svd_res["s"])
+            np.save(output_dir / f"U_{ckpt}.npy", svd_res["U"])
+            np.save(output_dir / f"Vt_{ckpt}.npy", svd_res["Vt"])
         print(f"  [R2a] '{ckpt}' completed in {results[ckpt]['elapsed_seconds']:.1f}s | Rank: {svd_res['numerical_rank']} | NullDim: {svd_res['null_space_dimension']} | DirVerified: {dir_res['all_passed']}")
         
     return results
@@ -376,181 +385,212 @@ def run_stage_r2a_jacobian_battery(
 
 def run_stage_r2b_external_reader(
     dev_seeds: list[int] = [730001, 730002, 730003, 730004],
-    total_maps: int = 48,
-    generator_seed: int = 740002,
+    conf_seeds: list[int] = [730201, 730202, 730203, 730204, 730205, 730206, 730207, 730208],
+    dev_generator_seed: int = 740002,
+    conf_generator_seed: int = 740201,
+    total_dev_maps: int = 48,
+    total_conf_maps: int = 16,
     permutation_runs: int = 200,
+    output_dir: Path | None = None,
 ) -> dict[str, Any]:
-    """Execute Stage R2b External Reader with 6 Ridge classifiers and 200 grouped permutation runs."""
-    maps = generate_task_panel(generator_seed=generator_seed, total_maps=total_maps)
-    
-    # 32 fit mappings / 16 tune mappings
-    fit_maps = maps[:32]
-    tune_maps = maps[32:48]
-    
-    print(f"\n[R2b] External Reader: Generating dataset across {len(dev_seeds)} seeds x {total_maps} mappings...")
+    """Execute Stage R2b External Reader with RidgeClassifier, frozen pipeline, and true out-of-fold confirmation."""
+    for s in dev_seeds + conf_seeds:
+        check_seed_safety(s)
+
+    dev_maps = generate_task_panel(generator_seed=dev_generator_seed, total_maps=total_dev_maps)
+    conf_maps = generate_task_panel(generator_seed=conf_generator_seed, total_maps=total_conf_maps)
+
+    print(f"\n[R2b] External Reader: Generating Development dataset across {len(dev_seeds)} seeds x {total_dev_maps} mappings...")
     t0 = time.perf_counter()
-    
-    # Dataset collection: X_initial, X_after, delta_X, y (for each query 1..6)
-    dataset = [] # list of dicts: {"seed", "map_idx", "X_init", "X_after", "delta_X", "targets": dict}
-    
-    for s_idx, s in enumerate(dev_seeds):
+
+    def _collect_split_data(seeds: list[int], maps: list[dict[int, int]], prefix: str) -> list[dict[str, Any]]:
+        dataset = []
         psi_0 = _get_quiescent_psi()
-        for m_idx, tmap in enumerate(maps):
-            core = setup_fresh_core(seed=s, enable_vortex=True)
-            K_init = core.K.copy()
-            
-            # Train through blocked wake schedule to post_new
-            sched = generate_wake_schedule(seed=s, task_id=m_idx, task_map=tmap, history_type="blocked")
-            for ev in sched:
-                wake_train_step(core, ev.token_in, ev.target_token, psi_0)
-                if ev.is_post_new_pre_tail:
-                    break
-                    
-            K_after = core.K.copy()
-            delta_K = K_after - K_init
-            
-            # Extract 144 active parameters
-            x_init = delta_k_to_param_vector(K_init)
-            x_after = delta_k_to_param_vector(K_after)
-            d_x = delta_k_to_param_vector(delta_K)
-            
-            dataset.append({
-                "seed": s,
-                "map_idx": m_idx,
-                "x_init": x_init,
-                "x_after": x_after,
-                "delta_x": d_x,
-                "targets": tmap,
-            })
-            
-    print(f"[R2b] Dataset generated ({len(dataset)} examples) in {time.perf_counter() - t0:.1f}s.")
-    
-    train_data = [d for d in dataset if d["map_idx"] < 32]
-    tune_data = [d for d in dataset if d["map_idx"] >= 32]
-    
-    # Fit 6 Ridge classifiers per query
-    alpha_grid = [0.1, 1.0, 10.0]
+        for s in seeds:
+            for m_idx, tmap in enumerate(maps):
+                core = setup_fresh_core(seed=s, enable_vortex=True)
+                K_init = core.K.copy()
+                sched = generate_wake_schedule(seed=s, task_id=m_idx, task_map=tmap, history_type="blocked")
+                for ev in sched:
+                    wake_train_step(core, ev.token_in, ev.target_token, psi_0)
+                    if ev.is_post_new_pre_tail:
+                        break
+                K_after = core.K.copy()
+                delta_K = K_after - K_init
+                dataset.append({
+                    "seed": s,
+                    "map_idx": m_idx,
+                    "x_init": delta_k_to_param_vector(K_init),
+                    "x_after": delta_k_to_param_vector(K_after),
+                    "delta_x": delta_k_to_param_vector(delta_K),
+                    "targets": tmap,
+                })
+        return dataset
+
+    dev_dataset = _collect_split_data(dev_seeds, dev_maps, "dev")
+    print(f"[R2b] Development dataset ({len(dev_dataset)} examples) generated in {time.perf_counter() - t0:.1f}s.")
+
+    fit_data = [d for d in dev_dataset if d["map_idx"] < 32]
+    tune_data = [d for d in dev_dataset if d["map_idx"] >= 32]
+
+    alpha_grid = [0.01, 0.1, 1.0, 10.0, 100.0]
     best_alphas = {}
-    
-    # 1. Evaluate K_after vs K_initial vs Delta_K
-    feature_accuracies = {}
-    
+    frozen_classifiers = {} # key: (feat_name, tok) -> fitted RidgeClassifier
+
+    # 1. Tuning phase on development split
+    tune_accuracies = {}
     for feat_name, key in [("K_after", "x_after"), ("K_initial", "x_init"), ("delta_K", "delta_x")]:
-        X_train = np.stack([d[key] for d in train_data])
+        X_fit = np.stack([d[key] for d in fit_data])
         X_tune = np.stack([d[key] for d in tune_data])
-        
+        X_all_dev = np.stack([d[key] for d in dev_dataset])
+
         tune_correct = 0
-        total_evals = len(tune_data) * 6
-        
-        per_query_acc = {}
+        per_query_tune_acc = {}
+
         for tok in range(1, 7):
-            y_train = np.array([d["targets"][tok] for d in train_data])
+            y_fit = np.array([d["targets"][tok] for d in fit_data])
             y_tune = np.array([d["targets"][tok] for d in tune_data])
-            
-            # Tune alpha
+            y_all_dev = np.array([d["targets"][tok] for d in dev_dataset])
+
             best_a = 1.0
             best_sc = -1.0
             for a in alpha_grid:
-                clf = Ridge(alpha=a)
-                clf.fit(X_train, y_train)
-                preds = np.round(clf.predict(X_tune))
-                preds = np.clip(preds, 1, 4).astype(int)
+                clf = RidgeClassifier(alpha=a)
+                clf.fit(X_fit, y_fit)
+                preds = clf.predict(X_tune)
                 sc = float(np.mean(preds == y_tune))
                 if sc > best_sc:
                     best_sc = sc
                     best_a = a
-                    
+
             best_alphas[f"{feat_name}_q{tok}"] = best_a
-            
-            # Final eval
-            final_clf = Ridge(alpha=best_a)
-            final_clf.fit(X_train, y_train)
-            final_preds = np.round(final_clf.predict(X_tune))
-            final_preds = np.clip(final_preds, 1, 4).astype(int)
-            acc_q = float(np.mean(final_preds == y_tune))
-            per_query_acc[tok] = acc_q
-            tune_correct += np.sum(final_preds == y_tune)
-            
-        overall_acc = float(tune_correct) / total_evals
-        feature_accuracies[feat_name] = {
-            "overall_accuracy": overall_acc,
-            "per_query": per_query_acc,
+            per_query_tune_acc[tok] = best_sc
+            tune_correct += int(np.sum(clf.predict(X_tune) == y_tune))
+
+            # Freeze classifier by fitting on all development data with best_a
+            final_clf = RidgeClassifier(alpha=best_a)
+            final_clf.fit(X_all_dev, y_all_dev)
+            frozen_classifiers[(feat_name, tok)] = final_clf
+
+        tune_accuracies[feat_name] = {
+            "overall_accuracy": float(tune_correct) / (len(tune_data) * 6),
+            "per_query": per_query_tune_acc,
         }
-        print(f"[R2b] {feat_name:10s} | Tune Accuracy: {overall_acc*100:.2f}% | Queries: {[f'q{t}:{per_query_acc[t]*100:.1f}%' for t in range(1, 7)]}")
-        
-    # 2. Majority Baseline per query on tune set
+
+    print(f"[R2b] Development tuning complete. Frozen alphas: {best_alphas}")
+
+    # 2. Confirmation Phase (True Out-Of-Fold on Fresh Seeds & Mappings)
+    print(f"[R2b] Generating Confirmation dataset across {len(conf_seeds)} fresh seeds x {total_conf_maps} fresh mappings...")
+    t1 = time.perf_counter()
+    conf_dataset = _collect_split_data(conf_seeds, conf_maps, "conf")
+    print(f"[R2b] Confirmation dataset ({len(conf_dataset)} examples) generated in {time.perf_counter() - t1:.1f}s.")
+
+    total_conf_evals = len(conf_dataset) * 6 # 128 * 6 = 768 decisions
+    conf_feature_accuracies = {}
+    conf_predictions = {}
+
+    for feat_name, key in [("K_after", "x_after"), ("K_initial", "x_init"), ("delta_K", "delta_x")]:
+        X_conf = np.stack([d[key] for d in conf_dataset])
+        conf_correct = 0
+        per_query_conf_acc = {}
+        pred_matrix = np.zeros((len(conf_dataset), 6), dtype=int)
+
+        for q_idx, tok in enumerate(range(1, 7)):
+            y_conf = np.array([d["targets"][tok] for d in conf_dataset])
+            clf = frozen_classifiers[(feat_name, tok)]
+            preds = clf.predict(X_conf)
+            pred_matrix[:, q_idx] = preds
+
+            corr_q = int(np.sum(preds == y_conf))
+            conf_correct += corr_q
+            per_query_conf_acc[tok] = float(corr_q) / len(conf_dataset)
+
+        overall_conf_acc = float(conf_correct) / total_conf_evals
+        conf_feature_accuracies[feat_name] = {
+            "overall_accuracy": overall_conf_acc,
+            "per_query": per_query_conf_acc,
+        }
+        conf_predictions[feat_name] = pred_matrix
+        print(f"[R2b CONFIRMATION] {feat_name:10s} | Out-of-fold Accuracy: {overall_conf_acc*100:.2f}% | Queries: {[f'q{t}:{per_query_conf_acc[t]*100:.1f}%' for t in range(1, 7)]}")
+
+    # Ground truth matrix for confirmation
+    y_true_matrix = np.zeros((len(conf_dataset), 6), dtype=int)
+    for q_idx, tok in enumerate(range(1, 7)):
+        y_true_matrix[:, q_idx] = np.array([d["targets"][tok] for d in conf_dataset])
+
+    # 3. Majority Baseline on Confirmation Set
     maj_correct = 0
-    total_evals = len(tune_data) * 6
     maj_per_query = {}
-    for tok in range(1, 7):
-        y_train = [d["targets"][tok] for d in train_data]
-        y_tune = [d["targets"][tok] for d in tune_data]
-        # Most frequent class in train
-        counts = np.bincount(y_train, minlength=5)
+    for q_idx, tok in enumerate(range(1, 7)):
+        y_c = y_true_matrix[:, q_idx]
+        counts = np.bincount(y_c, minlength=5)
         maj_class = int(np.argmax(counts[1:])) + 1
-        acc_maj = float(np.mean(np.array(y_tune) == maj_class))
+        acc_maj = float(np.mean(y_c == maj_class))
         maj_per_query[tok] = acc_maj
-        maj_correct += np.sum(np.array(y_tune) == maj_class)
-    majority_baseline = float(maj_correct) / total_evals
-    print(f"[R2b] Majority Baseline: {majority_baseline*100:.2f}%")
-    
-    # 3. Grouped Permutation Test (200 runs)
-    print(f"[R2b] Running {permutation_runs} grouped permutation runs...")
+        maj_correct += int(np.sum(y_c == maj_class))
+    conf_majority_baseline = float(maj_correct) / total_conf_evals
+    print(f"[R2b CONFIRMATION] Majority Baseline: {conf_majority_baseline*100:.2f}%")
+
+    # 4. Grouped Permutation Test on Confirmation Set (200 runs)
+    print(f"[R2b CONFIRMATION] Running {permutation_runs} grouped permutation runs on confirmation panel...")
     rng_perm = np.random.default_rng(750003)
     perm_accuracies = []
-    
-    X_train_after = np.stack([d["x_after"] for d in train_data])
-    X_tune_after = np.stack([d["x_after"] for d in tune_data])
-    
+    k_after_preds = conf_predictions["K_after"] # (128, 6)
+
     for _ in range(permutation_runs):
-        # Permute mapping assignment consistently across seeds within tune split
-        permuted_map_order = rng_perm.permutation(16)
-        
-        # Evaluate tune accuracy under shuffled targets
+        permuted_map_order = rng_perm.permutation(total_conf_maps)
         p_correct = 0
-        for tok in range(1, 7):
-            y_train = np.array([d["targets"][tok] for d in train_data])
-            # Fit clf on unpermuted train
-            clf = Ridge(alpha=1.0)
-            clf.fit(X_train_after, y_train)
-            
-            # Predict on tune
-            preds = np.round(clf.predict(X_tune_after))
-            preds = np.clip(preds, 1, 4).astype(int)
-            
-            # Compare to permuted tune targets
-            # Map index in tune_data is mapped to permuted index
-            shuffled_targets = []
-            for d in tune_data:
-                orig_local_idx = d["map_idx"] - 32
-                perm_map_idx = 32 + permuted_map_order[orig_local_idx]
-                shuffled_targets.append(maps[perm_map_idx][tok])
-                
-            p_correct += np.sum(preds == np.array(shuffled_targets))
-            
-        perm_accuracies.append(float(p_correct) / total_evals)
-        
+        for d_idx, d in enumerate(conf_dataset):
+            orig_m_idx = d["map_idx"]
+            perm_m_idx = permuted_map_order[orig_m_idx]
+            for q_idx, tok in enumerate(range(1, 7)):
+                shuffled_tgt = conf_maps[perm_m_idx][tok]
+                if k_after_preds[d_idx, q_idx] == shuffled_tgt:
+                    p_correct += 1
+        perm_accuracies.append(float(p_correct) / total_conf_evals)
+
     p_mean = float(np.mean(perm_accuracies))
     p_95 = float(np.percentile(perm_accuracies, 95))
-    k_after_acc = feature_accuracies["K_after"]["overall_accuracy"]
-    perm_p_value = float(np.mean([acc >= k_after_acc for acc in perm_accuracies]))
-    
-    print(f"[R2b] Permutation Baseline: Mean = {p_mean*100:.2f}%, 95th percentile = {p_95*100:.2f}%, p-value = {perm_p_value:.4f}")
-    
-    primary_gain = k_after_acc - feature_accuracies["K_initial"]["overall_accuracy"]
-    
+    obs_k_after_acc = conf_feature_accuracies["K_after"]["overall_accuracy"]
+
+    # Rigorous plus-one permutation p-value:
+    perm_p_value = float(1 + np.sum(np.array(perm_accuracies) >= obs_k_after_acc)) / float(permutation_runs + 1)
+    primary_gain = obs_k_after_acc - conf_feature_accuracies["K_initial"]["overall_accuracy"]
+
+    print(f"[R2b CONFIRMATION] Permutation Baseline: Mean = {p_mean*100:.2f}%, 95th perc = {p_95*100:.2f}%, Plus-One p-value = {perm_p_value:.5f}")
+    print(f"[R2b CONFIRMATION] Primary Gain (K_after - K_init): {primary_gain*100:+.2f} p.p.")
+
+    # 5. Serialization
+    if output_dir:
+        np.savez_compressed(
+            output_dir / "conf_predictions.npz",
+            y_true=y_true_matrix,
+            y_pred_after=conf_predictions["K_after"],
+            y_pred_init=conf_predictions["K_initial"],
+            y_pred_delta=conf_predictions["delta_K"],
+            perm_accuracies=np.array(perm_accuracies),
+        )
+
     return {
-        "feature_accuracies": feature_accuracies,
-        "majority_baseline": majority_baseline,
-        "majority_per_query": maj_per_query,
-        "permutation_summary": {
-            "runs": permutation_runs,
-            "mean": p_mean,
-            "p95": p_95,
-            "p_value": perm_p_value,
+        "dev_tuning": {
+            "best_alphas": best_alphas,
+            "tune_accuracies": tune_accuracies,
         },
-        "primary_contrast_K_after_minus_K_initial": primary_gain,
-        "passed_minimum_gain": bool(primary_gain >= 0.05 and perm_p_value <= 0.05),
+        "confirmation": {
+            "seeds": conf_seeds,
+            "total_maps": total_conf_maps,
+            "feature_accuracies": conf_feature_accuracies,
+            "majority_baseline": conf_majority_baseline,
+            "majority_per_query": maj_per_query,
+            "permutation_summary": {
+                "runs": permutation_runs,
+                "mean": p_mean,
+                "p95": p_95,
+                "plus_one_p_value": perm_p_value,
+            },
+            "primary_contrast_K_after_minus_K_initial": primary_gain,
+            "passed_minimum_gain": bool(primary_gain >= 0.05 and perm_p_value <= 0.05),
+        },
     }
 
 
@@ -592,29 +632,41 @@ def generate_r2_report(
 - **Возмущения в пространстве строк (размерность 18):** немедленно вызывают изменение логитов пропорционально $\\epsilon$, приводя к искажению ответов.
 """
     if r2b_results is not None:
-        fa = r2b_results["feature_accuracies"]
-        perm = r2b_results["permutation_summary"]
+        dev_tun = r2b_results.get("dev_tuning", {})
+        conf = r2b_results.get("confirmation", {})
+        fa = conf.get("feature_accuracies", {})
+        perm = conf.get("permutation_summary", {})
+        maj_base = conf.get("majority_baseline", 0.25)
+        prim_gain = conf.get("primary_contrast_K_after_minus_K_initial", 0.0)
+        p_val = perm.get("plus_one_p_value", 1.0)
+        passed = conf.get("passed_minimum_gain", False)
+
         rep += f"""
 ---
 
 ## 2. Внешний линейный декодер (Этап R2b)
 
-- **Обучающая выборка (Fit):** 32 отображения $\\times$ 4 семени разработки = 128 сессий
+### 2.1 Настройка гиперпараметров (Development Split)
+- **Обучающая выборка (Fit):** 32 отображения $\\times$ 4 семени разработки (`{DEV_SEEDS if 'DEV_SEEDS' in globals() else '[730001..730004]'}`) = 128 сессий
 - **Настроечная выборка (Tune):** 16 независимых отображений $\\times$ 4 семени разработки = 64 сессии
-- **Архитектура декодера:** 6 независимых Ridge-классификаторов (по одному на запрос)
-- **Базовая линия большинства:** **{r2b_results['majority_baseline']*100:.2f}%** (исправленная константа большинства)
-- **Перестановочный контроль:** {perm['runs']} прогонов с группировкой по отображениям
+- **Архитектура декодера:** 6 независимых `RidgeClassifier` (по одному на запрос)
+- **Замороженные параметры $\\alpha$:** `{dev_tun.get('best_alphas', {})}`
 
-### Результаты декодирования признаков
+### 2.2 Строгая Out-Of-Fold Конфирмация на свежих данных
+- **Выборка подтверждения (Confirmation):** 16 независимых отображений (генератор `740201`) $\\times$ 8 свежих семян подтверждения (`[730201..730208]`) = 128 сессий (768 решений)
+- **Базовая линия большинства:** **{maj_base*100:.2f}%**
+- **Перестановочный контроль:** {perm.get('runs', 200)} прогонов (группировка по отображениям, plus-one estimator)
 
-| Признак весов | Точность на отложенных отображениях | Превышение над Majority | Перестановочный p-value |
+#### Результаты Out-Of-Fold декодирования признаков
+
+| Признак весов | Точность подтверждения | Превышение над Majority | Перестановочный p-value (plus-one) |
 |---|---|---|---|
-| **$K_{{\\text{{after}}}}$** (Обученная матрица) | **{fa['K_after']['overall_accuracy']*100:.2f}%** | **{fa['K_after']['overall_accuracy']*100 - r2b_results['majority_baseline']*100:+.2f} п.п.** | **{perm['p_value']:.4f}** |
-| **$K_{{\\text{{initial}}}}$** (Начальная матрица) | {fa['K_initial']['overall_accuracy']*100:.2f}% | {fa['K_initial']['overall_accuracy']*100 - r2b_results['majority_baseline']*100:+.2f} п.п. | — |
-| **$\\Delta K$** (Прирост обучения) | {fa['delta_K']['overall_accuracy']*100:.2f}% | {fa['delta_K']['overall_accuracy']*100 - r2b_results['majority_baseline']*100:+.2f} п.п. | — |
+| **$K_{{\\text{{after}}}}$** (Обученная матрица) | **{fa.get('K_after', {}).get('overall_accuracy', 0.0)*100:.2f}%** | **{fa.get('K_after', {}).get('overall_accuracy', 0.0)*100 - maj_base*100:+.2f} п.п.** | **{p_val:.5f}** |
+| **$K_{{\\text{{initial}}}}$** (Начальная матрица) | {fa.get('K_initial', {}).get('overall_accuracy', 0.0)*100:.2f}% | {fa.get('K_initial', {}).get('overall_accuracy', 0.0)*100 - maj_base*100:+.2f} п.п. | — |
+| **$\\Delta K$** (Прирост обучения) | {fa.get('delta_K', {}).get('overall_accuracy', 0.0)*100:.2f}% | {fa.get('delta_K', {}).get('overall_accuracy', 0.0)*100 - maj_base*100:+.2f} п.п. | — |
 
-**Основной контраст $K_{{\\text{{after}}}} - K_{{\\text{{initial}}}}$:** **{r2b_results['primary_contrast_K_after_minus_K_initial']*100:+.2f} п.п.**  
-**Статус:** `{'PASS (DECODABILITY_CONFIRMED)' if r2b_results['passed_minimum_gain'] else 'FAIL'}`
+**Основной контраст $K_{{\\text{{after}}}} - K_{{\\text{{initial}}}}$:** **{prim_gain*100:+.2f} п.п.**  
+**Статус конфирмации:** `{'PASS (CONFIRMED_DECODABILITY)' if passed else 'FAIL'}`
 """
     report_file = run_dir / "R2_REPORT_RU.md"
     tmp_file = run_dir / "R2_REPORT_RU.md.tmp"
@@ -644,11 +696,14 @@ def main():
     # 2. Stage R2b (if not skipped)
     r2b_res = None
     if not args.skip_reader:
-        r2b_res = run_stage_r2b_external_reader()
+        r2b_res = run_stage_r2b_external_reader(output_dir=out_dir)
         tmp_r2b = out_dir / "r2b_reader_results.json.tmp"
         with open(tmp_r2b, "w", encoding="utf-8") as f:
             json.dump(r2b_res, f, indent=2)
         os.replace(tmp_r2b, out_dir / "r2b_reader_results.json")
+        
+    generate_r2_report(r2a_res, r2b_res, out_dir)
+    print(f"\nStage R2 complete. Report saved to: {out_dir / 'R2_REPORT_RU.md'}")
         
     generate_r2_report(r2a_res, r2b_res, out_dir)
     print(f"\nStage R2 complete. Report saved to: {out_dir / 'R2_REPORT_RU.md'}")

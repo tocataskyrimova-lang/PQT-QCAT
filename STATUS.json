@@ -1,68 +1,99 @@
 {
   "campaign_id": "PQT_QCAT_LIFE_ACCESS_CAMPAIGN_001",
-  "status": "COMPLETED",
-  "timestamp": "2026-11-18T07:38:30+05:00",
+  "status": "PARTIAL",
+  "review_status": "EXPLORATORY_PROGRESS_ACCEPTED_AUDIT_ADDRESSED",
+  "timestamp": "2026-11-18T10:20:00+05:00",
   "git": {
     "base_commit": "72e476e9773b50f803fb955018f3c0658efbc044",
     "branch": "fix/life-access-001",
-    "head_commit": "6d2988f"
+    "head_commit": "HEAD"
   },
   "stages": {
     "R0": {
       "name": "Defects repair F01-F12 and mathematical acceptance",
       "status": "COMPLETED",
       "verdict": "PASS",
-      "details": "All 12 defects addressed; 31/31 unit tests pass; exact resume verified; sealed M5 seeds quarantined and protected"
+      "details": "All 12 defects addressed; exact resume implemented on StatefulOnlineAgent and verified (test_agent_exact_resume.py, full suite 105/105 passed); sealed M5 seeds quarantined and protected"
     },
     "R1": {
       "name": "Continuous reading and state settling",
       "status": "COMPLETED",
-      "verdict": "LIFE_ACCESS_SUPPORTED",
+      "verdict": "PARTIAL_POSITIVE_ACCESS_SIGNAL",
       "selected_candidate": "QUERY32",
       "net_gain_over_idle": 0.3854,
-      "ci_gain": [0.3288, 0.4420]
+      "ci_gain": [0.3288, 0.4420],
+      "note": "Old accuracy significantly improves (+38.54 p.p.), new accuracy loss CI upper bound (+2.19 p.p.) slightly exceeds 2.0 p.p. non-inferiority bound"
     },
     "R2": {
       "name": "Observability and decoder controls",
       "status": "COMPLETED",
-      "verdict": "DECODABILITY_CONFIRMED",
+      "verdict": "CONFIRMED_DECODABILITY",
       "r2a_rank": 18,
       "r2a_null_dim": 126,
       "r2a_directional_check": "PASS (100% within tolerance across 4 epsilons)",
-      "r2b_decoder_accuracy": 1.0,
-      "r2b_permutation_p_value": 0.0000
+      "r2a_note": "Rank 18 is local readout Jacobian rank. Raw Jacobian, SVD, and basis arrays serialized to .npy",
+      "r2b_decoder_tune_accuracy": 1.0,
+      "r2b_decoder_conf_accuracy": 1.0,
+      "r2b_k_initial_conf_accuracy": 0.2370,
+      "r2b_delta_k_conf_accuracy": 1.0,
+      "r2b_majority_baseline": 0.3438,
+      "r2b_primary_gain": 0.7630,
+      "r2b_permutation_plus_one_p": 0.00498,
+      "r2b_note": "100.0% out-of-fold confirmation accuracy on 8 fresh confirmation seeds x 16 fresh mappings; serialized to conf_predictions.npz; p=0.00498"
     },
     "R3": {
       "name": "Stateful online learning and A factorial",
       "status": "COMPLETED",
-      "verdict": "A_WRITE_NULL_EFFECT",
+      "verdict": "TASK_NOT_INFORMATIVE",
       "joint_learnability": "FAIL (52.58% < 75.0% threshold, TASK_NOT_INFORMATIVE_FOR_CONTEXT_RETURN)",
       "selected_stateful_arm": "CARRY_TRAIN",
       "primary_a_write_gain": 0.0382,
       "ci_gain": [0.0095, 0.0669],
-      "supported": false
+      "supported": false,
+      "note": "A effect is PRACTICAL_EFFECT_INCONCLUSIVE because CI upper bound reaches +6.69 p.p.; wake calibration CALIBRATION_001 proved failure is topological (E2 isolated from Hold)"
     },
     "R4": {
       "name": "Long continuous life",
       "status": "COMPLETED",
-      "verdict": "CONTINUOUS_LIFE_STABILITY_CONFIRMED",
+      "verdict": "TECHNICAL_STRESS_TEST_STABLE",
       "candidate_evaluated": "CARRY_TRAIN",
       "horizon_events": 5000,
-      "retention_preserved_noninferiority": true,
+      "retention_preserved_noninferiority": false,
       "mean_retention_drop": 0.0,
       "ci_retention_drop": [0.0, 0.0],
       "a_write_retention_advantage": 0.0,
-      "trajectory_stability": "Bounded Z norm across all lives, zero divergence or NaNs"
+      "trajectory_stability": "Bounded Z norm across all lives, zero divergence or NaNs",
+      "note": "Initial and final retention were at chance baseline (16.67%), return accuracy ~19.89%; functional memory preservation not demonstrated"
+    },
+    "CALIBRATION_001": {
+      "name": "Wake interface calibration (write_gate x t_query)",
+      "status": "COMPLETED",
+      "verdict": "TOPOLOGICAL_ISOLATION_IDENTIFIED",
+      "single_rule_late_acc": {
+        "g0_t8": "29.17% +- 13.82%",
+        "g0_t32": "39.58% +- 7.70%",
+        "g1_t8": "37.50% +- 13.82%",
+        "g1_t32": "31.94% +- 8.22%"
+      },
+      "joint_rule_late_acc": {
+        "g0_t8": "22.92% +- 3.61%",
+        "g0_t32": "22.92% +- 3.61%",
+        "g1_t8": "21.53% +- 3.61%",
+        "g1_t32": "20.83% +- 5.73%"
+      },
+      "context_blind_baseline": "21.53% - 22.92%",
+      "stability_warning": "g1_t32 triggered NonFiniteStateError on seed 730003 due to unbounded potential energy accumulation",
+      "finding": "Failure to learn joint rules is not an artifact of write_gate=0.0; sensory context enters E2 which connects only to E6, while readout reads E4/E5"
     }
   },
   "overall_verdicts": {
-    "engineering_verdict": "PASS",
+    "engineering_verdict": "PASS (EXACT_RESUME_VERIFIED)",
     "scientific_verdict": {
-      "k_memory_encoding": "CONFIRMED (Exact functional information decodable with 100% accuracy, p=0.0000)",
-      "z_continuous_readout": "CONFIRMED (Input driving for 32 ticks settles continuous Z into readout basin with +38.54 p.p. gain over idle)",
-      "a_operator_advantage": "NULL_EFFECT (No statistically confirmed isolated retention advantage >= 5 p.p. from A_write in online continuous life)",
-      "context_task_learnability": "LIMITED (48D core without external memory controller achieves 52.58% joint learnability, failing 75% gate)",
-      "continuous_life_stability": "CONFIRMED (Trajectories remain strictly bounded and finite across 5000+ events without artificial resets)"
+      "k_memory_encoding": "CONFIRMED (100% out-of-fold decodability on fresh confirmation seeds [730201..730208], p=0.00498)",
+      "z_continuous_readout": "POSITIVE_SIGNAL (Input driving for 32 ticks provides +38.54 p.p. gain over matched idle)",
+      "a_operator_advantage": "INCONCLUSIVE (CI includes values >= 5 p.p.; task failed joint learnability gate)",
+      "context_task_learnability": "NOT_INFORMATIVE (Joint learnability 20.8%-22.9% matches context-blind baseline; E2 isolated from Hold)",
+      "continuous_life_stability": "NUMERICALLY_STABLE (5000 events run without NaN or blowup; open-gate g1_t32 requires energy damping)"
     }
   },
   "security_and_provenance": {
@@ -74,12 +105,12 @@
     "exact_resume_verified": true
   },
   "resource_accounting": {
-    "wall_clock_hours_used": 2.45,
+    "wall_clock_hours_used": 3.2,
     "wall_clock_hours_cap": 48.0,
-    "cpu_hours_used": 4.1,
+    "cpu_hours_used": 4.7,
     "cpu_hours_cap": 96.0,
     "max_concurrent_workers": 2,
     "blas_threads_per_worker": 1,
-    "peak_memory_mb_per_worker": 277
+    "peak_memory_mb_per_worker": 330
   }
 }

@@ -1,0 +1,37 @@
+{
+  "experiment": "CALIBRATION_001",
+  "date": "2026-11-18",
+  "dev_seeds": [
+    730001,
+    730002,
+    730003,
+    730004
+  ],
+  "map_generator_seed": 740003,
+  "conditions": [
+    {
+      "name": "g0_t8",
+      "write_gate": 0.0,
+      "t_query": 8
+    },
+    {
+      "name": "g0_t32",
+      "write_gate": 0.0,
+      "t_query": 32
+    },
+    {
+      "name": "g1_t8",
+      "write_gate": 1.0,
+      "t_query": 8
+    },
+    {
+      "name": "g1_t32",
+      "write_gate": 1.0,
+      "t_query": 32
+    }
+  ],
+  "eta_k": 0.8,
+  "delta_core_max": 0.5,
+  "t_context": 4,
+  "total_events_per_life": 72
+}

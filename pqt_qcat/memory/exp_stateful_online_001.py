@@ -130,6 +130,8 @@ class StatefulOnlineAgent:
         eta_k: float = 0.8,
         delta_core_max: float = 0.5,
         eligibility_decay: float = 0.0,
+        write_gate_presentation: float = 1.0,
+        read_gate: float = 0.0,
     ):
         self.core = core
         self.learning_mode = learning_mode # "RESET_TRAIN", "CARRY_TRAIN", "STATEFUL_ELIGIBILITY"
@@ -138,6 +140,8 @@ class StatefulOnlineAgent:
         self.eta_k = eta_k
         self.delta_core_max = delta_core_max
         self.eligibility_decay = eligibility_decay
+        self.write_gate_presentation = write_gate_presentation
+        self.read_gate = read_gate
         
         self.psi_0 = _get_quiescent_psi()
         self.Z0 = self.core.Z.copy()
@@ -149,6 +153,48 @@ class StatefulOnlineAgent:
         self.committed_logits: np.ndarray | None = None
         self.committed_pred: int | None = None
         self.event_active: bool = False
+
+    def snapshot(self) -> dict[str, Any]:
+        """Capture complete serializable agent state for exact resume."""
+        return {
+            "core_snapshot": self.core.snapshot(),
+            "learning_mode": self.learning_mode,
+            "t_context": self.t_context,
+            "t_query": self.t_query,
+            "eta_k": self.eta_k,
+            "delta_core_max": self.delta_core_max,
+            "eligibility_decay": self.eligibility_decay,
+            "write_gate_presentation": self.write_gate_presentation,
+            "read_gate": self.read_gate,
+            "psi_0": self.psi_0.tolist(),
+            "Z0": self.Z0.tolist(),
+            "eligibility_trace": self.eligibility_trace.tolist(),
+            "current_context": self.current_context,
+            "current_query": self.current_query,
+            "committed_logits": self.committed_logits.tolist() if self.committed_logits is not None else None,
+            "committed_pred": self.committed_pred,
+            "event_active": self.event_active,
+        }
+
+    def restore(self, snap: dict[str, Any]) -> None:
+        """Restore complete agent state from snapshot."""
+        self.core.restore(snap["core_snapshot"])
+        self.learning_mode = snap["learning_mode"]
+        self.t_context = snap["t_context"]
+        self.t_query = snap["t_query"]
+        self.eta_k = snap["eta_k"]
+        self.delta_core_max = snap["delta_core_max"]
+        self.eligibility_decay = snap["eligibility_decay"]
+        self.write_gate_presentation = snap.get("write_gate_presentation", 1.0)
+        self.read_gate = snap.get("read_gate", 0.0)
+        self.psi_0 = np.array(snap["psi_0"], dtype=np.float64)
+        self.Z0 = np.array(snap["Z0"], dtype=np.float64)
+        self.eligibility_trace = np.array(snap["eligibility_trace"], dtype=np.float64)
+        self.current_context = snap["current_context"]
+        self.current_query = snap["current_query"]
+        self.committed_logits = np.array(snap["committed_logits"], dtype=np.float64) if snap["committed_logits"] is not None else None
+        self.committed_pred = snap["committed_pred"]
+        self.event_active = snap["event_active"]
 
     def reset_state_to_z0(self) -> None:
         """Explicitly reset working state Z to baseline Z0."""
@@ -175,13 +221,13 @@ class StatefulOnlineAgent:
         x_ctx = np.zeros(8, dtype=np.float64)
         x_ctx[ctx_token] = 1.0
         for _ in range(self.t_context):
-            self.core.step(x_ctx, write_gate=0.0)
+            self.core.step(x_ctx, write_gate=self.write_gate_presentation)
 
         # 2. Present query token
         x_q = np.zeros(8, dtype=np.float64)
         x_q[query_token] = 1.0
         for _ in range(self.t_query):
-            self.core.step(x_q, write_gate=0.0)
+            self.core.step(x_q, write_gate=self.write_gate_presentation)
             if self.learning_mode == "STATEFUL_ELIGIBILITY":
                 instant_dpsi = np.tanh(self.core.Z) - self.psi_0
                 self.eligibility_trace = (

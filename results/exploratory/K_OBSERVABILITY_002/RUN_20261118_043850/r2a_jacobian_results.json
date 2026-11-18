@@ -69,7 +69,7 @@
         }
       }
     },
-    "elapsed_seconds": 113.95034710003529
+    "elapsed_seconds": 116.97042110003531
   },
   "prefix": {
     "jacobian_norm_fro": 0.8885103001614367,
@@ -141,7 +141,7 @@
         }
       }
     },
-    "elapsed_seconds": 113.84682949999114
+    "elapsed_seconds": 117.97094849997666
   },
   "post_new": {
     "jacobian_norm_fro": 0.9672564214737464,
@@ -213,6 +213,6 @@
         }
       }
     },
-    "elapsed_seconds": 116.97248669998953
+    "elapsed_seconds": 120.56997680000495
   }
 }
