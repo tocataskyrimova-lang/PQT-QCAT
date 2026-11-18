@@ -97,10 +97,7 @@ def run_integrator_convergence_battery(
                     z_norms.append(float(np.linalg.norm(core.Z)))
                     
                     # Compute total core potential energy
-                    try:
-                        E_pot = float(core.cell_params.quartic_potential(core.Z))
-                    except Exception:
-                        E_pot = float("inf")
+                    E_pot = core.total_energy()
                     energies.append(E_pot)
                     corrects.append(res["correct"])
                     
@@ -122,7 +119,10 @@ def run_integrator_convergence_battery(
             "accuracy": float(np.mean(corrects)) if corrects else 0.0,
             "max_z_norm": float(max(z_norms)) if z_norms else 0.0,
             "mean_z_norm": float(np.mean(z_norms)) if z_norms else 0.0,
-            "max_energy": float(max([e for e in energies if np.isfinite(e)], default=0.0)),
+            "max_energy": float(max(energies)) if energies else None,
+            "energy_at_event_boundaries": energies,
+            "max_energy_all_substeps": core.max_total_energy,
+            "max_z_norm_all_substeps": core.max_state_norm,
             "predictions": preds,
             "logits": [l.tolist() for l in logits_history],
             "elapsed_seconds": elapsed,

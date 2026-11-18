@@ -46,6 +46,7 @@ class JointAgent(StatefulOnlineAgent):
         t_query: int = 8,
         eta_k: float = 0.8,
         delta_core_max: float = 0.5,
+        update_core_in_direct: bool = False,
     ):
         super().__init__(
             core=core,
@@ -58,12 +59,31 @@ class JointAgent(StatefulOnlineAgent):
             read_gate=1.0,
         )
         self.architecture_mode = architecture_mode
+        # Preserve the historical frozen-core baseline. Plastic K is a distinct intervention.
+        self.update_core_in_direct = update_core_in_direct
         # For direct gating hypothesis: separate readout weights for C0 and C1 or modulation vector
         if architecture_mode == "direct_gating":
             # Direct gating: context modulates readout gain on E5
             # C0 gates first half of E5 coordinates, C1 gates second half
             self.W_readout_c0 = self.core.W_readout.copy()
             self.W_readout_c1 = self.core.W_readout.copy()
+
+    def snapshot(self):
+        snap = super().snapshot()
+        snap['architecture_mode'] = self.architecture_mode
+        snap['update_core_in_direct'] = self.update_core_in_direct
+        if self.architecture_mode == 'direct_gating':
+            snap['W_readout_c0'] = self.W_readout_c0.copy()
+            snap['W_readout_c1'] = self.W_readout_c1.copy()
+        return snap
+
+    def restore(self, snap, strict_config=True):
+        super().restore(snap, strict_config=strict_config)
+        self.architecture_mode = snap['architecture_mode']
+        self.update_core_in_direct = snap['update_core_in_direct']
+        if self.architecture_mode == 'direct_gating':
+            self.W_readout_c0 = snap['W_readout_c0'].copy()
+            self.W_readout_c1 = snap['W_readout_c1'].copy()
 
     def begin_event(self, context_id: int, query_token: int) -> tuple[int, np.ndarray]:
         assert context_id in (0, 1), f"Invalid context: {context_id}"
@@ -126,6 +146,9 @@ class JointAgent(StatefulOnlineAgent):
         assert self.event_active
         assert self.committed_logits is not None
         assert 1 <= target_class <= 4
+        k_before = self.core.K.copy()
+        prediction = self.committed_pred
+        applied_w_norm = 0.0
 
         logits_4 = self.committed_logits
         z = logits_4 - np.max(logits_4)
@@ -157,6 +180,9 @@ class JointAgent(StatefulOnlineAgent):
                 self.W_readout_c0 += delta_W
             else:
                 self.W_readout_c1 += delta_W
+            applied_w_norm = float(np.linalg.norm(delta_W))
+            if self.update_core_in_direct:
+                self.core.K += delta_K
         else:
             delta_Z = self.core.W_readout.T @ err
             d_psi = np.tanh(self.core.Z) - self.psi_0
@@ -173,10 +199,12 @@ class JointAgent(StatefulOnlineAgent):
 
         return {
             "correct": correct,
-            "pred": self.committed_pred,
+            "pred": prediction,
             "signed_margin": signed_margin,
             "nll": nll,
-            "delta_k_norm": float(np.linalg.norm(delta_K)),
+            "delta_k_norm": float(np.linalg.norm(self.core.K - k_before)),
+            "proposed_delta_k_norm": float(np.linalg.norm(delta_K)),
+            "delta_w_norm": applied_w_norm,
         }
 
 

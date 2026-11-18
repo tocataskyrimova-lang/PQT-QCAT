@@ -157,6 +157,7 @@ class StatefulOnlineAgent:
     def snapshot(self) -> dict[str, Any]:
         """Capture complete serializable agent state for exact resume."""
         return {
+            "agent_type": type(self).__module__ + "." + type(self).__qualname__,
             "core_snapshot": self.core.snapshot(),
             "learning_mode": self.learning_mode,
             "t_context": self.t_context,
@@ -178,6 +179,8 @@ class StatefulOnlineAgent:
 
     def restore(self, snap: dict[str, Any], strict_config: bool = True) -> None:
         """Restore complete agent state from snapshot."""
+        if snap.get("agent_type") != type(self).__module__ + "." + type(self).__qualname__:
+            raise ValueError("Incompatible agent type")
         self.core.restore(snap["core_snapshot"], strict_config=strict_config)
         self.learning_mode = snap["learning_mode"]
         self.t_context = snap["t_context"]
@@ -196,69 +199,16 @@ class StatefulOnlineAgent:
         self.committed_pred = snap["committed_pred"]
         self.event_active = snap["event_active"]
 
-    def save_checkpoint(self, filepath: Path | str) -> None:
-        """Save complete serializable agent state to an NPZ file on disk."""
-        path = Path(filepath)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        snap = self.snapshot()
-        core_snap = snap.pop("core_snapshot")
-        np.savez_compressed(
-            path,
-            core_Z=core_snap["Z"],
-            core_K=core_snap["K"],
-            core_B=core_snap["B"],
-            core_W_readout=core_snap["W_readout"],
-            psi_0=np.array(snap["psi_0"]),
-            Z0=np.array(snap["Z0"]),
-            eligibility_trace=np.array(snap["eligibility_trace"]),
-            committed_logits=np.array(snap["committed_logits"]) if snap["committed_logits"] is not None else np.array([]),
-            metadata_json=json.dumps({
-                "core_meta": {
-                    "enable_vortex": core_snap["enable_vortex"],
-                    "h_base": core_snap.get("h_base", self.core.config.h_base),
-                    "rng_state": core_snap["rng_state"],
-                },
-                "agent_meta": snap,
-            }),
-        )
+    def save_checkpoint(self, filepath: Path | str, runner_state: dict | None = None) -> None:
+        """Atomic disk snapshot, including subclass weights and optional stream cursor/RNG."""
+        from pqt_qcat.memory.checkpoint_io import save_state
+        save_state(filepath, {"agent": self.snapshot(), "runner": runner_state or {}})
 
-    def load_checkpoint(self, filepath: Path | str, strict_config: bool = True) -> None:
-        """Load complete agent state from an NPZ file on disk."""
-        path = Path(filepath)
-        data = np.load(path, allow_pickle=True)
-        meta = json.loads(str(data["metadata_json"]))
-        core_meta = meta["core_meta"]
-        agent_meta = meta["agent_meta"]
-
-        core_snap = {
-            "Z": data["core_Z"],
-            "K": data["core_K"],
-            "B": data["core_B"],
-            "W_readout": data["core_W_readout"],
-            "enable_vortex": core_meta["enable_vortex"],
-            "h_base": core_meta["h_base"],
-            "rng_state": core_meta["rng_state"],
-        }
-        agent_snap = {
-            "core_snapshot": core_snap,
-            "learning_mode": agent_meta["learning_mode"],
-            "t_context": agent_meta["t_context"],
-            "t_query": agent_meta["t_query"],
-            "eta_k": agent_meta["eta_k"],
-            "delta_core_max": agent_meta["delta_core_max"],
-            "eligibility_decay": agent_meta["eligibility_decay"],
-            "write_gate_presentation": agent_meta.get("write_gate_presentation", 0.0),
-            "read_gate": agent_meta.get("read_gate", 0.0),
-            "psi_0": data["psi_0"],
-            "Z0": data["Z0"],
-            "eligibility_trace": data["eligibility_trace"],
-            "current_context": agent_meta["current_context"],
-            "current_query": agent_meta["current_query"],
-            "committed_logits": data["committed_logits"] if len(data["committed_logits"]) > 0 else None,
-            "committed_pred": agent_meta["committed_pred"],
-            "event_active": agent_meta["event_active"],
-        }
-        self.restore(agent_snap, strict_config=strict_config)
+    def load_checkpoint(self, filepath: Path | str, strict_config: bool = True) -> dict:
+        from pqt_qcat.memory.checkpoint_io import load_state
+        state = load_state(filepath)
+        self.restore(state["agent"], strict_config=strict_config)
+        return state['runner']
 
     def reset_state_to_z0(self) -> None:
         """Explicitly reset working state Z to baseline Z0."""

@@ -13,7 +13,8 @@ Conforms strictly to ARCHITECTURE_LIFE_002 (Section 2 & 2.1) and ILORI approval:
 - Full ablation support: enable_vortex=False for exact A=0 (noA) comparison
 """
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+import copy
 import numpy as np
 
 from .energy import CellParameters, compute_energy, compute_grad_energy
@@ -87,6 +88,9 @@ class SixEchelonCore:
         # Dissipation matrices: normal vs hold
         self.gamma_diag_normal = self.integrator.gamma_diag.copy()
         self.gamma_diag_hold = self.gamma_diag_normal.copy() * self.config.hold_mobility_scale
+        self.step_count = 0
+        self.max_state_norm = float(np.linalg.norm(self.Z))
+        self.max_total_energy = self.total_energy()
 
     def _init_state(self) -> None:
         """Initialize 48D state with stable latch configuration."""
@@ -185,13 +189,16 @@ class SixEchelonCore:
 
             self.integrator.vortex_params = vparams_c
             z_c_next, diag_c = self.integrator.step_cell(
-                z_c, dt=dt, u=u_c, cell_idx=c, vortex_params=vparams_c
+                z_c, dt=dt, u=u_c, cell_idx=c, vortex_params=vparams_c, rng=self.rng
             )
 
             Z_next[idx:idx+8] = z_c_next
             diags.append(diag_c)
 
         self.Z = Z_next
+        self.step_count += 1
+        self.max_state_norm = max(self.max_state_norm, float(np.linalg.norm(self.Z)))
+        self.max_total_energy = max(self.max_total_energy, float(sum(d.final_energy for d in diags)))
         return self.Z.copy(), diags
 
     def compute_cell_vortex_force(self, cell_idx: int) -> np.ndarray:
@@ -216,9 +223,28 @@ class SixEchelonCore:
         idx = 8 * cell_idx
         return self.Z[idx:idx+8].copy()
 
+    def total_energy(self) -> float:
+        """Sum of the six cell potentials; not a coupling-energy Lyapunov claim."""
+        value = float(np.sum(compute_energy(self.Z.reshape(6, 8), self.cell_params)))
+        if not np.isfinite(value):
+            raise NonFiniteStateError('Non-finite total cell potential')
+        return value
+
     def snapshot(self) -> dict:
         """Export full persistent state for exact deterministic save/resume."""
         return {
+            "schema": 2,
+            "core_type": type(self).__module__ + '.' + type(self).__qualname__,
+            "config": asdict(self.config),
+            "cell_params": asdict(self.cell_params),
+            "vortex_params": asdict(self.vortex_params),
+            "integrator_config": asdict(self.integrator.config),
+            "gamma_diag_normal": self.gamma_diag_normal.copy(),
+            "gamma_diag_hold": self.gamma_diag_hold.copy(),
+            "substeps": getattr(self, 'substeps', 1),
+            "step_count": self.step_count,
+            "max_state_norm": self.max_state_norm,
+            "max_total_energy": self.max_total_energy,
             "Z": self.Z.copy(),
             "K": self.K.copy(),
             "B": self.B.copy(),
@@ -229,7 +255,7 @@ class SixEchelonCore:
             "u_max": self.config.u_max,
             "hold_mobility_scale": self.config.hold_mobility_scale,
             "integrator_mode": self.config.integrator_mode,
-            "rng_state": self.rng.bit_generator.state,
+            "rng_state": copy.deepcopy(self.rng.bit_generator.state),
         }
 
     def restore(self, snap: dict, strict_config: bool = True) -> None:
@@ -238,21 +264,37 @@ class SixEchelonCore:
         If strict_config is True, raises ValueError if essential configuration (e.g. h_base) differs.
         If strict_config is False, synchronizes configuration parameters to match the snapshot.
         """
-        if "h_base" in snap and not np.isclose(snap["h_base"], self.config.h_base):
-            if strict_config:
-                raise ValueError(
-                    f"Incompatible core configuration: snapshot h_base={snap['h_base']} != current {self.config.h_base}"
-                )
-            self.config.h_base = snap["h_base"]
+        if snap.get('schema') != 2:
+            raise ValueError('Legacy snapshot lacks complete configuration; use its historical runner')
+        if snap['core_type'] != type(self).__module__ + '.' + type(self).__qualname__:
+            raise ValueError('Incompatible core type')
+        if strict_config:
+            current = self.snapshot()
+            for field in ('config', 'cell_params', 'vortex_params', 'integrator_config', 'substeps',
+                          'gamma_diag_normal', 'gamma_diag_hold'):
+                left, right = copy.deepcopy(current[field]), copy.deepcopy(snap[field])
+                if field == 'config':
+                    # The ablation switch is restored state; other physics must agree exactly.
+                    left.pop('enable_vortex'); right.pop('enable_vortex')
+                equal = np.array_equal(left, right) if isinstance(left, np.ndarray) else left == right
+                if not equal:
+                    raise ValueError(f'Incompatible core configuration: {field}')
+        # Rebuild dependent objects too, including non-default dissipative parameters.
+        self.config = SixEchelonConfig(**snap['config'])
+        self.cell_params = CellParameters(**snap['cell_params'])
+        self.vortex_params = VortexParameters(**snap['vortex_params'])
+        self.integrator = AdaptiveHeunIntegrator(IntegratorConfig(**snap['integrator_config']),
+                                                self.cell_params, self.vortex_params)
+        self.gamma_diag_normal = snap['gamma_diag_normal'].copy()
+        self.gamma_diag_hold = snap['gamma_diag_hold'].copy()
+        if hasattr(self, 'substeps'):
+            self.substeps = int(snap['substeps'])
 
         self.Z = snap["Z"].copy()
         self.K = snap["K"].copy()
         self.B = snap["B"].copy()
         self.W_readout = snap["W_readout"].copy()
-        if "enable_vortex" in snap:
-            self.config.enable_vortex = snap["enable_vortex"]
-        if "beta_v" in snap and not strict_config:
-            self.config.beta_v = snap["beta_v"]
-        if "u_max" in snap and not strict_config:
-            self.config.u_max = snap["u_max"]
-        self.rng.bit_generator.state = snap["rng_state"]
+        self.rng.bit_generator.state = copy.deepcopy(snap["rng_state"])
+        self.step_count = snap['step_count']
+        self.max_state_norm = snap['max_state_norm']
+        self.max_total_energy = snap['max_total_energy']
