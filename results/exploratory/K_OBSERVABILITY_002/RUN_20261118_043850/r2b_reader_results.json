@@ -1,0 +1,54 @@
+{
+  "feature_accuracies": {
+    "K_after": {
+      "overall_accuracy": 1.0,
+      "per_query": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "4": 1.0,
+        "5": 1.0,
+        "6": 1.0
+      }
+    },
+    "K_initial": {
+      "overall_accuracy": 0.2604166666666667,
+      "per_query": {
+        "1": 0.5,
+        "2": 0.25,
+        "3": 0.125,
+        "4": 0.1875,
+        "5": 0.125,
+        "6": 0.375
+      }
+    },
+    "delta_K": {
+      "overall_accuracy": 1.0,
+      "per_query": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "4": 1.0,
+        "5": 1.0,
+        "6": 1.0
+      }
+    }
+  },
+  "majority_baseline": 0.23958333333333334,
+  "majority_per_query": {
+    "1": 0.125,
+    "2": 0.1875,
+    "3": 0.25,
+    "4": 0.4375,
+    "5": 0.25,
+    "6": 0.1875
+  },
+  "permutation_summary": {
+    "runs": 200,
+    "mean": 0.29911458333333335,
+    "p95": 0.40625,
+    "p_value": 0.0
+  },
+  "primary_contrast_K_after_minus_K_initial": 0.7395833333333333,
+  "passed_minimum_gain": true
+}
