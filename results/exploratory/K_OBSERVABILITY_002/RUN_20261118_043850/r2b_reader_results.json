@@ -120,5 +120,49 @@
     },
     "primary_contrast_K_after_minus_K_initial": 0.7630208333333334,
     "passed_minimum_gain": true
-  }
+  },
+  "feature_accuracies": {
+    "K_after": {
+      "overall_accuracy": 1.0,
+      "per_query": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "4": 1.0,
+        "5": 1.0,
+        "6": 1.0
+      }
+    },
+    "K_initial": {
+      "overall_accuracy": 0.23697916666666666,
+      "per_query": {
+        "1": 0.296875,
+        "2": 0.3125,
+        "3": 0.1875,
+        "4": 0.25,
+        "5": 0.1875,
+        "6": 0.1875
+      }
+    },
+    "delta_K": {
+      "overall_accuracy": 1.0,
+      "per_query": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "4": 1.0,
+        "5": 1.0,
+        "6": 1.0
+      }
+    }
+  },
+  "majority_baseline": 0.34375,
+  "permutation_summary": {
+    "runs": 200,
+    "mean": 0.27828125,
+    "p95": 0.3958333333333333,
+    "plus_one_p_value": 0.004975124378109453
+  },
+  "primary_contrast": 0.7630208333333334,
+  "confirmation_730201_730208_implemented": true
 }

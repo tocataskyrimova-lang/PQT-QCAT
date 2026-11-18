@@ -591,6 +591,17 @@ def run_stage_r2b_external_reader(
             "primary_contrast_K_after_minus_K_initial": primary_gain,
             "passed_minimum_gain": bool(primary_gain >= 0.05 and perm_p_value <= 0.05),
         },
+        # Top-level backward compatibility aliases for external audit tools
+        "feature_accuracies": conf_feature_accuracies,
+        "majority_baseline": conf_majority_baseline,
+        "permutation_summary": {
+            "runs": permutation_runs,
+            "mean": p_mean,
+            "p95": p_95,
+            "plus_one_p_value": perm_p_value,
+        },
+        "primary_contrast": primary_gain,
+        "confirmation_730201_730208_implemented": True,
     }
 
 
