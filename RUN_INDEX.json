@@ -1,0 +1,120 @@
+{
+  "campaign_id": "PQT_QCAT_LIFE_ACCESS_CAMPAIGN_001",
+  "created_at": "2026-11-18T07:38:00+05:00",
+  "base_commit": "72e476e9773b50f803fb955018f3c0658efbc044",
+  "branch": "fix/life-access-001",
+  "runs": [
+    {
+      "stage": "R0",
+      "name": "Defects repair and mathematical acceptance",
+      "status": "COMPLETED",
+      "verdict": "PASS",
+      "tests_passed": 31,
+      "tests_total": 31,
+      "commit": "262dd92",
+      "artifacts": [
+        "R0_ACCEPTANCE.json",
+        "SEED_INCIDENT.md",
+        "ADDENDUM_RETRACTION_20261118.md",
+        "IMPLEMENTATION_CHANGELOG.md"
+      ]
+    },
+    {
+      "stage": "R1",
+      "name": "LIFE-ACCESS-001 continuous reading & settling",
+      "run_dir": "results/exploratory/LIFE_ACCESS_001/RUN_20261118_040220",
+      "status": "COMPLETED",
+      "verdict": "LIFE_ACCESS_SUPPORTED",
+      "candidate_selected": "QUERY32",
+      "gain_over_idle": "+38.54 p.p. (95% CI: [+32.88%, +44.20%])",
+      "development_seeds": [730001, 730002, 730003, 730004],
+      "confirmation_seeds": [730101, 730102, 730103, 730104, 730105, 730106, 730107, 730108],
+      "commit": "29156ae",
+      "artifacts": [
+        "results/exploratory/LIFE_ACCESS_001/RUN_20261118_040220/development_results.json",
+        "results/exploratory/LIFE_ACCESS_001/RUN_20261118_040220/confirmation_results.json",
+        "results/exploratory/LIFE_ACCESS_001/RUN_20261118_040220/R1_REPORT_RU.md"
+      ]
+    },
+    {
+      "stage": "R2",
+      "name": "Observability and decoder controls",
+      "run_dir": "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850",
+      "status": "COMPLETED",
+      "verdict": "DECODABILITY_CONFIRMED",
+      "r2a_jacobian": {
+        "p": 144,
+        "numerical_rank": 18,
+        "null_space_dim": 126,
+        "energy_top3_sv": 0.993,
+        "directional_verification": "PASS (100% within tolerance across 4 epsilons)",
+        "guard_analysis": "Nullspace perturbations at eps <= 1.0 produce 0.0% class changes"
+      },
+      "r2b_reader": {
+        "fit_sessions": 32,
+        "tune_sessions": 16,
+        "k_after_tune_accuracy": 1.0,
+        "delta_k_tune_accuracy": 1.0,
+        "k_initial_tune_accuracy": 0.2604,
+        "majority_baseline": 0.2396,
+        "permutation_p_value": 0.0000,
+        "primary_contrast": "+73.96 p.p."
+      },
+      "commit": "5af2d32",
+      "artifacts": [
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/r2a_jacobian_results.json",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/r2b_reader_results.json",
+        "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/R2_REPORT_RU.md"
+      ]
+    },
+    {
+      "stage": "R3",
+      "name": "Stateful online learning and A factorial",
+      "run_dir": "results/exploratory/STATEFUL_ONLINE_001/RUN_20261118_051107",
+      "status": "COMPLETED",
+      "verdict": "A_WRITE_NULL_EFFECT",
+      "joint_learnability": {
+        "mean_accuracy": 0.5258,
+        "passed_75_gate": false,
+        "status": "TASK_NOT_INFORMATIVE_FOR_CONTEXT_RETURN"
+      },
+      "candidate_selected": "CARRY_TRAIN",
+      "primary_a_write_retention_contrast": {
+        "mean_gain": 0.0382,
+        "ci_gain": [0.0095, 0.0669],
+        "threshold": 0.05,
+        "supported": false
+      },
+      "development_seeds": [730001, 730002, 730003, 730004],
+      "confirmation_seeds": [730301, 730302, 730303, 730304, 730305, 730306, 730307, 730308],
+      "commit": "afe2822",
+      "artifacts": [
+        "results/exploratory/STATEFUL_ONLINE_001/RUN_20261118_051107/dev_results.json",
+        "results/exploratory/STATEFUL_ONLINE_001/RUN_20261118_051107/conf_results.json",
+        "results/exploratory/STATEFUL_ONLINE_001/RUN_20261118_051107/R3_REPORT_RU.md"
+      ]
+    },
+    {
+      "stage": "R4",
+      "name": "Long continuous life",
+      "run_dir": "results/exploratory/LONG_LIFE_001/RUN_20261118_064048",
+      "status": "COMPLETED",
+      "verdict": "CONTINUOUS_LIFE_STABILITY_CONFIRMED",
+      "candidate_evaluated": "CARRY_TRAIN",
+      "horizon_events": 5000,
+      "retention_preserved_noninferiority": true,
+      "mean_retention_drop": 0.0000,
+      "ci_retention_drop": [0.0000, 0.0000],
+      "a_write_retention_advantage": 0.0000,
+      "state_stability": "Bounded Z norm across all lives, zero divergence or NaNs",
+      "development_seeds": [730001, 730002, 730003, 730004],
+      "confirmation_seeds": [730401, 730402, 730403, 730404, 730405, 730406, 730407, 730408],
+      "commit": "6d2988f",
+      "artifacts": [
+        "results/exploratory/LONG_LIFE_001/RUN_20261118_064048/dev_results.json",
+        "results/exploratory/LONG_LIFE_001/RUN_20261118_064048/conf_results.json",
+        "results/exploratory/LONG_LIFE_001/RUN_20261118_064048/R4_REPORT_RU.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "campaign_id": "PQT_QCAT_LIFE_ACCESS_CAMPAIGN_001",
+  "status": "COMPLETED",
+  "timestamp": "2026-11-18T07:38:30+05:00",
+  "git": {
+    "base_commit": "72e476e9773b50f803fb955018f3c0658efbc044",
+    "branch": "fix/life-access-001",
+    "head_commit": "6d2988f"
+  },
+  "stages": {
+    "R0": {
+      "name": "Defects repair F01-F12 and mathematical acceptance",
+      "status": "COMPLETED",
+      "verdict": "PASS",
+      "details": "All 12 defects addressed; 31/31 unit tests pass; exact resume verified; sealed M5 seeds quarantined and protected"
+    },
+    "R1": {
+      "name": "Continuous reading and state settling",
+      "status": "COMPLETED",
+      "verdict": "LIFE_ACCESS_SUPPORTED",
+      "selected_candidate": "QUERY32",
+      "net_gain_over_idle": 0.3854,
+      "ci_gain": [0.3288, 0.4420]
+    },
+    "R2": {
+      "name": "Observability and decoder controls",
+      "status": "COMPLETED",
+      "verdict": "DECODABILITY_CONFIRMED",
+      "r2a_rank": 18,
+      "r2a_null_dim": 126,
+      "r2a_directional_check": "PASS (100% within tolerance across 4 epsilons)",
+      "r2b_decoder_accuracy": 1.0,
+      "r2b_permutation_p_value": 0.0000
+    },
+    "R3": {
+      "name": "Stateful online learning and A factorial",
+      "status": "COMPLETED",
+      "verdict": "A_WRITE_NULL_EFFECT",
+      "joint_learnability": "FAIL (52.58% < 75.0% threshold, TASK_NOT_INFORMATIVE_FOR_CONTEXT_RETURN)",
+      "selected_stateful_arm": "CARRY_TRAIN",
+      "primary_a_write_gain": 0.0382,
+      "ci_gain": [0.0095, 0.0669],
+      "supported": false
+    },
+    "R4": {
+      "name": "Long continuous life",
+      "status": "COMPLETED",
+      "verdict": "CONTINUOUS_LIFE_STABILITY_CONFIRMED",
+      "candidate_evaluated": "CARRY_TRAIN",
+      "horizon_events": 5000,
+      "retention_preserved_noninferiority": true,
+      "mean_retention_drop": 0.0,
+      "ci_retention_drop": [0.0, 0.0],
+      "a_write_retention_advantage": 0.0,
+      "trajectory_stability": "Bounded Z norm across all lives, zero divergence or NaNs"
+    }
+  },
+  "overall_verdicts": {
+    "engineering_verdict": "PASS",
+    "scientific_verdict": {
+      "k_memory_encoding": "CONFIRMED (Exact functional information decodable with 100% accuracy, p=0.0000)",
+      "z_continuous_readout": "CONFIRMED (Input driving for 32 ticks settles continuous Z into readout basin with +38.54 p.p. gain over idle)",
+      "a_operator_advantage": "NULL_EFFECT (No statistically confirmed isolated retention advantage >= 5 p.p. from A_write in online continuous life)",
+      "context_task_learnability": "LIMITED (48D core without external memory controller achieves 52.58% joint learnability, failing 75% gate)",
+      "continuous_life_stability": "CONFIRMED (Trajectories remain strictly bounded and finite across 5000+ events without artificial resets)"
+    }
+  },
+  "security_and_provenance": {
+    "sealed_m5_seeds_accessed": false,
+    "quarantined_seeds_in_confirmation": false,
+    "confirmation_seeds_fresh": true,
+    "prediction_before_feedback": true,
+    "atomic_writes_verified": true,
+    "exact_resume_verified": true
+  },
+  "resource_accounting": {
+    "wall_clock_hours_used": 2.45,
+    "wall_clock_hours_cap": 48.0,
+    "cpu_hours_used": 4.1,
+    "cpu_hours_cap": 96.0,
+    "max_concurrent_workers": 2,
+    "blas_threads_per_worker": 1,
+    "peak_memory_mb_per_worker": 277
+  }
+}
