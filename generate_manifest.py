@@ -32,18 +32,26 @@ for mod in [
     "pqt_qcat/tests/test_r0_acceptance.py",
     "pqt_qcat/tests/test_r3_r4_smoke.py",
     "pqt_qcat/tests/test_agent_exact_resume.py",
+    "pqt_qcat/memory/dev_integrator_convergence.py",
+    "pqt_qcat/memory/dev_context_pathway_ablation.py",
+    "pqt_qcat/memory/dev_single_rule_calibration.py",
+    "pqt_qcat/memory/dev_joint_rule_calibration.py",
 ]:
     p = root / mod
     if p.exists():
         files_to_hash.append(p)
 
-# Results from R1, R2, R3, R4, and CALIBRATION_001
+# Results from R1, R2, R3, R4, CALIBRATION_001, and corrective review investigations
 for pattern in [
     "results/exploratory/LIFE_ACCESS_001/RUN_20261118_040220/*",
     "results/exploratory/K_OBSERVABILITY_002/RUN_20261118_043850/*",
     "results/exploratory/STATEFUL_ONLINE_001/RUN_20261118_051107/*",
     "results/exploratory/LONG_LIFE_001/RUN_20261118_064048/*",
     "results/exploratory/CALIBRATION_001/*",
+    "results/exploratory/INTEGRATOR_CONVERGENCE_001/*",
+    "results/exploratory/CONTEXT_ABLATION_001/*",
+    "results/exploratory/SINGLE_RULE_CALIBRATION_001/*",
+    "results/exploratory/JOINT_RULE_CALIBRATION_001/*",
 ]:
     for p in root.glob(pattern):
         if p.is_file() and not p.name.endswith(".tmp"):

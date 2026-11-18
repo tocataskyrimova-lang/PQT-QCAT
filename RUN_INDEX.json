@@ -96,7 +96,7 @@
       "name": "Wake interface calibration (write_gate x t_query)",
       "run_dir": "results/exploratory/CALIBRATION_001",
       "status": "COMPLETED",
-      "verdict": "TOPOLOGICAL_ISOLATION_IDENTIFIED",
+      "verdict": "LOW_ONLINE_LEARNABILITY_CAUSE_UNRESOLVED",
       "development_seeds": [730001, 730002, 730003, 730004],
       "single_rule_late_acc": {
         "g0_t8": "29.17% +- 13.82%",

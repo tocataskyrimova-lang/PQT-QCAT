@@ -130,7 +130,7 @@ class StatefulOnlineAgent:
         eta_k: float = 0.8,
         delta_core_max: float = 0.5,
         eligibility_decay: float = 0.0,
-        write_gate_presentation: float = 1.0,
+        write_gate_presentation: float = 0.0,
         read_gate: float = 0.0,
     ):
         self.core = core
@@ -176,16 +176,16 @@ class StatefulOnlineAgent:
             "event_active": self.event_active,
         }
 
-    def restore(self, snap: dict[str, Any]) -> None:
+    def restore(self, snap: dict[str, Any], strict_config: bool = True) -> None:
         """Restore complete agent state from snapshot."""
-        self.core.restore(snap["core_snapshot"])
+        self.core.restore(snap["core_snapshot"], strict_config=strict_config)
         self.learning_mode = snap["learning_mode"]
         self.t_context = snap["t_context"]
         self.t_query = snap["t_query"]
         self.eta_k = snap["eta_k"]
         self.delta_core_max = snap["delta_core_max"]
         self.eligibility_decay = snap["eligibility_decay"]
-        self.write_gate_presentation = snap.get("write_gate_presentation", 1.0)
+        self.write_gate_presentation = snap.get("write_gate_presentation", 0.0)
         self.read_gate = snap.get("read_gate", 0.0)
         self.psi_0 = np.array(snap["psi_0"], dtype=np.float64)
         self.Z0 = np.array(snap["Z0"], dtype=np.float64)
@@ -195,6 +195,70 @@ class StatefulOnlineAgent:
         self.committed_logits = np.array(snap["committed_logits"], dtype=np.float64) if snap["committed_logits"] is not None else None
         self.committed_pred = snap["committed_pred"]
         self.event_active = snap["event_active"]
+
+    def save_checkpoint(self, filepath: Path | str) -> None:
+        """Save complete serializable agent state to an NPZ file on disk."""
+        path = Path(filepath)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        snap = self.snapshot()
+        core_snap = snap.pop("core_snapshot")
+        np.savez_compressed(
+            path,
+            core_Z=core_snap["Z"],
+            core_K=core_snap["K"],
+            core_B=core_snap["B"],
+            core_W_readout=core_snap["W_readout"],
+            psi_0=np.array(snap["psi_0"]),
+            Z0=np.array(snap["Z0"]),
+            eligibility_trace=np.array(snap["eligibility_trace"]),
+            committed_logits=np.array(snap["committed_logits"]) if snap["committed_logits"] is not None else np.array([]),
+            metadata_json=json.dumps({
+                "core_meta": {
+                    "enable_vortex": core_snap["enable_vortex"],
+                    "h_base": core_snap.get("h_base", self.core.config.h_base),
+                    "rng_state": core_snap["rng_state"],
+                },
+                "agent_meta": snap,
+            }),
+        )
+
+    def load_checkpoint(self, filepath: Path | str, strict_config: bool = True) -> None:
+        """Load complete agent state from an NPZ file on disk."""
+        path = Path(filepath)
+        data = np.load(path, allow_pickle=True)
+        meta = json.loads(str(data["metadata_json"]))
+        core_meta = meta["core_meta"]
+        agent_meta = meta["agent_meta"]
+
+        core_snap = {
+            "Z": data["core_Z"],
+            "K": data["core_K"],
+            "B": data["core_B"],
+            "W_readout": data["core_W_readout"],
+            "enable_vortex": core_meta["enable_vortex"],
+            "h_base": core_meta["h_base"],
+            "rng_state": core_meta["rng_state"],
+        }
+        agent_snap = {
+            "core_snapshot": core_snap,
+            "learning_mode": agent_meta["learning_mode"],
+            "t_context": agent_meta["t_context"],
+            "t_query": agent_meta["t_query"],
+            "eta_k": agent_meta["eta_k"],
+            "delta_core_max": agent_meta["delta_core_max"],
+            "eligibility_decay": agent_meta["eligibility_decay"],
+            "write_gate_presentation": agent_meta.get("write_gate_presentation", 0.0),
+            "read_gate": agent_meta.get("read_gate", 0.0),
+            "psi_0": data["psi_0"],
+            "Z0": data["Z0"],
+            "eligibility_trace": data["eligibility_trace"],
+            "current_context": agent_meta["current_context"],
+            "current_query": agent_meta["current_query"],
+            "committed_logits": data["committed_logits"] if len(data["committed_logits"]) > 0 else None,
+            "committed_pred": agent_meta["committed_pred"],
+            "event_active": agent_meta["event_active"],
+        }
+        self.restore(agent_snap, strict_config=strict_config)
 
     def reset_state_to_z0(self) -> None:
         """Explicitly reset working state Z to baseline Z0."""
@@ -303,23 +367,25 @@ class StatefulOnlineAgent:
         target_class: int,
         enable_vortex_read: bool = True,
         ticks: int = 8,
+        read_gate: float | None = None,
     ) -> dict[str, Any]:
         """Evaluate performance on an isolated clone without disturbing the live trajectory."""
         clone_core = copy.deepcopy(self.core)
         clone_core.config.enable_vortex = enable_vortex_read
+        gate = self.read_gate if read_gate is None else read_gate
 
         # Present context
         ctx_token = 0 if context_id == 0 else 7
         x_ctx = np.zeros(8, dtype=np.float64)
         x_ctx[ctx_token] = 1.0
         for _ in range(self.t_context):
-            clone_core.step(x_ctx, write_gate=0.0)
+            clone_core.step(x_ctx, write_gate=gate)
 
         # Present query
         x_q = np.zeros(8, dtype=np.float64)
         x_q[query_token] = 1.0
         for _ in range(ticks):
-            clone_core.step(x_q, write_gate=0.0)
+            clone_core.step(x_q, write_gate=gate)
 
         logits = clone_core.predict()[1:5]
         pred = int(np.argmax(logits)) + 1

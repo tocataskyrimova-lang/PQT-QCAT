@@ -174,6 +174,7 @@ def run_single_calibration_life(
     delta_z_norms = []
     max_e3_e4_changes = []
     unstable = False
+    failure_info = None
 
     for idx, ev in enumerate(schedule):
         ctx = ev["context"]
@@ -218,14 +219,35 @@ def run_single_calibration_life(
         except Exception as e:
             # Numerical instability or NonFiniteStateError caught
             unstable = True
-            is_correct = False
-            margin = -10.0
-            nll = 10.0
-            dk_norm = 0.0
-            dz_norm = 0.0
-            max_e3_e4 = 0.0
-            pred = -1
-            logits_4 = np.array([0.0, 0.0, 0.0, 0.0])
+            failure_info = {
+                "event_idx": idx,
+                "error_type": type(e).__name__,
+                "error_message": str(e),
+            }
+            event_logs.append({
+                "event_idx": idx,
+                "context": ctx,
+                "query": query,
+                "target": target,
+                "status": "failed",
+                "failure": failure_info,
+                "pred": None,
+                "correct": False,
+            })
+            for rem_idx in range(idx + 1, total_events):
+                correct_all.append(False)
+                if rem_idx >= total_events // 2:
+                    correct_late.append(False)
+                event_logs.append({
+                    "event_idx": rem_idx,
+                    "context": schedule[rem_idx]["context"],
+                    "query": schedule[rem_idx]["query"],
+                    "target": schedule[rem_idx]["target"],
+                    "status": "skipped_due_to_prior_failure",
+                    "pred": None,
+                    "correct": False,
+                })
+            break
 
         correct_all.append(is_correct)
         if idx >= total_events // 2:
@@ -243,6 +265,7 @@ def run_single_calibration_life(
 
         event_logs.append({
             "event_idx": idx,
+            "status": "executed",
             "context": ctx,
             "query": query,
             "target": target,
@@ -255,27 +278,6 @@ def run_single_calibration_life(
             "delta_z_norm": dz_norm,
             "max_coord_change_e3_e4": max_e3_e4,
         })
-        if unstable:
-            # Fill remaining events as failed
-            for rem_idx in range(idx + 1, total_events):
-                correct_all.append(False)
-                if rem_idx >= total_events // 2:
-                    correct_late.append(False)
-                event_logs.append({
-                    "event_idx": rem_idx,
-                    "context": schedule[rem_idx]["context"],
-                    "query": schedule[rem_idx]["query"],
-                    "target": schedule[rem_idx]["target"],
-                    "pred": -1,
-                    "correct": False,
-                    "logits": [0.0, 0.0, 0.0, 0.0],
-                    "margin": -10.0,
-                    "nll": 10.0,
-                    "delta_k_norm": 0.0,
-                    "delta_z_norm": 0.0,
-                    "max_coord_change_e3_e4": 0.0,
-                })
-            break
 
     summary = {
         "core_seed": core_seed,
@@ -285,7 +287,9 @@ def run_single_calibration_life(
         "t_query": t_query,
         "t_context": t_context,
         "total_events": total_events,
+        "completed_events": len(margins),
         "unstable": unstable,
+        "failure_info": failure_info if unstable else None,
         "acc_all": float(np.mean(correct_all)),
         "acc_late": float(np.mean(correct_late)),
         "acc_c0": float(np.mean(correct_c0)) if correct_c0 else None,

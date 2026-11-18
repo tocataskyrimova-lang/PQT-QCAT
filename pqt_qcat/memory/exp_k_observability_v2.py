@@ -465,7 +465,7 @@ def run_stage_r2b_external_reader(
 
             best_alphas[f"{feat_name}_q{tok}"] = best_a
             per_query_tune_acc[tok] = best_sc
-            tune_correct += int(np.sum(clf.predict(X_tune) == y_tune))
+            tune_correct += int(round(best_sc * len(y_tune)))
 
             # Freeze classifier by fitting on all development data with best_a
             final_clf = RidgeClassifier(alpha=best_a)

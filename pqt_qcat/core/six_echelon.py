@@ -224,15 +224,35 @@ class SixEchelonCore:
             "B": self.B.copy(),
             "W_readout": self.W_readout.copy(),
             "enable_vortex": self.config.enable_vortex,
+            "h_base": self.config.h_base,
+            "beta_v": self.config.beta_v,
+            "u_max": self.config.u_max,
+            "hold_mobility_scale": self.config.hold_mobility_scale,
+            "integrator_mode": self.config.integrator_mode,
             "rng_state": self.rng.bit_generator.state,
         }
 
-    def restore(self, snap: dict) -> None:
-        """Restore exact persistent state."""
+    def restore(self, snap: dict, strict_config: bool = True) -> None:
+        """Restore exact persistent state.
+        
+        If strict_config is True, raises ValueError if essential configuration (e.g. h_base) differs.
+        If strict_config is False, synchronizes configuration parameters to match the snapshot.
+        """
+        if "h_base" in snap and not np.isclose(snap["h_base"], self.config.h_base):
+            if strict_config:
+                raise ValueError(
+                    f"Incompatible core configuration: snapshot h_base={snap['h_base']} != current {self.config.h_base}"
+                )
+            self.config.h_base = snap["h_base"]
+
         self.Z = snap["Z"].copy()
         self.K = snap["K"].copy()
         self.B = snap["B"].copy()
         self.W_readout = snap["W_readout"].copy()
         if "enable_vortex" in snap:
             self.config.enable_vortex = snap["enable_vortex"]
+        if "beta_v" in snap and not strict_config:
+            self.config.beta_v = snap["beta_v"]
+        if "u_max" in snap and not strict_config:
+            self.config.u_max = snap["u_max"]
         self.rng.bit_generator.state = snap["rng_state"]
