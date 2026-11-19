@@ -72,15 +72,23 @@ def test_h6_provenance_isolation():
     assert res["passed"] is True
 
 
-def test_sha256_manifest_and_verification():
+def test_sha256_manifest_and_verification(tmp_path):
     """Verify that generating and verifying SHA-256 manifest completes with 100% match."""
-    gen_res = generate_sha256_manifest()
+    # Never overwrite the historical preregistration while testing manifest I/O.
+    root = tmp_path / 'repository'
+    root.mkdir()
+    for i in range(25):
+        (root / f'module_{i}.py').write_text(f'value = {i}\n', encoding='utf-8')
+    gen_res = generate_sha256_manifest(root_dir=root)
     assert gen_res["total_files_hashed"] > 20
 
-    success, count, mismatches = verify_sha256_manifest()
+    success, count, mismatches = verify_sha256_manifest(root_dir=root)
     assert success is True
     assert len(mismatches) == 0
     assert count == gen_res["total_files_hashed"]
+    (root / 'module_0.py').write_text('value = 999\n', encoding='utf-8')
+    success, _, mismatches = verify_sha256_manifest(root_dir=root)
+    assert not success and len(mismatches) == 1
 
 
 def test_cross_platform_line_ending_manifest_invariance(tmp_path):

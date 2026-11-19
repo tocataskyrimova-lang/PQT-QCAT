@@ -121,8 +121,10 @@ def run_integrator_convergence_battery(
             "mean_z_norm": float(np.mean(z_norms)) if z_norms else 0.0,
             "max_energy": float(max(energies)) if energies else None,
             "energy_at_event_boundaries": energies,
-            "max_energy_all_substeps": core.max_total_energy,
-            "max_z_norm_all_substeps": core.max_state_norm,
+            "max_energy_all_substeps": core.max_total_energy if np.isfinite(core.max_total_energy) else None,
+            "energy_nonfinite_observed": not bool(np.isfinite(core.max_total_energy)),
+            "max_z_norm_all_substeps": core.max_state_norm if np.isfinite(core.max_state_norm) else None,
+            "state_norm_nonfinite_observed": not bool(np.isfinite(core.max_state_norm)),
             "predictions": preds,
             "logits": [l.tolist() for l in logits_history],
             "elapsed_seconds": elapsed,
@@ -186,9 +188,12 @@ def run_integrator_convergence_battery(
             rep += f"| **{factor}x** | {d['h']:.4f} | {d['completed_events']}/72 | {fail_str} | {d['max_z_norm']:.2f} | {d['accuracy']*100:.1f}% | {comp['max_logit_diff_vs_finest']:.4f} |\n"
             
         rep += """
-### Выводы:
-1. **Численная устойчивость:** сбой на шаге $h=0.01$ полностью устраняется при $h=0.005$ (2 подшага) и $h=0.0025$ (4 подшага). Все 72 события выполняются успешно без вылетов и без необходимости введения искусственного демпфирования.
-2. **Сходимость логитов:** при переходе от $h=0.005$ к $h=0.0025$ траектория остаётся численно близкой, подтверждая достаточную точность дискретизации $h=0.005$ для непрерывной динамики бодрствования.
+### Ограничения
+Число завершённых событий характеризует численную работоспособность, не task accuracy.
+Используется Heun, не Euler. Разница относительно самого тонкого шага — наблюдаемая
+чувствительность на этой панели, не доказанная оценка ошибки относительно точного решения.
+Для заявления о достаточности шага нужны заданный допуск и дополнительные проверки.
+Переполнение энергии обозначается null плюс energy_nonfinite_observed=true, не нулевой энергией.
 """
         rep_file = output_dir / "CONVERGENCE_REPORT_RU.md"
         tmp_rep = output_dir / "CONVERGENCE_REPORT_RU.md.tmp"

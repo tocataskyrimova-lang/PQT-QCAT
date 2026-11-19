@@ -1,6 +1,6 @@
 """Independent artifact checks; no model training and no metric selection."""
 from pathlib import Path
-import argparse, hashlib, json, sys
+import argparse, hashlib, json, sys, zipfile
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
@@ -11,7 +11,9 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('run');args=parser.parse_args()
     run=Path(args.run);plan=json.loads((run/'PLAN.json').read_text())
     source=json.loads((run/'SOURCE.json').read_text())
-    assert all(hashlib.sha256((ROOT/f).read_bytes()).hexdigest()==h for f,h in source['files'].items())
+    with zipfile.ZipFile(run/'SOURCE_CODE.zip') as archive:
+        assert all(hashlib.sha256(archive.read(f.replace('\\','/'))).hexdigest()==h for f,h in source['files'].items())
+    current_changes=[f for f,h in source['files'].items() if hashlib.sha256((ROOT/f).read_bytes()).hexdigest()!=h]
     freeze=json.loads((run/'READER_FREEZE.json').read_text())
     assert freeze['sha256']==hashlib.sha256((run/'FROZEN_READERS.json').read_bytes()).hexdigest()
     assert len({tuple(x) for x in plan['maps']})==24
@@ -41,7 +43,8 @@ def main():
         cpu+=row['cpu_seconds'];steps+=row['training_substeps']
     assert lives==128 and events==9216
     result={'verified_lives':lives,'verified_training_events':events,'checkpoint_count':checks,
-            'total_training_substeps':steps,'life_cpu_seconds':cpu,'source_hashes_match':True,
+            'total_training_substeps':steps,'life_cpu_seconds':cpu,'archived_source_hashes_match':True,
+            'current_source_changes_since_run':current_changes,
             'reader_hash_matches':True,'predictions_and_metrics_match':True,'actual_updates_match':True}
     (run/'INDEPENDENT_CHECKS.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
     print(json.dumps(result,indent=2))
