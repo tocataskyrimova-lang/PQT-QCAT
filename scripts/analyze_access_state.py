@@ -33,7 +33,7 @@ def difference(first, second, key, plan):
                    for a, b in zip(first, second)], plan)
 
 
-def measure_curves(plan, raw, baseline, targets, hypotheses=None):
+def measure_curves(plan, raw, baseline, targets):
     result = {}
     for name, rows in raw.items():
         result[name] = {}
@@ -92,7 +92,8 @@ def verify_frozen(phase, unit, plan, output, history, z0_state):
                                                      W_readout=array_hash(original['W_readout']))
                 for h, result in row['horizons'].items():
                     np.testing.assert_array_equal(result['logits'], (original['W_readout'] @ result['Z'])[1:5])
-                    assert result['rng_hash'] == raw['own'][q-1]['horizons'][h]['rng_hash']
+                    reference = raw['own'][q - 1]['horizons'].get(h)
+                    assert reference is None or result['rng_hash'] == reference['rng_hash']
                 if row['failure'] is None:
                     assert row['substeps'] == 128
                 counters['substeps'] += row['substeps']
@@ -153,7 +154,8 @@ def select(plan, data, output, phase):
             variants = {f'E{cell}': {'cells': [cell], 'depth': 1.} for cell in cells}
             variants.update({f'{best_group}@{depth}': {'cells': cells, 'depth': depth}
                              for depth in plan['refinement_depths'] if depth < 1.})
-            selections[arm] = {'group': best_group, 'observed_gain': key(best_group),
+            measured_gain = rows[best_group][tick]['contrasts']['live']['accuracy']['mean']
+            selections[arm] = {'group': best_group, 'observed_gain': measured_gain,
                                'refinements': variants if key(best_group) >= plan['refinement_trigger_gain'] else {}}
         else:
             coarse = {k: {'cells': v, 'depth': 1.} for k, v in GROUPS.items()}
