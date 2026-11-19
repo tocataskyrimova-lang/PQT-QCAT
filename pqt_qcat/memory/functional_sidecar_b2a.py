@@ -142,7 +142,7 @@ def init(history, b1_source, output):
     })
 
 
-def read_branch(core, z0, query, reader, donor, side_shadow, gate):
+def read_branch(core, z0, query, reader, donor, side_shadow, gate, *, stimulus=None):
     if reader == 'Z0-64':
         core.Z = z0.copy()
     if donor is not None:
@@ -151,7 +151,8 @@ def read_branch(core, z0, query, reader, donor, side_shadow, gate):
     shadow = copy.deepcopy(core) if side_shadow else None
     z_start = core.Z.copy()
     rng_pre = rng_hash(core)
-    stimulus = np.eye(8)[query]
+    if stimulus is None:
+        stimulus = np.eye(8)[query]
     start_steps = core.step_count
     for _ in range(64):
         core.step(stimulus, write_gate=gate)
@@ -170,15 +171,15 @@ def read_branch(core, z0, query, reader, donor, side_shadow, gate):
             'side_shadow_substeps': shadow.step_count - start_steps if shadow is not None else 0}
 
 
-def forecast(agent, query, reader, credit, donor, table):
+def forecast(agent, query, reader, credit, donor, table, *, stimulus=None):
     pre = agent.snapshot()
     clone = copy.deepcopy(agent.core) if reader in ('Z0-64', 'LIVE64') else None
     start_steps, start_shadow = agent.core.step_count, agent.shadow_steps
-    main = agent.begin_query(query)
+    main = agent.begin_query(query) if stimulus is None else agent.begin_query(query, stimulus=stimulus)
     pending = agent.snapshot()
     if clone is not None:
         external = read_branch(clone, agent.Z0, query, reader, donor,
-                               credit == 'aligned', agent.read_gate)
+                               credit == 'aligned', agent.read_gate, stimulus=stimulus)
         assert main['rng_pre_hash'] == external['rng_pre']
     else:
         external = None

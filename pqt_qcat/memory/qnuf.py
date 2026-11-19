@@ -64,20 +64,25 @@ class QNUFAgent(StatefulOnlineAgent):
         self.update_candidates = 0
         self.last_decision = None
 
-    def begin_query(self, query):
+    def begin_query(self, query, *, stimulus=None):
         if self.pending is not None:
             raise RuntimeError('Resolve pending feedback before the next query')
         if query not in range(7):
             raise ValueError('Expected neutral query 0 or a token in 1..6')
+        if stimulus is not None:
+            stimulus = np.asarray(stimulus, dtype=np.float64)
+            if not query or stimulus.shape != (8,) or not np.isfinite(stimulus).all():
+                raise ValueError('Explicit sensory input requires a non-neutral token and eight finite coordinates')
+        else:
+            stimulus = np.zeros(8)
+            if query:
+                stimulus[query] = 1.0
         if self.learning_mode == 'RESET_TRAIN':
             self.reset_state_to_z0()
         shadow = copy.deepcopy(self.core)
         z_pre = self.core.Z.copy()
         k_pre = array_hash(self.core.K)
         rng_pre = rng_hash(self.core)
-        stimulus = np.zeros(8)
-        if query:
-            stimulus[query] = 1.0
         for _ in range(self.t_query):
             self.core.step(stimulus, write_gate=self.write_gate_presentation)
         shadow_start = shadow.step_count
