@@ -39,9 +39,9 @@ def select_folds(units, test):
     return [tuple(unit) for unit in units if unit[0]!=seed and unit[1]!=mapping]
 
 
-def fit(blocks, train, mode, blind):
+def fit(training_blocks, mode, blind):
     x, y = [], []
-    for core, initial, rules in (blocks[key] for key in train):
+    for core, initial, rules in training_blocks:
         for key, features in rows(core,mode,core['K'],initial,blind=blind):
             ctx, token = key.split(':')
             target = rules[ctx][int(token)-1]
@@ -75,8 +75,9 @@ def evaluate(root, plan):
             test = seed,mapping
             train = select_folds(plan['units'],test)
             assert len(train)==4 and all(s!=seed and m!=mapping for s,m in train)
-            full,n = fit(blocks,train,mode,False)
-            blind,n_blind = fit(blocks,train,mode,True)
+            training_blocks = [blocks[key] for key in train]
+            full,n = fit(training_blocks,mode,False)
+            blind,n_blind = fit(training_blocks,mode,True)
             folds.append({'mode':mode,'arm':arm,'test':list(test),'fit':[list(key) for key in train],
                           'fit_class_rows':n,'blind_class_rows':n_blind,'restored_sha256':verified[test]})
             core, initial, rules = blocks[test]
