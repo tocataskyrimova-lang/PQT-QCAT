@@ -1,15 +1,13 @@
 """Regression tests for action-dependent evidence and coherent credit."""
 import copy
-import json
-import os
-from pathlib import Path
 
 import numpy as np
 import pytest
 
 from pqt_qcat.memory import functional_sidecar_b2a as b2
-from pqt_qcat.memory.access_state import exact, load_agent
+from pqt_qcat.memory.access_state import exact
 from pqt_qcat.memory.functional_sidecar import ActionJournal
+from pqt_qcat.memory.life_qnuf_001 import new_agent
 from pqt_qcat.memory.qnuf import ObservedEvidence
 
 
@@ -35,19 +33,16 @@ def test_transition_and_evidence_order(tmp_path):
 
 
 def test_credit_matches_dispatched_read_branch():
-    root = Path(os.environ['LIFE_B2A_TEST_RUN'])
-    plan = json.loads((root / 'PLAN.json').read_text())
-    seed, mapping = plan['units'][0]
-    main = load_agent(plan, 'B3', seed, mapping, 48)
+    config = dict(substeps=2, h_base=.01, query_ticks=8, eta=.8, clip=.5, gate=1.)
+    main = new_agent('B3', 821101, config)
     aligned = copy.deepcopy(main)
-    current = plan['streams'][f'{seed}_{mapping}']['start_query']
     original_k = main.core.K.copy()
-    a = b2.forecast(main, current, 'Z0-64', 'main', None, {})
-    b = b2.forecast(aligned, current, 'Z0-64', 'aligned', None, {})
+    a = b2.forecast(main, 4, 'Z0-64', 'main', None, {})
+    b = b2.forecast(aligned, 4, 'Z0-64', 'aligned', None, {})
     exact(a['main'], b['main'])
     exact(a['logits'], b['logits'])
     exact(main.snapshot(), aligned.snapshot())
-    evidence = ObservedEvidence(48, plan['parent']['stage1_mappings'][mapping][current - 1])
+    evidence = ObservedEvidence(0, 3)
     source, update = b2.learn(aligned, b, evidence, 'aligned')
     assert source == 'external'
     e = np.array(update['error_vector'])
