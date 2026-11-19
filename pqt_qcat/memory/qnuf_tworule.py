@@ -167,6 +167,8 @@ def train(job):
     root, plan, seed, mapping, mode, arm, resume = job
     start, cpu = time.perf_counter(), time.process_time()
     order, rules = block(plan, seed, mapping)
+    cut_age = plan['cut']
+    pending_name = f'pending_{cut_age:02d}.npz'
     origin = where(root, seed, mapping, mode, arm)
     path = where(root/'resume', seed, mapping, mode, arm) if resume else origin
     path.mkdir(parents=True, exist_ok=False)
@@ -175,7 +177,7 @@ def train(job):
     environment = TeachingStream(order, rules)
     journal = ActionJournal(path/'pre_feedback.jsonl')
     if resume:
-        cut = load_state(origin/'pending_48.npz')
+        cut = load_state(origin/pending_name)
         assert cut['plan_sha256'] == digest(plan) and cut['condition'] == [mode, arm]
         table = cut['table']
         if agent is not None:
@@ -187,7 +189,7 @@ def train(job):
     elif agent is not None:
         save_state(path/'start.npz', {'agent': agent.snapshot(), 'plan_sha256': digest(plan)})
     rows, timing = [], []
-    while environment.cursor < EXPOSURES:
+    while environment.cursor < len(order):
         begin = time.perf_counter_ns()
         observation = environment.observe()
         ctx, q, age = observation['context'], observation['query'], observation['cursor']
@@ -201,8 +203,8 @@ def train(job):
             pending['observation'] = observation
             receipt = journal.publish(pending)
         issued = time.perf_counter_ns()
-        if age == CUT and not resume:
-            save_state(path/'pending_48.npz', {'agent': agent.snapshot() if agent is not None else None,
+        if age == cut_age and not resume:
+            save_state(path/pending_name, {'agent': agent.snapshot() if agent is not None else None,
                        'table': table, 'receipt': receipt, 'cursor': age, 'condition': [mode,arm], 'plan_sha256': digest(plan)})
         evidence = environment.feedback(journal, receipt)
         revealed = time.perf_counter_ns()
@@ -225,10 +227,10 @@ def train(job):
     complete = {'seed': seed, 'mapping': mapping, 'condition': [mode,arm], 'events': len(rows),
                 'wall_seconds': time.perf_counter()-start, 'cpu_seconds': time.process_time()-cpu}
     if resume:
-        exact(rows, read_json(origin/'events.json')[CUT:])
+        exact(rows, read_json(origin/'events.json')[cut_age:])
         assert state_hash(end) == state_hash(load_state(origin/'end.npz'))
         assert journal.path.read_bytes().splitlines(keepends=True) == (
-            (origin/'pre_feedback.jsonl').read_bytes().splitlines(keepends=True)[CUT:])
+            (origin/'pre_feedback.jsonl').read_bytes().splitlines(keepends=True)[cut_age:])
         complete['exact'] = True
     atomic_json(path/'COMPLETE.json', complete)
     return [seed, mapping, mode, arm]
