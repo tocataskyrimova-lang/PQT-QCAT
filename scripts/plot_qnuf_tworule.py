@@ -16,7 +16,7 @@ def main():
     data = json.loads((root/'ANALYSIS.json').read_text(encoding='utf-8'))
     values = {(r['encoder'],r['policy'],r['probe']): r for r in data['probe_means']}
     modes = [('separate','MM'),('separate','SS'),('opponent','MM'),('opponent','SS')]
-    labels = ['Раздельные\nканалы, MM','Раздельные\nканалы, SS','Противоположные\nзнаки, MM','Противоположные\nзнаки, SS']
+    labels = [f'{mode}\nraw {arm}' for mode, arm in modes]
     fig, axes = plt.subplots(1,2,figsize=(11.4,4.4),sharey=True,layout='constrained')
     for axis, (probe, title) in zip(axes,(('z0','Из Z0, 64 такта'),('live','Из живого Z, 64 такта')),strict=True):
         for i, (rule,color) in enumerate((('A','#2d5682'),('B','#af5227'))):
