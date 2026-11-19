@@ -82,6 +82,7 @@ def d1_d2(root,plan):
                 ref = b.path_for(root,plan,anchor,seed,mapping,mode,arm)
                 end = load_state(ref/'end.npz')['agent']
                 core = end['core_snapshot']
+                archived_probe = read_json(ref/'PROBES.json')
                 directory = root/'diagnostics'/anchor/f'{seed}_{mapping}'/mode/arm
                 data = read_json(directory/'RESULTS.json')
                 stored = load_state(directory/'DELTAS.npz')
@@ -118,6 +119,10 @@ def d1_d2(root,plan):
                         exact(raw_side.tolist(),external['eligibility'])
                         base[ctx] = p['logits']
                         exact(base[ctx],external['logits'])
+                        token_key = f'{ctx}:{q}'
+                        witness_logits = (archived_probe['reads']['z0'][token_key]['trace']['64']['logits']
+                                          if anchor=='joint' else archived_probe['logits'][token_key])
+                        exact(base[ctx],witness_logits)
                         raw = raw_side if arm=='SS' else np.tanh(main['Z_post'])-np.tanh(main['Z_noinput'])
                         errors[ctx] = b.error_for(base[ctx] if arm=='SS' else main['logits'],target)
                         features[ctx] = {'raw':raw}
@@ -204,6 +209,25 @@ def mean_effect(rows,plan,correct):
     return {**paired(by_block,boot),'queries':n,'lost_correct':loss,'gained_correct':gain}
 
 
+def compare_decoder_to_native(root,plan,predictions):
+    comparisons = []
+    for row in predictions:
+        if row['probe']!='decoded':
+            continue
+        seed,mapping = row['unit']
+        mode,arm = row['mode'],row['arm']
+        native = read_json(b.path_for(root,plan,'joint',seed,mapping,mode,arm)/'PROBES.json')['reads']['z0']
+        for pair,logits in row['scores'].items():
+            ctx,token = pair.split(':')
+            target = plan['c0']['mappings'][mapping][ctx][int(token)-1]
+            standard = int(np.argmax(native[pair]['trace']['64']['logits']))+1
+            decoded = int(np.argmax(logits))+1
+            comparisons.append({'seed':seed,'mapping':mapping,'mode':mode,'arm':arm,'context':ctx,'token':int(token),
+                                'target':target,'native':standard,'decoded':decoded,
+                                'native_correct':int(standard==target),'decoded_correct':int(decoded==target)})
+    return comparisons
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('output',type=Path)
@@ -220,6 +244,7 @@ def main():
     single,train_events,resumes = d0(root,plan)
     effects,directions,spatial,count,steps = d1_d2(root,plan)
     decoded,predictions,folds = evaluate(root,plan)
+    comparisons = compare_decoder_to_native(root,plan,predictions)
     horizons = []
     for seed,mapping in plan['units']:
         saved = read_json(root/'horizon128'/f'{seed}_{mapping}.json')
@@ -263,14 +288,20 @@ def main():
     out = {'verdict':'CONTEXT_BINDING_DIAGNOSED' if diagnosed else 'CAUSE_NOT_IDENTIFIED',
            'mechanisms':mechanisms,'phase_status':phases,'solo_verified_actions':train_events,'exact_resumes':resumes,
            'diagnostic_states':count,'diagnostic_substeps':steps,'d0_means':d0_means,'d3_means':d3_means,
-           'update_effects':all_effects,'decoder_folds':folds,'decoder_controls_exact_restore':len(folds)}
+           'update_effects':all_effects,'decoder_folds':folds,'decoder_controls_exact_restore':len(folds),
+           'decoder_disagreements':[{'mode':mode,'arm':arm,'context':ctx,
+               'decoder_only_correct':sum(r['decoded_correct'] and not r['native_correct'] for r in comparisons
+                                          if (r['mode'],r['arm'],r['context'])==(mode,arm,ctx)),
+               'native_only_correct':sum(r['native_correct'] and not r['decoded_correct'] for r in comparisons
+                                          if (r['mode'],r['arm'],r['context'])==(mode,arm,ctx))}
+               for mode,arm in b.c0.NEURAL for ctx in b.CONTEXTS]}
     if args.verify_only:
         exact(out,read_json(root/'ANALYSIS.json'))
     else:
         atomic_json(root/'ANALYSIS.json',out)
         atomic_json(root/'DECODER_PREDICTIONS.json',predictions)
         for name,data in [('D0_BY_BLOCK',single),('D1_D2_EFFECTS',effects),('D1_D2_DIRECTIONS',directions),
-                          ('D1_D2_ECHELONS',spatial),('D3_BY_BLOCK',d3)]:
+                          ('D1_D2_ECHELONS',spatial),('D3_BY_BLOCK',d3),('D3_READ_COMPARISONS',comparisons)]:
             write_csv(root/f'{name}.csv',data)
     print(json.dumps({k:out[k] for k in ('verdict','mechanisms','solo_verified_actions','exact_resumes',
                                           'diagnostic_states','decoder_controls_exact_restore')},indent=2))
