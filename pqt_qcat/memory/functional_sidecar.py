@@ -14,6 +14,7 @@ import time
 import numpy as np
 
 from .access_state import exact, load_agent
+from ..core.security import check_seed_safety
 from .checkpoint_io import load_state, save_state
 from .codex_memory_location import atomic_json, digest, source_hashes
 from .qnuf import ObservedEvidence, array_hash, rng_hash
@@ -149,8 +150,8 @@ def initialize(history, stage_a, brief, output):
     files = {'frozen_config.json'}
     a_files = {'PLAN.json', 'DELIVERY.json', 'SOURCE.json', 'ENVIRONMENT.json', 'EVENT49_DONOR_ANALYSIS.json'}
     for seed, mapping in units:
-        bridge.check_seed_safety(seed)
-        for name, stage, cursor in [('B3', 'start', 48), ('B3', 'end', 72), ('B0', 'initial', 0)]:
+        check_seed_safety(seed)
+        for name, cursor in [('B3', 48), ('B3', 72), ('B0', 0)]:
             files.add(bridge.checkpoint(history, name, seed, mapping, cursor).relative_to(history).as_posix())
         lib = bridge.life_path(history, 'B3', seed, mapping)
         files.add((lib / 'event_records.json').relative_to(history).as_posix())
@@ -200,7 +201,7 @@ def verify(output, plan):
 
 
 def validate_unit(plan, seed, mapping):
-    bridge.check_seed_safety(seed)
+    check_seed_safety(seed)
     if [seed, mapping] not in plan['units'] or not 0 <= mapping < len(plan['parent']['stage1_mappings']):
         raise ValueError('Unit is outside the historical B3 panel')
 

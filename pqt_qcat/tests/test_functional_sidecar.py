@@ -5,7 +5,6 @@ import json
 import os
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from pqt_qcat.memory.access_state import exact, load_agent
