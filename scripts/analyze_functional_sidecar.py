@@ -12,7 +12,7 @@ from pqt_qcat.memory.access_state import exact
 from pqt_qcat.memory.checkpoint_io import load_state
 from pqt_qcat.memory.codex_memory_location import atomic_json
 from pqt_qcat.memory.qnuf import array_hash
-from analyze_access_bridge import paired
+from scripts.analyze_access_bridge import paired
 import numpy as np
 
 
