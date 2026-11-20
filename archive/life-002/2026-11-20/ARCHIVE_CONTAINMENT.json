@@ -1,0 +1,140 @@
+[
+  {
+    "name": "LIFE_ACCESS_STATE_B2A_DELIVERY.zip",
+    "nested_route": [
+      "LIFE_QNUF_F0B_COVERAGE_001_DELIVERY.zip",
+      "F0_ORIGINAL.zip",
+      "D4_ORIGINAL.zip",
+      "D0_D3_ORIGINAL.zip",
+      "C0_ORIGINAL.zip",
+      "CONFIRM_ORIGINAL.zip",
+      "B2A_CAUSAL_ORIGINAL.zip",
+      "B2A_ORIGINAL.zip"
+    ],
+    "sha256": "8366272bc8459f0bf9a4f7c9b934ebabdb88e3aafc7ec948ea83f1cbd3aa09c2",
+    "size": 49436408
+  },
+  {
+    "name": "LIFE_ACCESS_STATE_STAGE_A_DELIVERY.zip",
+    "nested_route": null,
+    "sha256": "c5c5e56904bff88da2fe904bf5b99d86fbc00dc66c9c042677c0c63502d193d5",
+    "size": 67413648
+  },
+  {
+    "name": "LIFE_B2A_CAUSAL_001_DELIVERY.zip",
+    "nested_route": [
+      "LIFE_QNUF_F0B_COVERAGE_001_DELIVERY.zip",
+      "F0_ORIGINAL.zip",
+      "D4_ORIGINAL.zip",
+      "D0_D3_ORIGINAL.zip",
+      "C0_ORIGINAL.zip",
+      "CONFIRM_ORIGINAL.zip",
+      "B2A_CAUSAL_ORIGINAL.zip"
+    ],
+    "sha256": "358ba2e09c0db539ac851847bcbd8f92ed424edcefb2a5d9a83eccccb47f4975",
+    "size": 98197397
+  },
+  {
+    "name": "LIFE_FUNCTIONAL_SIDECAR_B1_DELIVERY.zip",
+    "nested_route": null,
+    "sha256": "58f3f9c81db331c0754d7c32bd272a87f7de11fcd2812746cfaef525ea05b816",
+    "size": 109799396
+  },
+  {
+    "name": "LIFE_QNUF_001_DELIVERY.zip",
+    "nested_route": null,
+    "sha256": "79e53adc840992e1926e38860e8fbb8701143257ab2af2c24803124d3b30271e",
+    "size": 138863733
+  },
+  {
+    "name": "LIFE_QNUF_ACCESS_BRIDGE_DELIVERY.zip",
+    "nested_route": null,
+    "sha256": "074d85a98b3095367945a1f003969f08ca08145aa93d0398732c5d9711e58fb3",
+    "size": 57017192
+  },
+  {
+    "name": "LIFE_QNUF_CONFIRM_001_DELIVERY.zip",
+    "nested_route": [
+      "LIFE_QNUF_F0B_COVERAGE_001_DELIVERY.zip",
+      "F0_ORIGINAL.zip",
+      "D4_ORIGINAL.zip",
+      "D0_D3_ORIGINAL.zip",
+      "C0_ORIGINAL.zip",
+      "CONFIRM_ORIGINAL.zip"
+    ],
+    "sha256": "2d01da82b364240937500b72cf3eb88800692ef5a63894cb3c77bd5b510257eb",
+    "size": 170851568
+  },
+  {
+    "name": "LIFE_QNUF_CONTEXT_BIND_001_DELIVERY.zip",
+    "nested_route": [
+      "LIFE_QNUF_F0B_COVERAGE_001_DELIVERY.zip",
+      "F0_ORIGINAL.zip",
+      "D4_ORIGINAL.zip",
+      "D0_D3_ORIGINAL.zip"
+    ],
+    "sha256": "87bbf0083239e1eb7e7773d1f9e13fabfbb704c8115d1494fce8c337360dce85",
+    "size": 258932139
+  },
+  {
+    "name": "LIFE_QNUF_CONTEXT_BIND_D4_001_DELIVERY.zip",
+    "nested_route": [
+      "LIFE_QNUF_F0B_COVERAGE_001_DELIVERY.zip",
+      "F0_ORIGINAL.zip",
+      "D4_ORIGINAL.zip"
+    ],
+    "sha256": "c16ce209173bc49167a4559cf8f72ae185f21ab3af99803087cc1d02e1d2cce9",
+    "size": 278995458
+  },
+  {
+    "name": "LIFE_QNUF_F0B_COVERAGE_001_DELIVERY.zip",
+    "nested_route": null,
+    "sha256": "03378f8556f72a4fd7c55cc56d06a1945d31009bd50b2937ae2f14ced2fae233",
+    "size": 319723736
+  },
+  {
+    "name": "LIFE_QNUF_F_GATE_001_DELIVERY.zip",
+    "nested_route": [
+      "LIFE_QNUF_F0B_COVERAGE_001_DELIVERY.zip",
+      "F0_ORIGINAL.zip"
+    ],
+    "sha256": "7edee4a19e59598d785fd96f8038a642cb990fa4fcc54c8bb676b1e1e792e350",
+    "size": 300320248
+  },
+  {
+    "name": "LIFE_QNUF_TWORULE_C0_001_DELIVERY.zip",
+    "nested_route": [
+      "LIFE_QNUF_F0B_COVERAGE_001_DELIVERY.zip",
+      "F0_ORIGINAL.zip",
+      "D4_ORIGINAL.zip",
+      "D0_D3_ORIGINAL.zip",
+      "C0_ORIGINAL.zip"
+    ],
+    "sha256": "65f232c6cd7f2a66354669a69b0821d7c3f253cc3ddbb4de615db19c76b6c50d",
+    "size": 213427706
+  },
+  {
+    "name": "PQT_QCat_CODEX_DELIVERY_20261119.zip",
+    "nested_route": null,
+    "sha256": "ab0ef11f9d8eb933c2ea76d96ce2c1eeeb25436f919ea59ea651f2fd719f0017",
+    "size": 12354629
+  },
+  {
+    "name": "PQT_QCAT_DELIVERY_20261111.zip",
+    "nested_route": null,
+    "sha256": "72ffb7a9644cc008357fd09250f7144d78381d5d93a25f13a09d3006011f22e0",
+    "size": 58243670
+  },
+  {
+    "name": "PQT_QCat_LIFE_002.zip",
+    "nested_route": null,
+    "sha256": "219b1d7e2a6a4c9da3604775095b26a05f7e032d3f16fb104da44808eb2bbca8",
+    "size": 982984
+  },
+  {
+    "name": "PQT_QCat_LIFE_002_M3_DELIVERY.zip",
+    "nested_route": null,
+    "sha256": "46e69aeef74c1ce164d298d9fcefe34ccca58aa9a5c6b461de54882af5402378",
+    "size": 1080387
+  }
+]

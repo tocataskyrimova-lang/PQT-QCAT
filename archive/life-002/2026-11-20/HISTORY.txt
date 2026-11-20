@@ -1,0 +1,60 @@
+* b3ff631 (HEAD -> archive/life-002-freeze-2026-11-20, exp/life-qnuf-f0b-coverage-001) Report F0B coverage and package reproducible causal diagnosis
+* c11d277 Freeze F0B witness masks and finite-set feasibility contrasts
+* 72379f3 (exp/life-qnuf-f-gate-001) Audit F0 feasibility, document off-bank failures, and package evidence
+* 95ee485 Freeze F0 witness separation and candidate feasibility rules
+* 774cca9 (exp/life-qnuf-context-bind-d4) Report D4 causal norm contrasts and preserve infeasible pairs
+* 8ccd4ee Freeze single-write D4 norm matching and clipping checks
+* b8fc818 (exp/life-qnuf-context-bind-001) Deliver context binding diagnosis and replayable evidence
+* 7c42f44 Limit decoder fit inputs to selected training blocks
+* bb8ec0c Freeze crossed K decoder and causal mechanism criteria
+* 0d4644a Freeze context binding development diagnostics
+* 1b9eaaf (exp/life-qnuf-tworule-001) Keep C0 condition labels legible in figure
+* 3c98743 Verify C0 gate and preserve negative joint learnability result
+* 89482a1 Freeze C0 conflicting-rule encoders, probes and development panel
+* 4275083 (exp/life-qnuf-confirm-001) Deliver independent QNUF confirmation and two-rule proposal
+* 43297fc Freeze independent QNUF confirmation panel and policy protocol
+* 01fa3ae (exp/life-b2a-causal-001) Verify causal Sidecar credit and update-scale results
+* ec02031 Freeze B2A causal credit, scale and environment interventions
+* 16c75c1 (exp/life-functional-sidecar-b2a) Verify and document action-dependent Sidecar development results
+* 9530eef Freeze action-dependent Stage B2A protocol and coherent credit
+* aaf51b9 (exp/life-functional-sidecar-b1) Report verified Functional Sidecar B1 results
+* 28538c4 Add paired B1 statistics and independent action-journal verification
+* 9885a3c Use the immutable core seed guard in B0 and B1
+* 97a8917 Freeze Functional Sidecar B0 and B1 action protocol
+* c32e889 (exp/life-access-state-001) Report Stage A sidecar access and continuity results
+* 8fdb23c Add event-49 donor controls for isolated sidecar reads
+* 5011de1 Freeze Stage A interpretation and refinement rules
+* 84f4d8e Freeze Stage A local access and continuation measurements
+* 8643bcf (exp/life-qnuf-access-bridge) Report state-dependent access to QNUF memory
+* 65b2432 Freeze paired ACCESS-BRIDGE development interventions
+* 86b56cb (exp/life-qnuf-001) Report QNUF development results and verify matched lives
+* 80dbe5d Add matched Stage 0 and Stage 1 QNUF experiments
+* dd92af2 (fix/codex-memory-location-001) docs: report memory-location results and remove unsupported calibration claims
+* 9cb2dda fix: preserve complete online memory state and add frozen-reader experiment
+* 55ec3f8 (fix/life-access-001) fix(review): implement corrective actions for independent review 20261118 (convergence, pathway ablation, single-rule and joint calibration)
+* b37a1f0 fix(r2b): add top-level backward compatibility aliases for audit_results.py
+* d583073 fix(review): address independent audit feedback, implement exact resume, wake calibration, and out-of-fold decoder confirmation
+* 12790df docs(campaign): deliver final report, run index, status, and artifact manifest
+* 6d2988f feat(r4): execute long continuous life protocol across nested horizons
+* afe2822 feat(r3): execute stateful online learning and A factorial protocol
+* 5af2d32 feat(r2): verify mathematical observability (rank 18 SVD) and external decoder (100% decodability, p=0.0000)
+* 29156ae feat(r1): implement and confirm LIFE-ACCESS-001 continuous state readout (QUERY32 confirmed)
+* 262dd92 R0: Repair and acceptance of defects F01-F12 with regression suite
+* 72e476e (fix/sleep-need-sensitivity-001) feat(sensitivity-fix): complete Task 1 stand readiness, Task 2 sleep-need-001b calibration, and Task 3 K-observability analysis
+* de3291c Fix sleep diagnostics and validate bounded K-only response experiment
+* 2291e34 (origin/exp/sleep-need-001, exp/sleep-need-001) exp: EXP-SLEEP-NEED-001 stand implementation, test suite, and Stage A calibration execution
+* 5906681 (origin/exp/memory-trace-001, exp/memory-trace-001) exp: MEMORY-TRACE-001 EXP-1 stand implementation, calibration, replication, and scientific verdict
+* aaa0f2c exp: MEMORY-TRACE-001 EXP-0 calibration, frozen-B K-swap diagnostics, and T5 positive controls
+* 4cf76bc (origin/m5-refinement, m5-refinement) ci & manifest: GITHUB-CI-FIX-001 canonical LF in .gitattributes, cross-platform SHA-256 invariance, and verified manifest
+* 02bf536 docs & ci: Add comprehensive README.md, GitHub Actions CI workflow, and requirements.txt
+* e7fbb5a (tag: life002-prereg-v1, origin/pqt-qcat-life-002, origin/main, pqt-qcat-life-002) M5-PREP: Independent H0-H6 evaluator with 20000 episodes/scenario, symmetric budget control, raw logging, and complete SHA-256 manifest
+* c9bf277 CONTROL-FIX-002: Enforce exact 1000 physical sleep ticks across all policies, strict measured vortex audit without defaults, and bit-for-bit identical RNG fingerprints for PQT/noA paired comparisons
+* bacc949 CONTROL-FIX-001: Implement empirical control models audit, eliminate no_replay sensory input, enforce total noA vortex ablation, and add regression tests
+* e076898 M4-FIX: Complete M4-FIX-001 (integrator vortex passing & test), M4-FIX-002 (decouple verdicts), M4-FIX-003 (K-consolidation, q_ctx causality, exploratory prereg) and control models audit
+* 166103f M4: Witness Ledger provenance, symmetric DREAM generator, three-gate consolidation, M3-FIX-002 diagnostics, and T4/T5 benchmarks
+* 5a2a2ad docs: Add HANDOVER_LIFE_002.md research handover document
+* 88b477d M3: Endogenous contexts q_ctx, Blind Twin-Histories T2, causal interventions, symmetric noA ablation, and gap=1000 physical diagnostics
+* ae796b1 M2: Six-echelon 48D architecture, core plasticity, T1 hold retention, and T6 core causality
+* 8c58330 M1-FIX-001: Strict IntegratorConvergenceError, fixed/adaptive modes, extended invariants and validation
+* a07e3d3 M0-M1: Complete mathematical engine, canonical A_I, adaptive Heun stepper, and invariant verification
+* b8a5689 (origin/pqt-qcat-life-001, pqt-qcat-life-001) Build LIFE-001 continuous plasticity experiment

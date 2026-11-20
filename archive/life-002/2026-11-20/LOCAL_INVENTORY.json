@@ -1,0 +1,253 @@
+[
+  {
+    "directory": "ACCESS_BRIDGE_RUN_001",
+    "files": 572,
+    "bytes": 115358781,
+    "npz": 288,
+    "metadata": {
+      "SOURCE.json": {},
+      "DELIVERY.json": {
+        "delivery_commit": "8643bcff3c539298821a28040f64f28e0ed06cd3"
+      },
+      "PLAN.json": {},
+      "ANALYSIS.json": {}
+    }
+  },
+  {
+    "directory": "CODEX_MEMORY_LOCATION_001_RUN_A",
+    "files": 4,
+    "bytes": 42320,
+    "npz": 0,
+    "metadata": {
+      "SOURCE.json": {},
+      "PLAN.json": {}
+    }
+  },
+  {
+    "directory": "CODEX_MEMORY_LOCATION_001_RUN_B",
+    "files": 1056,
+    "bytes": 18916234,
+    "npz": 774,
+    "metadata": {
+      "SOURCE.json": {},
+      "DELIVERY.json": {
+        "delivery_commit": "dd92af26641f2e701ee9e2c4fa80fcad92caf376",
+        "engineering": "Targeted corrections verified; not a blanket audit of every repository feature"
+      },
+      "PLAN.json": {}
+    }
+  },
+  {
+    "directory": "FUNCTIONAL_SIDECAR_RUN_001",
+    "files": 1,
+    "bytes": 192,
+    "npz": 0,
+    "metadata": {}
+  },
+  {
+    "directory": "FUNCTIONAL_SIDECAR_RUN_002",
+    "files": 1282,
+    "bytes": 153790355,
+    "npz": 876,
+    "metadata": {
+      "SOURCE.json": {},
+      "DELIVERY.json": {
+        "delivery_commit": "aaf51b9b886e9223cbe07b5b0871e8c12ab42ba5",
+        "engineering": "B1_VALID",
+        "scientific": "B1_DEPLOYED_SIGNAL"
+      },
+      "PLAN.json": {}
+    }
+  },
+  {
+    "directory": "LIFE_ACCESS_STATE_RUN_001",
+    "files": 1271,
+    "bytes": 176129959,
+    "npz": 662,
+    "metadata": {
+      "SOURCE.json": {},
+      "DELIVERY.json": {},
+      "PLAN.json": {}
+    }
+  },
+  {
+    "directory": "LIFE_B2A_CAUSAL_RUN_001",
+    "files": 1513,
+    "bytes": 215212216,
+    "npz": 510,
+    "metadata": {
+      "SOURCE.json": {},
+      "DELIVERY.json": {
+        "delivery_commit": "01fa3ae7847f7e5bf8c0397702bf31f386d73690",
+        "engineering": "CAUSAL_VALID"
+      },
+      "PLAN.json": {},
+      "ANALYSIS.json": {
+        "engineering": "CAUSAL_VALID"
+      }
+    }
+  },
+  {
+    "directory": "LIFE_B2A_RUN_001",
+    "files": 1541,
+    "bytes": 137502857,
+    "npz": 621,
+    "metadata": {
+      "SOURCE.json": {},
+      "DELIVERY.json": {
+        "base_sha": "aaf51b9b886e9223cbe07b5b0871e8c12ab42ba5",
+        "delivery_commit": "16c75c1f43ffc46b3f3277f8f45c8b5d047bfd74",
+        "engineering": "B2A_VALID",
+        "scientific": "ACTION_DEPENDENT_DEPLOYED_SIGNAL"
+      },
+      "PLAN.json": {},
+      "ANALYSIS.json": {
+        "engineering": "B2A_VALID",
+        "scientific": "ACTION_DEPENDENT_DEPLOYED_SIGNAL"
+      }
+    }
+  },
+  {
+    "directory": "LIFE_QNUF_CONFIRM_RUN_001",
+    "files": 2795,
+    "bytes": 373169331,
+    "npz": 944,
+    "metadata": {
+      "SOURCE.json": {
+        "git": "43297fce8d24eb783c0cb10d38fbb9662b872a02"
+      },
+      "DELIVERY.json": {
+        "delivery_commit": "42750836c797bd6fdfd4df560ff4c55ed8353ad5",
+        "engineering": "CONFIRM_VALID",
+        "accuracy_verdict": "CONFIRMED",
+        "reward_verdict": "CONFIRMED"
+      },
+      "PLAN.json": {},
+      "ANALYSIS.json": {
+        "engineering": "CONFIRM_VALID",
+        "accuracy_verdict": "CONFIRMED",
+        "reward_verdict": "CONFIRMED"
+      }
+    }
+  },
+  {
+    "directory": "LIFE_QNUF_CONTEXT_BIND_D4_RUN_001",
+    "files": 65,
+    "bytes": 282300588,
+    "npz": 20,
+    "metadata": {
+      "SOURCE.json": {
+        "git": "8ccd4ee28f5249c4b5217420e1604737f1482010"
+      },
+      "DELIVERY.json": {
+        "delivery_commit": "774cca9ca2f4a16f83c09e0f875786ad3f43c133"
+      },
+      "PLAN.json": {},
+      "ANALYSIS.json": {}
+    }
+  },
+  {
+    "directory": "LIFE_QNUF_CONTEXT_BIND_RUN_001",
+    "files": 896,
+    "bytes": 361804086,
+    "npz": 305,
+    "metadata": {
+      "SOURCE.json": {
+        "git": "0d4644a2c36147e5f110f275641ab8780d7f32dd"
+      },
+      "DELIVERY.json": {
+        "delivery_commit": "b8fc818cdcface65d1410d9197aaaf60773a5e9d",
+        "verdict": "CONTEXT_BINDING_DIAGNOSED"
+      },
+      "PLAN.json": {},
+      "ANALYSIS.json": {
+        "verdict": "CONTEXT_BINDING_DIAGNOSED"
+      }
+    }
+  },
+  {
+    "directory": "LIFE_QNUF_F0B_COVERAGE_RUN_001",
+    "files": 20,
+    "bytes": 322353922,
+    "npz": 0,
+    "metadata": {
+      "DELIVERY.json": {
+        "base_sha": "72379f393ffa35909712e80311008930203f3f5a",
+        "source_commit": "c11d2770a8087c150eb3f292509400a7b04e674c",
+        "delivery_commit": "b3ff6315ba596107097f6408bf53519b695eb1a2",
+        "engineering": "F0B_VALID",
+        "verdict": "CANDIDATE_SET_LIMITED",
+        "F1_executed": false,
+        "C1_executed": false
+      },
+      "PLAN.json": {
+        "base_sha": "72379f393ffa35909712e80311008930203f3f5a",
+        "source_commit": "c11d2770a8087c150eb3f292509400a7b04e674c"
+      },
+      "SUMMARY.json": {
+        "verdict": "CANDIDATE_SET_LIMITED",
+        "F1_executed": false,
+        "C1_executed": false
+      }
+    }
+  },
+  {
+    "directory": "LIFE_QNUF_F_GATE_RUN_001",
+    "files": 71,
+    "bytes": 304878559,
+    "npz": 20,
+    "metadata": {
+      "SOURCE.json": {
+        "git": "95ee48515825c951d05c88a2a8c404fde2d2ce4d"
+      },
+      "DELIVERY.json": {
+        "base_sha": "774cca9ca2f4a16f83c09e0f875786ad3f43c133",
+        "delivery_commit": "72379f393ffa35909712e80311008930203f3f5a",
+        "engineering": "F0_VALID",
+        "F1_executed": false,
+        "verdict": "F_GATE_INSUFFICIENT"
+      },
+      "PLAN.json": {},
+      "ANALYSIS.json": {
+        "verdict": "F_GATE_INSUFFICIENT"
+      }
+    }
+  },
+  {
+    "directory": "LIFE_QNUF_TWORULE_C0_RUN_001",
+    "files": 472,
+    "bytes": 317567596,
+    "npz": 150,
+    "metadata": {
+      "SOURCE.json": {
+        "git": "89482a1cfb5dde2e4c01af4203cf9fa55812847b"
+      },
+      "DELIVERY.json": {
+        "delivery_commit": "1b9eaaff981308f869dd58bf372b3cd4b7857b46"
+      },
+      "PLAN.json": {},
+      "ANALYSIS.json": {}
+    }
+  },
+  {
+    "directory": "PQT_QCat_CODEX_MEMORY_001",
+    "files": 1721,
+    "bytes": 28761778,
+    "npz": 1417,
+    "metadata": {}
+  },
+  {
+    "directory": "PQT_QCat_LIFE_002",
+    "files": 1572,
+    "bytes": 21971861,
+    "npz": 1392,
+    "metadata": {}
+  },
+  {
+    "directory": "PQT_QCat_LIFE_002_SENSITIVITY_FIX",
+    "files": 1762,
+    "bytes": 32116771,
+    "npz": 1440,
+    "metadata": {}
+  }
+]

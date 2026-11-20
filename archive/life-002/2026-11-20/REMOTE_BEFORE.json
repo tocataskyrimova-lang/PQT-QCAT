@@ -1,0 +1,11 @@
+{
+  "HEAD": "e7fbb5a1a39aade8a8a09c9d08d261b1a53803c6",
+  "refs/heads/exp/memory-trace-001": "59066812578f3fb246426566df8fa369bba249a5",
+  "refs/heads/exp/sleep-need-001": "2291e34ad330427bce16f9b314dff6c43a5dc8f9",
+  "refs/heads/m5-refinement": "4cf76bc31a43114a494d584576ac3a4e0a20ace5",
+  "refs/heads/main": "e7fbb5a1a39aade8a8a09c9d08d261b1a53803c6",
+  "refs/heads/pqt-qcat-life-001": "b8a5689ca2e065d8d353eb5f50b18939affa73af",
+  "refs/heads/pqt-qcat-life-002": "e7fbb5a1a39aade8a8a09c9d08d261b1a53803c6",
+  "refs/tags/life002-prereg-v1": "33e4a1e3f35f8f9d53bb9693c5cb0df071a106e7",
+  "refs/tags/life002-prereg-v1^{}": "e7fbb5a1a39aade8a8a09c9d08d261b1a53803c6"
+}

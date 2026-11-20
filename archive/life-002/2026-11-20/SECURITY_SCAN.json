@@ -1,0 +1,6 @@
+{
+  "git_blobs": 1673,
+  "unique_payloads": 27942,
+  "findings": [],
+  "scope": "All reachable local branch/tag blobs and recursive ZIP payloads. Signature-based audit, no entropy claim."
+}

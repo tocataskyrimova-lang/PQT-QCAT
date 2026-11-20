@@ -1,0 +1,14 @@
+{
+  "ARTIFACTS.zip": {
+    "sha256": "deb7e4bf82142ea52a3ccacf0c060c66e75a7290fc4a41c46158fde10ce15533",
+    "size": 707236871
+  },
+  "LIFE002_HISTORY.bundle": {
+    "sha256": "1b31b07fd0ffb0276acdaf54266d47b34ca64590376d4f555f58340718da8390",
+    "size": 9510013
+  },
+  "SUPPLEMENTAL.zip": {
+    "sha256": "80a7e2c67b0595ab1521e921cfd8dfbcddf0369c752eab19f4973134667de914",
+    "size": 19222064
+  }
+}

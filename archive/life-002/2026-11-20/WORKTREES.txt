@@ -1,0 +1,72 @@
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_LIFE_001
+HEAD b8a5689ca2e065d8d353eb5f50b18939affa73af
+branch refs/heads/pqt-qcat-life-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_ACCESS_BRIDGE
+HEAD 8643bcff3c539298821a28040f64f28e0ed06cd3
+branch refs/heads/exp/life-qnuf-access-bridge
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_ACCESS_STATE_001
+HEAD c32e8892f4aa5a37c659b89e23c58eefe09ae024
+branch refs/heads/exp/life-access-state-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_B2A_CAUSAL_001
+HEAD 01fa3ae7847f7e5bf8c0397702bf31f386d73690
+branch refs/heads/exp/life-b2a-causal-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_CODEX_MEMORY_001
+HEAD dd92af26641f2e701ee9e2c4fa80fcad92caf376
+branch refs/heads/fix/codex-memory-location-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_FUNCTIONAL_SIDECAR
+HEAD aaf51b9b886e9223cbe07b5b0871e8c12ab42ba5
+branch refs/heads/exp/life-functional-sidecar-b1
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_FUNCTIONAL_SIDECAR_B2A
+HEAD 16c75c1f43ffc46b3f3277f8f45c8b5d047bfd74
+branch refs/heads/exp/life-functional-sidecar-b2a
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_LIFE_002
+HEAD 2291e34ad330427bce16f9b314dff6c43a5dc8f9
+branch refs/heads/exp/sleep-need-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_LIFE_002_FREEZE_001
+HEAD b3ff6315ba596107097f6408bf53519b695eb1a2
+branch refs/heads/archive/life-002-freeze-2026-11-20
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_LIFE_002_SENSITIVITY_FIX
+HEAD 72e476e9773b50f803fb955018f3c0658efbc044
+branch refs/heads/fix/sleep-need-sensitivity-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_LIFE_ACCESS_001
+HEAD 55ec3f82ab1a2dbf797919b0f8e820c6a2e69666
+branch refs/heads/fix/life-access-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_QNUF_001
+HEAD 86b56cb177f4818c0daf68c007cc1c9fbc991c45
+branch refs/heads/exp/life-qnuf-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_QNUF_CONFIRM_001
+HEAD 42750836c797bd6fdfd4df560ff4c55ed8353ad5
+branch refs/heads/exp/life-qnuf-confirm-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_QNUF_CONTEXT_BIND_001
+HEAD b8fc818cdcface65d1410d9197aaaf60773a5e9d
+branch refs/heads/exp/life-qnuf-context-bind-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_QNUF_CONTEXT_BIND_D4
+HEAD 774cca9ca2f4a16f83c09e0f875786ad3f43c133
+branch refs/heads/exp/life-qnuf-context-bind-d4
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_QNUF_F0B_COVERAGE_001
+HEAD b3ff6315ba596107097f6408bf53519b695eb1a2
+branch refs/heads/exp/life-qnuf-f0b-coverage-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_QNUF_F_GATE_001
+HEAD 72379f393ffa35909712e80311008930203f3f5a
+branch refs/heads/exp/life-qnuf-f-gate-001
+
+worktree C:/AGI/PQT_QCAT_AUDIT/PQT_QCat_QNUF_TWORULE_001
+HEAD 1b9eaaff981308f869dd58bf372b3cd4b7857b46
+branch refs/heads/exp/life-qnuf-tworule-001
+
