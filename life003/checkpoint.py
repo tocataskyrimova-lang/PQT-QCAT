@@ -1,4 +1,8 @@
-"""Bit-exact Checkpoint / Resume IO for LIFE-003 complete organism state."""
+"""Bit-exact Checkpoint / Resume IO for LIFE-003 complete organism state.
+
+Supports arbitrary nested dictionaries, lists, and numpy arrays without requiring pickle
+(strict allow_pickle=False compliance).
+"""
 from __future__ import annotations
 import copy
 import hashlib
@@ -8,24 +12,60 @@ from typing import Any
 import numpy as np
 
 
+def pack_state(val: Any, arrays: dict[str, np.ndarray], prefix: str = "") -> Any:
+    """Recursively extract all numpy ndarrays for raw npz storage without pickle."""
+    if isinstance(val, np.ndarray):
+        arrays[prefix] = val
+        return {
+            "__ndarray__": prefix,
+            "dtype": str(val.dtype),
+            "shape": list(val.shape),
+        }
+    elif isinstance(val, dict):
+        return {
+            k: pack_state(v, arrays, f"{prefix}/{k}" if prefix else k)
+            for k, v in val.items()
+        }
+    elif isinstance(val, (list, tuple)):
+        packed = [pack_state(item, arrays, f"{prefix}[{i}]") for i, item in enumerate(val)]
+        return tuple(packed) if isinstance(val, tuple) else packed
+    else:
+        return val
+
+
+def unpack_state(val: Any, arrays: Any) -> Any:
+    """Recursively reconstruct state structure and re-insert numpy ndarrays."""
+    if isinstance(val, dict):
+        if "__ndarray__" in val:
+            key = val["__ndarray__"]
+            return arrays[key]
+        return {k: unpack_state(v, arrays) for k, v in val.items()}
+    elif isinstance(val, list):
+        return [unpack_state(item, arrays) for item in val]
+    elif isinstance(val, tuple):
+        return tuple(unpack_state(item, arrays) for item in val)
+    else:
+        return val
+
+
 def compute_state_hash(state: dict[str, Any]) -> str:
     """Compute deterministic SHA-256 digest of organism state."""
     hasher = hashlib.sha256()
 
     def walk(val):
         if isinstance(val, np.ndarray):
-            hasher.update(str(val.dtype).encode())
-            hasher.update(str(val.shape).encode())
+            hasher.update(str(val.dtype).encode("utf-8"))
+            hasher.update(str(val.shape).encode("utf-8"))
             hasher.update(val.tobytes())
         elif isinstance(val, dict):
             for k in sorted(val.keys()):
-                hasher.update(str(k).encode())
+                hasher.update(str(k).encode("utf-8"))
                 walk(val[k])
         elif isinstance(val, (list, tuple)):
             for item in val:
                 walk(item)
         else:
-            hasher.update(str(val).encode())
+            hasher.update(str(val).encode("utf-8"))
 
     walk(state)
     return hasher.hexdigest()
@@ -36,18 +76,17 @@ def save_checkpoint(filepath: str | Path, state: dict[str, Any]) -> str:
     path = Path(filepath)
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    arrays = {}
-    metadata = {}
+    arrays: dict[str, np.ndarray] = {}
+    packed_meta = pack_state(state, arrays)
 
-    for k, v in state.items():
-        if isinstance(v, np.ndarray):
-            arrays[k] = v
-        else:
-            metadata[k] = v
-
-    meta_json = json.dumps(metadata, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
-    meta_array = np.frombuffer(meta_json.encode("utf-8"), dtype=np.uint8)
-    arrays["__meta_json__"] = meta_array
+    meta_json = json.dumps(
+        packed_meta,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    )
+    arrays["__meta_json__"] = np.frombuffer(meta_json.encode("utf-8"), dtype=np.uint8)
 
     temp_path = path.with_suffix(".tmp.npz")
     np.savez_compressed(temp_path, **arrays)
@@ -64,14 +103,8 @@ def load_checkpoint(filepath: str | Path) -> tuple[dict[str, Any], str]:
 
     with np.load(path, allow_pickle=False) as npz:
         meta_bytes = npz["__meta_json__"].tobytes()
-        metadata = json.loads(meta_bytes.decode("utf-8"))
-
-        state = {}
-        for k in npz.files:
-            if k != "__meta_json__":
-                state[k] = npz[k]
-
-        state.update(metadata)
+        packed_meta = json.loads(meta_bytes.decode("utf-8"))
+        state = unpack_state(packed_meta, npz)
 
     state_hash = compute_state_hash(state)
     return state, state_hash

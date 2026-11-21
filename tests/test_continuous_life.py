@@ -394,3 +394,234 @@ def test_endogenous_trigger_changes_behavior_vs_disabled_trigger():
     assert array_hash(org.core.Z) == z_hash_pre, "MAIN Z was mutated by deliberation!"
     assert array_hash(org.core.K) == k_hash_pre, "MAIN K was mutated by deliberation!"
     assert org.core.rng.bit_generator.state == rng_state_pre, "MAIN RNG was consumed by deliberation!"
+
+
+# ===========================================================================
+# T1-FIX-001 REGRESSION TESTS (Independent Audit Verification)
+# ===========================================================================
+
+def test_fix1_full_state_checkpoint_and_resume_pending_event(tmp_path):
+    """FIX-1: Full-state checkpoint restores step_count, pending event, and exact state."""
+    org = ContinuousLifeOrganism()
+
+    # Advance a few idle ticks
+    for _ in range(5):
+        org.execute_physical_tick(event_query=None)
+
+    # Initiate an external query without finishing it
+    pred = org.agent.begin_query(2)
+    assert org.agent.pending is not None
+    assert pred["prediction"] in (1, 2, 3, 4)
+
+    # Capture and serialize full state during pending event
+    full_state = org.capture_full_state()
+    ckpt_path = tmp_path / "pending_event_checkpoint.npz"
+    h_saved = save_checkpoint(ckpt_path, full_state)
+
+    # Load and restore into a completely fresh organism instance
+    loaded_state, h_loaded = load_checkpoint(ckpt_path)
+    assert h_saved == h_loaded
+
+    org_resumed = ContinuousLifeOrganism()
+    org_resumed.restore_full_state(loaded_state)
+
+    # Verify that pending event and step count were faithfully restored
+    assert org_resumed.agent.pending is not None
+    assert org_resumed.agent.pending["prediction"]["query"] == 2
+    assert org_resumed.core.step_count == org.core.step_count
+    np.testing.assert_array_equal(org_resumed.core.Z, org.core.Z)
+    np.testing.assert_array_equal(org_resumed.core.K, org.core.K)
+    np.testing.assert_array_equal(org_resumed.agent.pending["legacy"], org.agent.pending["legacy"])
+    np.testing.assert_array_equal(org_resumed.agent.pending["event"], org.agent.pending["event"])
+
+    # Finish query on both instances and verify identical closure
+    org.agent.finish_query(None)
+    org_resumed.agent.finish_query(None)
+
+    assert org.agent.pending is None
+    assert org_resumed.agent.pending is None
+    np.testing.assert_array_equal(org_resumed.core.Z, org.core.Z)
+    np.testing.assert_array_equal(org_resumed.core.K, org.core.K)
+    assert org_resumed.agent.event_id == org.agent.event_id
+
+
+def test_fix1_full_state_comparison_after_continuation(tmp_path):
+    """FIX-1: Compare FULL dictionary states after continuation (not just Z/K/clock/ledger-head)."""
+    cfg = copy.deepcopy(ContinuousLifeOrganism().cfg)
+    cfg["rng_streams"]["rng_main_seed"] = 42
+    org1 = ContinuousLifeOrganism(config=cfg)
+
+    # Run 10 ticks
+    for _ in range(8):
+        org1.execute_physical_tick(event_query=None)
+    org1.execute_physical_tick(event_query=1)
+    org1.execute_physical_tick(event_query=None)
+
+    # Save full checkpoint
+    ckpt_path = tmp_path / "full_continuation_ckpt.npz"
+    save_checkpoint(ckpt_path, org1.capture_full_state())
+
+    # Restore in clone
+    loaded, _ = load_checkpoint(ckpt_path)
+    org2 = ContinuousLifeOrganism(config=cfg)
+    org2.restore_full_state(loaded)
+
+    # Run both across multiple subsequent events and idle ticks
+    for tick_idx in range(15):
+        q = (tick_idx % 4) + 1 if tick_idx % 5 == 0 else None
+        org1.execute_physical_tick(event_query=q)
+        org2.execute_physical_tick(event_query=q)
+
+    # Full dictionary state comparison
+    state1 = org1.capture_full_state()
+    state2 = org2.capture_full_state()
+
+    def assert_state_equal(v1, v2, path=""):
+        if isinstance(v1, np.ndarray) or isinstance(v2, np.ndarray):
+            np.testing.assert_array_equal(v1, v2, err_msg=f"Array mismatch at {path}")
+        elif isinstance(v1, dict):
+            assert isinstance(v2, dict), f"Type mismatch at {path}"
+            assert v1.keys() == v2.keys(), f"Key mismatch at {path}: {v1.keys()} vs {v2.keys()}"
+            for k in v1:
+                assert_state_equal(v1[k], v2[k], f"{path}/{k}" if path else k)
+        elif isinstance(v1, (list, tuple)):
+            assert isinstance(v2, (list, tuple)), f"Type mismatch at {path}"
+            assert len(v1) == len(v2), f"Length mismatch at {path}"
+            for idx, (item1, item2) in enumerate(zip(v1, v2)):
+                assert_state_equal(item1, item2, f"{path}[{idx}]")
+        else:
+            assert v1 == v2, f"Value mismatch at {path}: {v1} != {v2}"
+
+    assert_state_equal(state1, state2)
+
+
+def test_fix2_sidecar_pool_executes_actual_clones():
+    """FIX-2: clones_spawned and clones_executed match actual branches run."""
+    org = ContinuousLifeOrganism()
+
+    # 1. Single reader mode
+    res_single = org.sidecar_pool.single_sidecar_reader(
+        main_core=org.core,
+        stimulus=np.zeros(8),
+        rng_sidecar=org.rng_sidecar,
+    )
+    assert res_single["mode"] == "single_sidecar_reader"
+    assert res_single["clones_requested"] == 1
+    assert res_single["clones_executed"] == 1
+    assert res_single["clones_spawned"] == 1
+    assert res_single["rollout_ticks"] == 64
+
+    # 2. Multi-candidate deliberation: 3 clones requested
+    res_multi = org.sidecar_pool.run_deliberation(
+        main_core=org.core,
+        stimulus=np.zeros(8),
+        rng_sidecar=org.rng_sidecar,
+        num_clones=3,
+        candidate_actions=[1, 2, 3],
+    )
+    assert res_multi["clones_requested"] == 3
+    assert res_multi["clones_executed"] == 3
+    assert res_multi["clones_spawned"] == 3
+    assert len(res_multi["branches"]) == 3
+    assert res_multi["total_rollout_ticks"] == 192
+
+    # Verify each branch ran distinct simulation
+    for idx, branch in enumerate(res_multi["branches"]):
+        assert branch["branch_index"] == idx
+        assert branch["rollout_ticks"] == 64
+        assert len(branch["logits"]) == 4
+
+    assert res_multi["sidecar_prediction"] in (1, 2, 3, 4)
+    assert res_multi["main_unmutated"] is True
+
+
+def test_fix3_full_runtime_causal_intervention_real_variables():
+    """FIX-3: Full runtime paired test with identical state, events, and 100% REAL internal variables."""
+    cfg_a = copy.deepcopy(ContinuousLifeOrganism().cfg)
+    cfg_a["rng_streams"]["rng_main_seed"] = 810001
+    cfg_a["rng_streams"]["banned_seeds"] = []
+    org_a = ContinuousLifeOrganism(config=cfg_a)
+
+    cfg_b = copy.deepcopy(cfg_a)
+    org_b = ContinuousLifeOrganism(config=cfg_b)
+
+    # Initial states must be 100% identical
+    assert array_hash(org_a.core.Z) == array_hash(org_b.core.Z)
+    assert array_hash(org_a.core.K) == array_hash(org_b.core.K)
+
+    # Query event 1 arrives: evaluate with REAL internal variables (NO dummy control substitution)
+    res_a = org_a.execute_physical_tick(event_query=1, force_disable_trigger=False)
+    res_b = org_b.execute_physical_tick(event_query=1, force_disable_trigger=True)
+
+    # Check that Organism A fired trigger based on its genuine internal state
+    assert res_a["trigger"]["fired"] is True
+    assert res_a["trigger"]["score"] > 0.45
+    # Verify surprise and uncertainty were computed from live state
+    assert res_a["trigger"]["components"]["surprise_proxy"] > 0.0
+    assert res_a["trigger"]["components"]["uncertainty"] > 0.90
+
+    # Organism B had trigger disabled
+    assert res_b["trigger"]["fired"] is False
+
+    # Actual executed operational actions diverge
+    act_a = res_a["sankalpa_decision"]["operational_channel"]
+    act_b = res_b["sankalpa_decision"]["operational_channel"]
+    assert act_a != act_b, f"Causal divergence failed! A={act_a}, B={act_b}"
+
+    # Verify divergence mechanism was reported
+    assert res_a["deliberation"] is not None
+    assert "divergence_mechanism" in res_a["deliberation"]
+
+    # Verify MAIN core in Organism A remained strictly unmutated
+    assert res_a["deliberation"]["main_unmutated"] is True
+
+
+def test_fix4_witness_integrity_and_ledger_validation():
+    """FIX-4: Validate witness reference in Ledger and ensure no unlogged evictions."""
+    org = ContinuousLifeOrganism()
+
+    # 1. Fabricated witness_ref is rejected by ledger
+    fake_ref = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    is_valid, reason = org.ledger.verify_witness_reference(fake_ref)
+    assert is_valid is False
+    assert reason == "WITNESS_NOT_FOUND_IN_LEDGER"
+
+    # Fabricated witness trips zero-witness guard in SankalpaGate
+    d_ep, zero_tripped = org.sankalpa.evaluate_epistemic_channel(
+        witness_ref=fake_ref,
+        witness_support_score=0.95,
+        ledger=org.ledger,
+    )
+    assert d_ep == "ABSTAIN"
+    assert zero_tripped is True
+
+    # 2. Genuine witness record in ledger is accepted
+    obs_rec = org.ledger.append_entry(
+        record_type="OBSERVED",
+        payload={"query": 1, "prediction": 3, "entropy": 0.95},
+        clock=org.clock,
+    )
+    is_valid_real, _ = org.ledger.verify_witness_reference(obs_rec["entry_hash"])
+    assert is_valid_real is True
+
+    d_ep_real, zero_tripped_real = org.sankalpa.evaluate_epistemic_channel(
+        witness_ref=obs_rec["entry_hash"],
+        witness_support_score=0.95,
+        ledger=org.ledger,
+    )
+    assert d_ep_real == "COMMIT"
+    assert zero_tripped_real is False
+
+    # 3. Eviction logging: HypothesisPool records eviction info when capacity exceeded
+    pool = HypothesisPool(max_active_hypotheses=3)
+    pool.register_candidate("H1", 1, v_just="SUPPORTED")
+    pool.register_candidate("H2", 2, v_just="UNVERIFIED")
+    pool.register_candidate("H3", 3, v_just="REFUTED")
+    assert pool.last_eviction is None
+
+    # Registering 4th candidate evicts REFUTED (H3) first
+    pool.register_candidate("H4", 4, v_just="UNVERIFIED")
+    assert pool.last_eviction is not None
+    assert pool.last_eviction["candidate_id"] == "H3"
+    assert pool.last_eviction["v_just"] == "REFUTED"
+    assert pool.last_eviction["reason"] == "POOL_CAPACITY_EXCEEDED"

@@ -1,7 +1,10 @@
 """Two-channel SANKALPA policy gate for LIFE-003 (PQT-KC-001 v0.3)."""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .ledger import SaksinLedger
 
 
 @dataclass(frozen=True)
@@ -36,14 +39,23 @@ class SankalpaGate:
         self,
         witness_ref: str | None,
         witness_support_score: float = 0.0,
+        ledger: Any | None = None,
     ) -> tuple[str, bool]:
         """Evaluate epistemic channel d_ep.
         
-        ZeroWitnessCommit == 0: If witness is missing, epistemic assertion must be ABSTAIN.
+        ZeroWitnessCommit == 0: If witness is missing or unverified in ledger,
+        epistemic assertion must be ABSTAIN.
         """
         if witness_ref is None:
             # HonestPause: missing witness strictly forbids COMMIT
             return "ABSTAIN", True
+
+        # FIX-4: Validate witness reference against cryptographic Saksin Ledger
+        if ledger is not None:
+            is_valid, _ = ledger.verify_witness_reference(witness_ref)
+            if not is_valid:
+                # Invalid or unrecorded witness reference trips the zero-witness guard
+                return "ABSTAIN", True
 
         if witness_support_score >= self.witness_support_min_score:
             return "COMMIT", False
@@ -57,13 +69,14 @@ class SankalpaGate:
         witness_support_score: float = 0.0,
         is_safe_probe: bool = False,
         is_idle: bool = False,
+        ledger: Any | None = None,
     ) -> SankalpaDecision:
         """Compute joint decision over decoupled channels.
         
         CRITICAL: Epistemic ABSTAIN does NOT forbid safe PROBE or motor action.
         """
         if is_idle:
-            d_ep, tripped = self.evaluate_epistemic_channel(witness_ref, witness_support_score)
+            d_ep, tripped = self.evaluate_epistemic_channel(witness_ref, witness_support_score, ledger=ledger)
             return SankalpaDecision(
                 epistemic_channel="ABSTAIN",
                 operational_channel=self.default_idle_action,
@@ -71,7 +84,11 @@ class SankalpaGate:
                 zero_witness_guard_tripped=False,
             )
 
-        d_ep, zero_witness_tripped = self.evaluate_epistemic_channel(witness_ref, witness_support_score)
+        d_ep, zero_witness_tripped = self.evaluate_epistemic_channel(
+            witness_ref,
+            witness_support_score,
+            ledger=ledger,
+        )
 
         if is_safe_probe:
             a_act = self.safe_probe_action
@@ -81,6 +98,6 @@ class SankalpaGate:
         return SankalpaDecision(
             epistemic_channel=d_ep,
             operational_channel=a_act,
-            witness_ref=witness_ref,
+            witness_ref=witness_ref if not zero_witness_tripped else None,
             zero_witness_guard_tripped=zero_witness_tripped,
         )

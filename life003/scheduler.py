@@ -190,6 +190,7 @@ class ContinuousLifeOrganism:
                     main_core=self.core,
                     stimulus=None,
                     rng_sidecar=self.rng_sidecar,
+                    num_clones=1,
                 )
                 cand_action = deliberation_record["sidecar_prediction"]
                 hyp = self.hypotheses.register_candidate(
@@ -198,6 +199,14 @@ class ContinuousLifeOrganism:
                     v_just="UNVERIFIED",
                     witness_ref=None,
                 )
+                if self.hypotheses.last_eviction is not None:
+                    evict_rec = self.ledger.append_entry(
+                        record_type="EVICTED",
+                        payload=self.hypotheses.last_eviction,
+                        clock=self.clock,
+                    )
+                    ledger_events_this_tick.append(evict_rec)
+
                 rec = self.ledger.append_entry(
                     record_type="HYPOTHESIS",
                     payload={
@@ -215,6 +224,7 @@ class ContinuousLifeOrganism:
                 candidate_action="IDLE",
                 witness_ref=None,
                 is_idle=True,
+                ledger=self.ledger,
             )
 
         else:
@@ -261,10 +271,13 @@ class ContinuousLifeOrganism:
                 stim_arr = np.zeros(8)
                 if event_query:
                     stim_arr[event_query] = 1.0
+
+                num_clones_to_run = int(self.cfg.get("deliberation_budget", {}).get("max_sidecars_per_event", 1))
                 deliberation_record = self.sidecar_pool.run_deliberation(
                     main_core=self.core,
                     stimulus=stim_arr,
                     rng_sidecar=self.rng_sidecar,
+                    num_clones=num_clones_to_run,
                 )
                 chosen_action = deliberation_record["sidecar_prediction"]
                 hyp = self.hypotheses.register_candidate(
@@ -273,6 +286,14 @@ class ContinuousLifeOrganism:
                     v_just="UNVERIFIED",
                     witness_ref=None,
                 )
+                if self.hypotheses.last_eviction is not None:
+                    evict_rec = self.ledger.append_entry(
+                        record_type="EVICTED",
+                        payload=self.hypotheses.last_eviction,
+                        clock=self.clock,
+                    )
+                    ledger_events_this_tick.append(evict_rec)
+
                 hyp_rec = self.ledger.append_entry(
                     record_type="HYPOTHESIS",
                     payload={
@@ -291,9 +312,12 @@ class ContinuousLifeOrganism:
                 witness_ref=witness_ref,
                 is_safe_probe=False,
                 is_idle=False,
+                ledger=self.ledger,
             )
 
             # Step world with operational action
+            # Note: In T1 world events are driven from the outside; next_obs/reward/done
+            # are recorded for audit but not yet used for autonomous policy learning (deferred to T2).
             next_obs, reward, done, info = self.world.step(decision.operational_channel)
 
             # Atomic feedback closure in T1 (audit-only, K unchanged)
@@ -341,25 +365,16 @@ class ContinuousLifeOrganism:
         return log_entry
 
     def capture_full_state(self) -> dict[str, Any]:
-        """Capture complete serializable state for bit-exact checkpoint."""
+        """Capture complete serializable state for bit-exact checkpoint using official snapshots."""
         return {
-            "core_Z": self.core.Z.copy(),
-            "core_K": self.core.K.copy(),
-            "core_B": self.core.B.copy(),
-            "core_W": self.core.W_readout.copy(),
-            "rng_main_state": copy.deepcopy(self.core.rng.bit_generator.state),
+            "core_snapshot": self.core.snapshot(),
+            "agent_snapshot": self.agent.snapshot(),
             "rng_sidecar_state": copy.deepcopy(self.rng_sidecar.bit_generator.state),
             "clock": self.clock.snapshot(),
             "ledger": self.ledger.snapshot(),
             "hypotheses": self.hypotheses.snapshot(),
             "trigger": self.trigger.snapshot(),
             "world": self.world.snapshot(),
-            "agent_state": {
-                "event_id": int(self.agent.event_id),
-                "observed_counts": list(self.agent.observed_counts),
-                "shadow_steps": int(self.agent.shadow_steps),
-                "update_candidates": int(self.agent.update_candidates),
-            },
             "energy_deficit": float(self.energy_deficit),
             "unresolved_plan": float(self.unresolved_plan),
             "cfg_hash": self.cfg_hash,
@@ -367,25 +382,30 @@ class ContinuousLifeOrganism:
 
     def restore_full_state(self, state: dict[str, Any]) -> None:
         """Restore complete organism state bit-for-bit."""
-        self.core.Z = state["core_Z"].copy()
-        self.core.K = state["core_K"].copy()
-        self.core.B = state["core_B"].copy()
-        self.core.W_readout = state["core_W"].copy()
-        self.core.rng.bit_generator.state = copy.deepcopy(state["rng_main_state"])
-        self.rng_sidecar.bit_generator.state = copy.deepcopy(state["rng_sidecar_state"])
+        if "core_snapshot" in state:
+            self.core.restore(state["core_snapshot"])
+        else:
+            self.core.Z = state["core_Z"].copy()
+            self.core.K = state["core_K"].copy()
+            self.core.B = state["core_B"].copy()
+            self.core.W_readout = state["core_W"].copy()
+            self.core.rng.bit_generator.state = copy.deepcopy(state["rng_main_state"])
 
-        self.clock = LifeClock.restore(state["clock"])
-        self.ledger = SaksinLedger.restore(state["ledger"])
-        self.hypotheses = HypothesisPool.restore(state["hypotheses"])
-        self.trigger = EndogenousTrigger.restore(state["trigger"])
-        self.world = AmoebaWorld.restore(state["world"])
-
-        if "agent_state" in state:
+        if "agent_snapshot" in state:
+            self.agent.restore(state["agent_snapshot"])
+        elif "agent_state" in state:
             ag_st = state["agent_state"]
             self.agent.event_id = int(ag_st["event_id"])
             self.agent.observed_counts = list(ag_st["observed_counts"])
             self.agent.shadow_steps = int(ag_st["shadow_steps"])
             self.agent.update_candidates = int(ag_st["update_candidates"])
+
+        self.rng_sidecar.bit_generator.state = copy.deepcopy(state["rng_sidecar_state"])
+        self.clock = LifeClock.restore(state["clock"])
+        self.ledger = SaksinLedger.restore(state["ledger"])
+        self.hypotheses = HypothesisPool.restore(state["hypotheses"])
+        self.trigger = EndogenousTrigger.restore(state["trigger"])
+        self.world = AmoebaWorld.restore(state["world"])
 
         self.energy_deficit = float(state["energy_deficit"])
         self.unresolved_plan = float(state["unresolved_plan"])

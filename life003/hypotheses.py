@@ -37,7 +37,6 @@ class Hypothesis:
         
         CRITICAL: Freshness aging NEVER changes truth justification v_just to REFUTED.
         """
-        # OSSIFIED check (higher priority)
         if self.inertia_m_phi_uses >= m_phi_uses_ossified or self.ticks_since_audit >= age_ticks_ossified:
             self.s_fresh = "OSSIFIED"
         elif self.inertia_m_phi_uses >= m_phi_uses_aging or self.ticks_since_audit >= age_ticks_aging:
@@ -47,7 +46,7 @@ class Hypothesis:
 
 
 class HypothesisPool:
-    """Bounded set of hypotheses |H| <= max_active_hypotheses."""
+    """Bounded set of hypotheses |H| <= max_active_hypotheses with auditable lifecycle."""
 
     def __init__(
         self,
@@ -63,6 +62,7 @@ class HypothesisPool:
         self.age_ticks_aging = age_ticks_aging
         self.age_ticks_ossified = age_ticks_ossified
         self.hypotheses: dict[str, Hypothesis] = {}
+        self.last_eviction: dict[str, Any] | None = None
 
     def register_candidate(
         self,
@@ -72,13 +72,36 @@ class HypothesisPool:
         witness_ref: str | None = None,
         context: dict[str, Any] | None = None,
     ) -> Hypothesis:
-        """Register a new candidate. Sidecar outputs default to UNVERIFIED."""
+        """Register a new candidate.
+        
+        CRITICAL FIX-4: If eviction is required, never silently drop confirmed hypotheses
+        if unverified or refuted ones exist, and record eviction details on self.last_eviction
+        for Ledger audit logging.
+        """
+        eviction_info = None
+
         if len(self.hypotheses) >= self.max_capacity and candidate_id not in self.hypotheses:
-            # Evict oldest unverified or ossified
-            evict_id = next(
-                (hid for hid, h in self.hypotheses.items() if h.v_just in ("UNVERIFIED", "REFUTED")),
-                next(iter(self.hypotheses)),
-            )
+            # Hierarchical eviction priority: REFUTED -> UNVERIFIED -> oldest OSSIFIED supported
+            refuted = [hid for hid, h in self.hypotheses.items() if h.v_just == "REFUTED"]
+            unverified = [hid for hid, h in self.hypotheses.items() if h.v_just == "UNVERIFIED"]
+
+            if refuted:
+                evict_id = refuted[0]
+            elif unverified:
+                evict_id = unverified[0]
+            else:
+                # All hypotheses are SUPPORTED: evict oldest ossified/stale
+                evict_id = max(self.hypotheses.keys(), key=lambda hid: self.hypotheses[hid].ticks_since_audit)
+
+            evicted_hyp = self.hypotheses[evict_id]
+            eviction_info = {
+                "candidate_id": evict_id,
+                "action": evicted_hyp.action_candidate,
+                "v_just": evicted_hyp.v_just,
+                "s_fresh": evicted_hyp.s_fresh,
+                "witness_ref": evicted_hyp.witness_ref,
+                "reason": "POOL_CAPACITY_EXCEEDED",
+            }
             del self.hypotheses[evict_id]
 
         hyp = Hypothesis(
@@ -92,6 +115,7 @@ class HypothesisPool:
             context=copy.deepcopy(context),
         )
         self.hypotheses[candidate_id] = hyp
+        self.last_eviction = eviction_info
         return hyp
 
     def record_usage(self, candidate_id: str) -> None:
@@ -117,16 +141,30 @@ class HypothesisPool:
                 self.age_ticks_ossified,
             )
 
-    def audit_verification(self, candidate_id: str, is_supported: bool, witness_ref: str | None = None) -> None:
+    def audit_verification(
+        self,
+        candidate_id: str,
+        is_supported: bool,
+        witness_ref: str | None = None,
+    ) -> dict[str, Any] | None:
         """External feedback verifies or refutes hypothesis; resets Spanda staleness."""
         if candidate_id in self.hypotheses:
             hyp = self.hypotheses[candidate_id]
+            prev_v = hyp.v_just
             hyp.v_just = "SUPPORTED" if is_supported else "REFUTED"
             hyp.s_fresh = "FRESH"
             hyp.inertia_m_phi_uses = 0
             hyp.ticks_since_audit = 0
             if witness_ref is not None:
                 hyp.witness_ref = witness_ref
+
+            return {
+                "candidate_id": candidate_id,
+                "previous_justification": prev_v,
+                "new_justification": hyp.v_just,
+                "witness_ref": hyp.witness_ref,
+            }
+        return None
 
     def snapshot(self) -> dict[str, Any]:
         return {

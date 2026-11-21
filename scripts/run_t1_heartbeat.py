@@ -1,37 +1,35 @@
-"""LIFE-003 T1 10,000-Physical-Tick Heartbeat Runner & Exact-Resume Verifier."""
+"""Execution runner for LIFE-003 T1 Continuous Thought Loop & Verification (10,000 ticks)."""
 from __future__ import annotations
 import copy
-import hashlib
 import json
-from pathlib import Path
 import sys
-
-# Ensure repository root is on sys.path
-REPO_ROOT = Path(__file__).resolve().parent.parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
+from pathlib import Path
 import numpy as np
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from life003.config import load_and_validate_prereg_config
 from life003.scheduler import ContinuousLifeOrganism, array_hash
-from life003.checkpoint import save_checkpoint, load_checkpoint, compute_state_hash
+from life003.checkpoint import compute_state_hash, save_checkpoint, load_checkpoint
 
 
-def run_t1_experiment():
-    output_dir = REPO_ROOT / "results" / "THOUGHT_LOOP_T1"
+def run_t1_experiment(
+    config_path: str | Path | None = None,
+    output_dir: str | Path | None = None,
+) -> None:
+    output_dir = Path(output_dir or Path(__file__).resolve().parent.parent / "results" / "THOUGHT_LOOP_T1")
     output_dir.mkdir(parents=True, exist_ok=True)
-    jsonl_path = output_dir / "thought_stream.jsonl"
 
     print("Initializing ContinuousLifeOrganism with pre-registered config...")
-    org = ContinuousLifeOrganism()
+    org = ContinuousLifeOrganism(config_path=str(config_path) if config_path else None)
 
-    total_target_ticks = org.cfg["clock_and_schedule"]["total_physical_ticks"]  # 10000
-    checkpoint_interval = org.cfg["clock_and_schedule"]["checkpoint_interval_ticks"]  # 2000
-    resume_test_tick = org.cfg["clock_and_schedule"]["resume_test_tick"]  # 5000
+    total_target_ticks = org.cfg["clock_and_schedule"]["total_physical_ticks"]
+    checkpoint_interval = org.cfg["clock_and_schedule"]["checkpoint_interval_ticks"]
+    resume_tick = org.cfg["clock_and_schedule"]["resume_test_tick"]
 
     periodic_checkpoints = {}
     resume_verification = {
-        "resume_tick": resume_test_tick,
+        "resume_tick": resume_tick,
         "checkpoint_hash_pre": None,
         "checkpoint_hash_post": None,
         "step_discrepancy_count": 0,
@@ -42,31 +40,32 @@ def run_t1_experiment():
     org_resumed: ContinuousLifeOrganism | None = None
     resumed_matched = True
 
-    # Pre-generate deterministic event schedule: an event query every 40 core ticks
-    # To keep total core ticks exactly 10,000, we manage idle vs query steps carefully
     event_counter = 0
-
+    jsonl_path = output_dir / "thought_stream.jsonl"
     print(f"Beginning 10,000 physical tick execution loop to {jsonl_path}...")
+
     with open(jsonl_path, "w", encoding="utf-8") as f_out:
         while org.clock.core_tick < total_target_ticks:
             current_tick = org.clock.core_tick
 
-            # Check if this tick should trigger an exact resume checkpoint at 5000
-            if current_tick == resume_test_tick and org_resumed is None:
+            # Check if we need to do the unannounced exact resume verification test
+            if current_tick == resume_tick and org_resumed is None:
                 print(f"[Tick {current_tick}] Reached resume_test_tick! Serializing atomic checkpoint...")
-                ckpt_5000_path = output_dir / "checkpoint_5000_pre_resume.npz"
-                state_5000 = org.capture_full_state()
-                h_saved = save_checkpoint(ckpt_5000_path, state_5000)
-                resume_verification["checkpoint_hash_pre"] = h_saved
+                ckpt_resume_path = output_dir / f"checkpoint_{current_tick}_pre_resume.npz"
+                h_pre = save_checkpoint(ckpt_resume_path, org.capture_full_state())
+                resume_verification["checkpoint_hash_pre"] = h_pre
 
-                # Create fresh organism and restore
-                org_resumed = ContinuousLifeOrganism()
-                state_loaded, h_loaded = load_checkpoint(ckpt_5000_path)
-                org_resumed.restore_full_state(state_loaded)
-                resume_verification["checkpoint_hash_post"] = h_loaded
+                # Load and restore in a fresh clone
+                loaded_state, h_post = load_checkpoint(ckpt_resume_path)
+                resume_verification["checkpoint_hash_post"] = h_post
+                assert h_pre == h_post, "Checkpoint hash mismatch upon immediate read!"
 
-                assert h_saved == h_loaded, "Pre/post checkpoint hash mismatch!"
-                print(f"[Tick {current_tick}] Checkpoint verified: SHA-256 = {h_saved}")
+                org_resumed = ContinuousLifeOrganism(config=org.cfg)
+                org_resumed.restore_full_state(loaded_state)
+
+                h_clone = compute_state_hash(org_resumed.capture_full_state())
+                assert h_clone == h_pre, "Cloned organism state hash diverged from pre-resume!"
+                print(f"[Tick {current_tick}] Checkpoint verified: SHA-256 = {h_pre}")
 
             # Check periodic checkpoints
             if current_tick > 0 and current_tick % checkpoint_interval == 0 and current_tick not in periodic_checkpoints:
@@ -93,14 +92,13 @@ def run_t1_experiment():
             # Write continuous log line
             f_out.write(json.dumps(log_entry, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n")
 
-            # Verification of resumed clone against uninterrupted continuation
+            # Verification of resumed clone against uninterrupted continuation:
+            # FIX-1: Compare COMPLETE dictionary states via deterministic state hash
             if org_resumed is not None:
                 resume_verification["total_verified_ticks"] += 1
-                diff_z = not np.array_equal(org.core.Z, org_resumed.core.Z)
-                diff_k = not np.array_equal(org.core.K, org_resumed.core.K)
-                diff_clk = org.clock.snapshot() != org_resumed.clock.snapshot()
-                diff_led = org.ledger.prev_hash != org_resumed.ledger.prev_hash
-                if diff_z or diff_k or diff_clk or diff_led:
+                h_org = compute_state_hash(org.capture_full_state())
+                h_res = compute_state_hash(org_resumed.capture_full_state())
+                if h_org != h_res:
                     resume_verification["step_discrepancy_count"] += 1
                     resumed_matched = False
 
@@ -129,14 +127,15 @@ def run_t1_experiment():
     print("Exact resume verification report saved.")
 
     # -----------------------------------------------------------------------
-    # Run Test 19 Counterfactual Paired Comparison and save log
+    # Run Test 19 + FIX-3 Real-Variable Runtime Intervention and save log
     # -----------------------------------------------------------------------
-    print("Running Test 19 counterfactual paired comparison (trigger=ON vs trigger=OFF)...")
+    print("Running Test 19 & FIX-3 runtime causal paired comparison...")
     cfg_t19 = copy.deepcopy(org.cfg)
     cfg_t19["rng_streams"]["rng_main_seed"] = 810001
     cfg_t19["rng_streams"]["banned_seeds"] = []
+    
+    # 1. Classical controlled context
     org_t19 = ContinuousLifeOrganism(config=cfg_t19)
-
     for q in [1, 2, 3]:
         org_t19.execute_physical_tick(event_query=q, force_disable_trigger=True)
 
@@ -161,12 +160,22 @@ def run_t1_experiment():
 
     stim = np.zeros(8)
     stim[1] = 1.0
-    delib_res = org_t19.sidecar_pool.run_deliberation(org_t19.core, stim, org_t19.rng_sidecar)
+    delib_res = org_t19.sidecar_pool.run_deliberation(org_t19.core, stim, org_t19.rng_sidecar, num_clones=1)
     a_sidecar = delib_res["sidecar_prediction"]
 
     z_post = array_hash(org_t19.core.Z)
     k_post = array_hash(org_t19.core.K)
     rng_post = copy.deepcopy(org_t19.core.rng.bit_generator.state)
+
+    # 2. FIX-3: Full runtime paired intervention with 100% REAL internal variables
+    org_real_a = ContinuousLifeOrganism(config=cfg_t19)
+    org_real_b = ContinuousLifeOrganism(config=cfg_t19)
+
+    res_real_a = org_real_a.execute_physical_tick(event_query=1, force_disable_trigger=False)
+    res_real_b = org_real_b.execute_physical_tick(event_query=1, force_disable_trigger=True)
+
+    real_act_a = res_real_a["sankalpa_decision"]["operational_channel"]
+    real_act_b = res_real_b["sankalpa_decision"]["operational_channel"]
 
     t19_log = {
         "test_name": "test_endogenous_trigger_changes_behavior_vs_disabled_trigger",
@@ -186,6 +195,9 @@ def run_t1_experiment():
             "policy_source": "Z0_64_DELIBERATION",
             "sidecar_logits": delib_res["sidecar_logits"],
             "sidecar_entropy": delib_res["sidecar_entropy"],
+            "clones_requested": delib_res["clones_requested"],
+            "clones_executed": delib_res["clones_executed"],
+            "divergence_mechanism": delib_res["divergence_mechanism"],
         },
         "behavior_causally_changed": a_live != a_sidecar,
         "main_core_invariance": {
@@ -197,12 +209,23 @@ def run_t1_experiment():
             "k_main_identical": k_pre == k_post,
             "rng_main_identical": rng_pre == rng_post,
         },
-        "verdict": "PASS" if (a_live != a_sidecar and z_pre == z_post and k_pre == k_post and rng_pre == rng_post) else "FAIL",
+        "fix3_real_runtime_paired_intervention": {
+            "trigger_on_action": real_act_a,
+            "trigger_off_action": real_act_b,
+            "causally_diverged": real_act_a != real_act_b,
+            "trigger_score_real": res_real_a["trigger"]["score"],
+            "surprise_proxy_real": res_real_a["trigger"]["components"]["surprise_proxy"],
+            "uncertainty_real": res_real_a["trigger"]["components"]["uncertainty"],
+            "energy_deficit_real": res_real_a["trigger"]["components"]["energy_deficit"],
+            "divergence_mechanism": res_real_a["deliberation"]["divergence_mechanism"],
+            "clones_executed": res_real_a["deliberation"]["clones_executed"],
+        },
+        "verdict": "PASS" if (a_live != a_sidecar and real_act_a != real_act_b and z_pre == z_post and k_pre == k_post and rng_pre == rng_post) else "FAIL",
     }
 
     with open(output_dir / "trigger_on_vs_off.json", "w", encoding="utf-8") as f_t19:
         json.dump(t19_log, f_t19, indent=2)
-    print("Test 19 paired log saved: trigger_on_vs_off.json")
+    print("Test 19 & FIX-3 paired log saved: trigger_on_vs_off.json")
     print("Heartbeat T1 execution finished successfully.")
 
 

@@ -15,6 +15,7 @@ ALLOWED_RECORD_TYPES = {
     "REJECTED",
     "REVISED",
     "AUDIT_SHADOW",
+    "EVICTED",
 }
 
 
@@ -80,6 +81,53 @@ class SaksinLedger:
         self.prev_hash = entry_hash
         self.seq += 1
         return record
+
+    def get_entry(self, entry_hash: str) -> dict[str, Any] | None:
+        """Find record by its entry_hash."""
+        for rec in self.records:
+            if rec["entry_hash"] == entry_hash:
+                return rec
+        return None
+
+    def verify_witness_reference(
+        self,
+        witness_ref: str | None,
+        required_types: set[str] | None = None,
+    ) -> tuple[bool, str]:
+        """FIX-4: Cryptographically verify that witness_ref points to an authentic ledger record.
+        
+        Returns:
+            (is_valid, reason)
+        """
+        if witness_ref is None:
+            return False, "WITNESS_NONE"
+
+        rec = self.get_entry(witness_ref)
+        if rec is None:
+            return False, "WITNESS_NOT_FOUND_IN_LEDGER"
+
+        # Check sequence index
+        if not (0 <= rec["seq"] < len(self.records)):
+            return False, "WITNESS_INVALID_SEQ"
+
+        # Re-verify cryptographic hash
+        entry_meta = {
+            "seq": rec["seq"],
+            "prev_hash": rec["prev_hash"],
+            "core_tick": rec["core_tick"],
+            "world_tick": rec["world_tick"],
+            "record_type": rec["record_type"],
+            "payload": rec["payload"],
+        }
+        expected_hash = hashlib.sha256(canonical_json_bytes(entry_meta)).hexdigest()
+        if expected_hash != rec["entry_hash"]:
+            return False, "WITNESS_HASH_CHAIN_CORRUPT"
+
+        valid_types = required_types or {"VERIFIED_FEEDBACK", "OBSERVED", "AUDIT_SHADOW"}
+        if rec["record_type"] not in valid_types:
+            return False, f"WITNESS_TYPE_NOT_ALLOWED:{rec['record_type']}"
+
+        return True, "WITNESS_VALID"
 
     def validate_integrity(self) -> bool:
         """Verify the cryptographic hash-chain across all historical records."""
