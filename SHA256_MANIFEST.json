@@ -37,9 +37,9 @@
     "results/THOUGHT_LOOP_T1/checkpoint_5000_pre_resume.npz": "e72ff8b010ff6cbfa5b2928365ca4a1c1e74ad85d8c064c157128d4c1f36c89e",
     "results/THOUGHT_LOOP_T1/checkpoint_6000.npz": "73275dc8b8e0276ce25d918c6c688cae2f5ae4383e197fd33a8a852de1a40474",
     "results/THOUGHT_LOOP_T1/checkpoint_8000.npz": "39ed4b2ea880ffb3f5b193aa3574b7d8151d0defec009ffad4398d768bd79206",
-    "results/THOUGHT_LOOP_T1/resume_verification.json": "29b5a33e5ad94d56bd08d0efe36b434f06b5818b3bbed6627a5353ed105e372d",
-    "results/THOUGHT_LOOP_T1/thought_stream.jsonl": "29a02ca82dabaa66cc74a97b1f8c0c7dff62718664cc9f7ec6d592f39705a6a7",
-    "results/THOUGHT_LOOP_T1/trigger_on_vs_off.json": "34414b617c942954fc48523299f61a421e4fb50b9484f7fbcd9c7ced6bac9c25",
+    "results/THOUGHT_LOOP_T1/resume_verification.json": "5c7a02215bc945168b9344f41863017d476ed0536ce00ee123b72b5445c840e5",
+    "results/THOUGHT_LOOP_T1/thought_stream.jsonl": "1dbf4f60b1de6a6f00b6d7fb812551bc07f86198d488cb2b6de0efe8d0332f68",
+    "results/THOUGHT_LOOP_T1/trigger_on_vs_off.json": "b03401ea4ab5192ef04f718e43aded4c2eba7449c8966d29d32488c6580085f8",
     "scripts/run_t1_heartbeat.py": "86a08ab0981835e85f1d413e49d875ec9f0516d62763f0b9fd1061d3d3b38580",
     "tests/test_continuous_life.py": "d5c316fbd368bcc1c8a824d185fee997ebf7eb3412da7a32e0ff102eb8bdaa4a"
   }
