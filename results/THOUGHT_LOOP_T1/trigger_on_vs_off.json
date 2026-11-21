@@ -1,0 +1,60 @@
+{
+  "test_name": "test_endogenous_trigger_changes_behavior_vs_disabled_trigger",
+  "frozen_k_seed": 810001,
+  "u_live_entropy": 0.9978314182582539,
+  "trigger_score": 0.5292409963903888,
+  "threshold_theta": 0.45,
+  "trigger_fired": true,
+  "trigger_components": {
+    "surprise_proxy": 0.3,
+    "uncertainty": 0.9978314182582539,
+    "energy_deficit": 0.5,
+    "unresolved_plan": 0.0
+  },
+  "branch_a_trigger_off": {
+    "action_chosen": 3,
+    "policy_source": "LIVE_MAIN_LOGITS",
+    "logits": [
+      0.06824321249437165,
+      -0.10480540824217756,
+      0.09555707343076578,
+      0.07061645620114032
+    ]
+  },
+  "branch_b_trigger_on": {
+    "action_chosen": 1,
+    "policy_source": "Z0_64_DELIBERATION",
+    "sidecar_logits": [
+      0.1927391181146101,
+      -0.1379499434268543,
+      0.062096256933511985,
+      0.08217702668560554
+    ],
+    "sidecar_entropy": 0.9951060764335898,
+    "clones_requested": 1,
+    "clones_executed": 1,
+    "divergence_mechanism": "READOUT_RELAXATION_Z0_64"
+  },
+  "behavior_causally_changed": true,
+  "main_core_invariance": {
+    "z_main_hash_pre": "68394b416da513efb859ed8edac8ea6a9a21679910ad06d770e5b3d02f54ef3d",
+    "z_main_hash_post": "68394b416da513efb859ed8edac8ea6a9a21679910ad06d770e5b3d02f54ef3d",
+    "z_main_identical": true,
+    "k_main_hash_pre": "b7d2bb167b748b92430bc89b0a2a9d2b77103aa05e75bc4c76f9bdae3ee1a53a",
+    "k_main_hash_post": "b7d2bb167b748b92430bc89b0a2a9d2b77103aa05e75bc4c76f9bdae3ee1a53a",
+    "k_main_identical": true,
+    "rng_main_identical": true
+  },
+  "fix3_real_runtime_paired_intervention": {
+    "trigger_on_action": 1,
+    "trigger_off_action": 3,
+    "causally_diverged": true,
+    "trigger_score_real": 0.49358233961585046,
+    "surprise_proxy_real": 0.4129511409473562,
+    "uncertainty_real": 0.9972841150979309,
+    "energy_deficit_real": 0.0,
+    "divergence_mechanism": "MULTI_CANDIDATE_OUTCOME_COMPARISON",
+    "clones_executed": 3
+  },
+  "verdict": "PASS"
+}
