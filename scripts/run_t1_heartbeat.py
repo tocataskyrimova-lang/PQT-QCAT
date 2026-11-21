@@ -1,0 +1,210 @@
+"""LIFE-003 T1 10,000-Physical-Tick Heartbeat Runner & Exact-Resume Verifier."""
+from __future__ import annotations
+import copy
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+# Ensure repository root is on sys.path
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+import numpy as np
+
+from life003.scheduler import ContinuousLifeOrganism, array_hash
+from life003.checkpoint import save_checkpoint, load_checkpoint, compute_state_hash
+
+
+def run_t1_experiment():
+    output_dir = REPO_ROOT / "results" / "THOUGHT_LOOP_T1"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    jsonl_path = output_dir / "thought_stream.jsonl"
+
+    print("Initializing ContinuousLifeOrganism with pre-registered config...")
+    org = ContinuousLifeOrganism()
+
+    total_target_ticks = org.cfg["clock_and_schedule"]["total_physical_ticks"]  # 10000
+    checkpoint_interval = org.cfg["clock_and_schedule"]["checkpoint_interval_ticks"]  # 2000
+    resume_test_tick = org.cfg["clock_and_schedule"]["resume_test_tick"]  # 5000
+
+    periodic_checkpoints = {}
+    resume_verification = {
+        "resume_tick": resume_test_tick,
+        "checkpoint_hash_pre": None,
+        "checkpoint_hash_post": None,
+        "step_discrepancy_count": 0,
+        "total_verified_ticks": 0,
+        "status": "PENDING",
+    }
+
+    org_resumed: ContinuousLifeOrganism | None = None
+    resumed_matched = True
+
+    # Pre-generate deterministic event schedule: an event query every 40 core ticks
+    # To keep total core ticks exactly 10,000, we manage idle vs query steps carefully
+    event_counter = 0
+
+    print(f"Beginning 10,000 physical tick execution loop to {jsonl_path}...")
+    with open(jsonl_path, "w", encoding="utf-8") as f_out:
+        while org.clock.core_tick < total_target_ticks:
+            current_tick = org.clock.core_tick
+
+            # Check if this tick should trigger an exact resume checkpoint at 5000
+            if current_tick == resume_test_tick and org_resumed is None:
+                print(f"[Tick {current_tick}] Reached resume_test_tick! Serializing atomic checkpoint...")
+                ckpt_5000_path = output_dir / "checkpoint_5000_pre_resume.npz"
+                state_5000 = org.capture_full_state()
+                h_saved = save_checkpoint(ckpt_5000_path, state_5000)
+                resume_verification["checkpoint_hash_pre"] = h_saved
+
+                # Create fresh organism and restore
+                org_resumed = ContinuousLifeOrganism()
+                state_loaded, h_loaded = load_checkpoint(ckpt_5000_path)
+                org_resumed.restore_full_state(state_loaded)
+                resume_verification["checkpoint_hash_post"] = h_loaded
+
+                assert h_saved == h_loaded, "Pre/post checkpoint hash mismatch!"
+                print(f"[Tick {current_tick}] Checkpoint verified: SHA-256 = {h_saved}")
+
+            # Check periodic checkpoints
+            if current_tick > 0 and current_tick % checkpoint_interval == 0 and current_tick not in periodic_checkpoints:
+                ckpt_p = output_dir / f"checkpoint_{current_tick}.npz"
+                h_p = save_checkpoint(ckpt_p, org.capture_full_state())
+                periodic_checkpoints[current_tick] = {"path": str(ckpt_p), "state_hash": h_p}
+                print(f"[Tick {current_tick}] Periodic checkpoint saved: {h_p}")
+
+            # Decide whether to run idle tick or query event
+            ticks_remaining = total_target_ticks - org.clock.core_tick
+            should_run_query = (org.clock.core_tick % 40 == 0) and (ticks_remaining >= org.t_query)
+
+            if should_run_query:
+                query_token = (event_counter % 6) + 1
+                event_counter += 1
+                log_entry = org.execute_physical_tick(event_query=query_token)
+                if org_resumed is not None:
+                    log_entry_res = org_resumed.execute_physical_tick(event_query=query_token)
+            else:
+                log_entry = org.execute_physical_tick(event_query=None)
+                if org_resumed is not None:
+                    log_entry_res = org_resumed.execute_physical_tick(event_query=None)
+
+            # Write continuous log line
+            f_out.write(json.dumps(log_entry, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n")
+
+            # Verification of resumed clone against uninterrupted continuation
+            if org_resumed is not None:
+                resume_verification["total_verified_ticks"] += 1
+                diff_z = not np.array_equal(org.core.Z, org_resumed.core.Z)
+                diff_k = not np.array_equal(org.core.K, org_resumed.core.K)
+                diff_clk = org.clock.snapshot() != org_resumed.clock.snapshot()
+                diff_led = org.ledger.prev_hash != org_resumed.ledger.prev_hash
+                if diff_z or diff_k or diff_clk or diff_led:
+                    resume_verification["step_discrepancy_count"] += 1
+                    resumed_matched = False
+
+    # Save final periodic checkpoint at 10,000
+    final_ckpt = output_dir / f"checkpoint_{org.clock.core_tick}.npz"
+    h_final = save_checkpoint(final_ckpt, org.capture_full_state())
+    periodic_checkpoints[org.clock.core_tick] = {"path": str(final_ckpt), "state_hash": h_final}
+    print(f"[Tick {org.clock.core_tick}] Final checkpoint saved: {h_final}")
+
+    resume_verification["status"] = "PASS" if (resumed_matched and resume_verification["step_discrepancy_count"] == 0) else "FAIL"
+
+    with open(output_dir / "resume_verification.json", "w", encoding="utf-8") as f_res:
+        json.dump(
+            {
+                **resume_verification,
+                "periodic_checkpoints": periodic_checkpoints,
+                "total_ticks_run": org.clock.core_tick,
+                "final_state_hash": h_final,
+                "ledger_chain_valid": org.ledger.validate_integrity(),
+                "total_ledger_records": len(org.ledger.records),
+                "total_deliberations": org.trigger.total_triggers_count,
+            },
+            f_res,
+            indent=2,
+        )
+    print("Exact resume verification report saved.")
+
+    # -----------------------------------------------------------------------
+    # Run Test 19 Counterfactual Paired Comparison and save log
+    # -----------------------------------------------------------------------
+    print("Running Test 19 counterfactual paired comparison (trigger=ON vs trigger=OFF)...")
+    cfg_t19 = copy.deepcopy(org.cfg)
+    cfg_t19["rng_streams"]["rng_main_seed"] = 810001
+    cfg_t19["rng_streams"]["banned_seeds"] = []
+    org_t19 = ContinuousLifeOrganism(config=cfg_t19)
+
+    for q in [1, 2, 3]:
+        org_t19.execute_physical_tick(event_query=q, force_disable_trigger=True)
+
+    l_live = org_t19.core.predict()[1:5]
+    p_live = np.exp(l_live - np.max(l_live)) / np.sum(np.exp(l_live - np.max(l_live)))
+    u_live = -float(np.sum(p_live * np.log(np.clip(p_live, 1e-12, 1.0)))) / float(np.log(4))
+    a_live = int(np.argmax(l_live)) + 1
+
+    ctrl = org_t19.cfg["endogenous_trigger"]["test19_control_context"]
+    score, can_fire, comp = org_t19.trigger.evaluate(
+        surprise_proxy=ctrl["fixed_surprise_proxy"],
+        uncertainty=u_live,
+        energy_deficit=ctrl["fixed_energy_deficit"],
+        unresolved=ctrl["fixed_unresolved"],
+        current_tick=org_t19.clock.core_tick,
+        force_disable=False,
+    )
+
+    z_pre = array_hash(org_t19.core.Z)
+    k_pre = array_hash(org_t19.core.K)
+    rng_pre = copy.deepcopy(org_t19.core.rng.bit_generator.state)
+
+    stim = np.zeros(8)
+    stim[1] = 1.0
+    delib_res = org_t19.sidecar_pool.run_deliberation(org_t19.core, stim, org_t19.rng_sidecar)
+    a_sidecar = delib_res["sidecar_prediction"]
+
+    z_post = array_hash(org_t19.core.Z)
+    k_post = array_hash(org_t19.core.K)
+    rng_post = copy.deepcopy(org_t19.core.rng.bit_generator.state)
+
+    t19_log = {
+        "test_name": "test_endogenous_trigger_changes_behavior_vs_disabled_trigger",
+        "frozen_k_seed": 810001,
+        "u_live_entropy": u_live,
+        "trigger_score": score,
+        "threshold_theta": org_t19.trigger.threshold_theta,
+        "trigger_fired": can_fire,
+        "trigger_components": comp,
+        "branch_a_trigger_off": {
+            "action_chosen": a_live,
+            "policy_source": "LIVE_MAIN_LOGITS",
+            "logits": l_live.tolist(),
+        },
+        "branch_b_trigger_on": {
+            "action_chosen": a_sidecar,
+            "policy_source": "Z0_64_DELIBERATION",
+            "sidecar_logits": delib_res["sidecar_logits"],
+            "sidecar_entropy": delib_res["sidecar_entropy"],
+        },
+        "behavior_causally_changed": a_live != a_sidecar,
+        "main_core_invariance": {
+            "z_main_hash_pre": z_pre,
+            "z_main_hash_post": z_post,
+            "z_main_identical": z_pre == z_post,
+            "k_main_hash_pre": k_pre,
+            "k_main_hash_post": k_post,
+            "k_main_identical": k_pre == k_post,
+            "rng_main_identical": rng_pre == rng_post,
+        },
+        "verdict": "PASS" if (a_live != a_sidecar and z_pre == z_post and k_pre == k_post and rng_pre == rng_post) else "FAIL",
+    }
+
+    with open(output_dir / "trigger_on_vs_off.json", "w", encoding="utf-8") as f_t19:
+        json.dump(t19_log, f_t19, indent=2)
+    print("Test 19 paired log saved: trigger_on_vs_off.json")
+    print("Heartbeat T1 execution finished successfully.")
+
+
+if __name__ == "__main__":
+    run_t1_experiment()

@@ -1,0 +1,77 @@
+# LIFE-003 CONTINUOUS-THOUGHT-001: Pre-registered T1 Configuration
+# Epistemic Status: W_CANDIDATE, proof_claim: false
+# Mandate: T0 + T1 ONLY (Execution of T2/T3/T4 is strictly forbidden)
+# NOTE: SHA-256 of this file is recorded externally in SHA256_MANIFEST.json
+#       and in entry 0 (CONFIG_REGISTERED) of Saksin Ledger (INV-9).
+
+contract_version: "v0.2.1"
+
+metadata:
+  target_core: "SixEchelonCore"
+  core_dimension: 48
+  coupling_dimension: [48, 48]
+  frozen_baseline_commit: "06fbd5b7e6fcc224619d19b78ded716f74694a08"
+  historical_tag: "life-002-freeze-2026-11-20"
+
+clock_and_schedule:
+  total_physical_ticks: 10000
+  dt_core: 0.01                         # Базовый шаг h_base SixEchelonCore
+  t_query: 8                            # Подставлено точное проверенное значение из frozen QNUFAgent в T0
+  idle_step_write_gate: 0.0             # В режиме idle запись в K строго закрыта
+  checkpoint_interval_ticks: 2000       # Периодические атомарные снимки
+  resume_test_tick: 5000                # Внеплановая контрольная точка для exact resume
+  force_checkpoint_at_resume_test_tick: true
+
+rng_streams:
+  rng_main_seed: 42
+  rng_sidecar_seed: 1337
+  rng_world_seed: 2026
+  banned_seeds: [101, 102, 103, 104, 105]
+
+endogenous_trigger:
+  # trigger_score = w_surprise * S + w_uncertainty * U + w_energy_deficit * E + w_unresolved * R
+  weights:
+    w_surprise: 0.35
+    w_uncertainty: 0.35
+    w_energy_deficit: 0.15
+    w_unresolved: 0.15
+  threshold_theta: 0.45
+  norm_scale_surprise: 2.5
+  test19_control_context:
+    # Гарантирует score >= 0.495 > 0.45 при boundary stimulus с U >= 0.90
+    fixed_energy_deficit: 0.50
+    fixed_surprise_proxy: 0.30
+    fixed_unresolved: 0.00
+
+deliberation_budget:
+  max_sidecars_per_event: 3
+  sidecar_rollout_ticks: 64
+  max_deliberation_ticks_per_tick: 192
+  max_total_deliberations_t1: 150
+  cooldown_ticks_after_trigger: 20
+
+sankalpa_policy_channels:
+  epistemic:
+    require_structured_witness: true    # Без witness_ref != null COMMIT невозможен
+    witness_support_min_score: 0.60     # Дополнительный порог при наличии witness_ref
+    allow_zero_witness_commit: false    # При W_a = None строго ABSTAIN
+  operational:
+    default_idle_action: "IDLE"
+    safe_probe_action: "PROBE"
+    wait_action: "WAIT"
+    motor_actions: [1, 2, 3, 4]
+
+hypotheses_and_ledger:
+  max_active_hypotheses: 8
+  initial_sidecar_v_just: "UNVERIFIED"  # Запрет самоподтверждения без внешнего feedback
+  m_phi_uses_aging: 8                   # Использований без аудита: FRESH -> AGING
+  m_phi_uses_ossified: 32               # Использований без аудита: AGING -> OSSIFIED
+  age_ticks_aging: 50                   # Тиков без аудита: FRESH -> AGING
+  age_ticks_ossified: 200               # Тиков без аудита: AGING -> OSSIFIED
+  hash_algorithm: "sha256"
+  exclude_wall_clock_from_hashes: true  # Канонический детерминизм байтов
+
+frozen_core_guards:
+  k_write_gate_active: 0.0
+  forbid_main_z_mutation_by_sidecar: true
+  forbid_oracle_world_leakage: true

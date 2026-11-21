@@ -1,0 +1,125 @@
+"""Immutable hash-chained Sākṣin Ledger for LIFE-003 (PQT-KC-001 v0.3)."""
+from __future__ import annotations
+import copy
+import hashlib
+import json
+from typing import Any
+
+from .clock import LifeClock
+
+ALLOWED_RECORD_TYPES = {
+    "CONFIG_REGISTERED",
+    "OBSERVED",
+    "VERIFIED_FEEDBACK",
+    "HYPOTHESIS",
+    "REJECTED",
+    "REVISED",
+    "AUDIT_SHADOW",
+}
+
+
+def canonical_json_bytes(obj: Any) -> bytes:
+    """Deterministic JSON serialization without whitespace, sorted keys, no floats NaN."""
+    return json.dumps(
+        obj,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode("utf-8")
+
+
+class SaksinLedger:
+    """Append-only witness and belief ledger with strict SHA-256 hash chaining."""
+
+    def __init__(self, genesis_config_sha: str | None = None, genesis_clock: LifeClock | None = None):
+        self.records: list[dict[str, Any]] = []
+        self.prev_hash: str = "0" * 64
+        self.seq: int = 0
+
+        # Register genesis record if config hash is provided
+        if genesis_config_sha is not None:
+            clk = genesis_clock or LifeClock()
+            self.append_entry(
+                record_type="CONFIG_REGISTERED",
+                payload={"prereg_manifest_hash": genesis_config_sha, "contract_version": "v0.2.1"},
+                clock=clk,
+            )
+
+    def append_entry(
+        self,
+        record_type: str,
+        payload: dict[str, Any],
+        clock: LifeClock,
+    ) -> dict[str, Any]:
+        """Append a new strictly hashed entry to the ledger."""
+        if record_type not in ALLOWED_RECORD_TYPES:
+            raise ValueError(f"Record type '{record_type}' is not permitted in SaksinLedger!")
+
+        # Hash payload excludes any wall-clock or random non-reproducible tokens
+        canonical_payload = copy.deepcopy(payload)
+        
+        entry_meta = {
+            "seq": self.seq,
+            "prev_hash": self.prev_hash,
+            "core_tick": clock.core_tick,
+            "world_tick": clock.world_tick,
+            "record_type": record_type,
+            "payload": canonical_payload,
+        }
+
+        entry_bytes = canonical_json_bytes(entry_meta)
+        entry_hash = hashlib.sha256(entry_bytes).hexdigest()
+
+        record = {
+            **entry_meta,
+            "entry_hash": entry_hash,
+        }
+
+        self.records.append(record)
+        self.prev_hash = entry_hash
+        self.seq += 1
+        return record
+
+    def validate_integrity(self) -> bool:
+        """Verify the cryptographic hash-chain across all historical records."""
+        expected_prev = "0" * 64
+        for idx, rec in enumerate(self.records):
+            if rec["seq"] != idx:
+                return False
+            if rec["prev_hash"] != expected_prev:
+                return False
+
+            # Recompute hash
+            entry_meta = {
+                "seq": rec["seq"],
+                "prev_hash": rec["prev_hash"],
+                "core_tick": rec["core_tick"],
+                "world_tick": rec["world_tick"],
+                "record_type": rec["record_type"],
+                "payload": rec["payload"],
+            }
+            recomputed = hashlib.sha256(canonical_json_bytes(entry_meta)).hexdigest()
+            if recomputed != rec["entry_hash"]:
+                return False
+
+            expected_prev = rec["entry_hash"]
+
+        return True
+
+    def snapshot(self) -> dict[str, Any]:
+        return {
+            "records": copy.deepcopy(self.records),
+            "prev_hash": self.prev_hash,
+            "seq": self.seq,
+        }
+
+    @classmethod
+    def restore(cls, data: dict[str, Any]) -> SaksinLedger:
+        ledger = cls()
+        ledger.records = copy.deepcopy(data["records"])
+        ledger.prev_hash = str(data["prev_hash"])
+        ledger.seq = int(data["seq"])
+        if not ledger.validate_integrity():
+            raise ValueError("Restored ledger failed cryptographic integrity validation!")
+        return ledger
