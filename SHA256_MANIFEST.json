@@ -38,11 +38,11 @@
     "results/THOUGHT_LOOP_T1/checkpoint_5000_pre_resume.npz": "6c68dc12d39726ab065038e542da55d51b7ce22a9e3229347d40bfe4e02cf49b",
     "results/THOUGHT_LOOP_T1/checkpoint_6000.npz": "131550a01badfc5267f98279d9e17e8be6e385395bd1402c14f7e30dc4dc6f78",
     "results/THOUGHT_LOOP_T1/checkpoint_8000.npz": "8bc84961f0d75228dd0f3ae5e0ea1ab9b21d90e5424af7a70a89e69dac7c4aa5",
-    "results/THOUGHT_LOOP_T1/resume_verification.json": "7c02e53da2d9e0d9f9b7e5c6e2ddedef75908674fc456c96b935ace28dd0c620",
+    "results/THOUGHT_LOOP_T1/resume_verification.json": "83f816dc0cc882c3c5f4d6d7128f806c06375073ae24ca7afe9c1d002c74cb20",
     "results/THOUGHT_LOOP_T1/thought_stream.jsonl": "fc3ceccd03c8c3f2b57530732781f22d2bf5562fec5593634175aa46f54ff1a8",
     "results/THOUGHT_LOOP_T1/trigger_on_vs_off.json": "f7b0cf02a8d5ffbb5a10a3e34194366b035c15b0322c6a00fa16dd2d645504ad",
     "reviews/GEMINI_NEON_T1_AUDIT_BRIEF.md": "26f7821a1141b29a497b7a528737318be7ebd96d9e4312db137c11b1db4e59e0",
-    "scripts/run_t1_heartbeat.py": "9c65dad9221c54c9bde7c551806a27f5da5af4866a77367d7c0959293a8f8773",
+    "scripts/run_t1_heartbeat.py": "d84f2416055d452757aecf907837c6e3bf7129592f63e45dd943e3098be0afc0",
     "tests/test_continuous_life.py": "077ca4cf137ea8d48abd67e15d72aab748d323f145b8310af64ced0e15f2819d"
   }
 }

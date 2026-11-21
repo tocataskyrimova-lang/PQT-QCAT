@@ -12,23 +12,23 @@
   "status": "PASS",
   "periodic_checkpoints": {
     "2000": {
-      "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_2000.npz",
+      "path": "checkpoint_2000.npz",
       "state_hash": "12e1a2870f1309bdc8e64e75266614e889a09d66a7fc6c1eb013362c6b5f3cfa"
     },
     "4000": {
-      "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_4000.npz",
+      "path": "checkpoint_4000.npz",
       "state_hash": "03d1d33eb208ddd0129ccba9d334d44b5608ee4fbc21faba71f7413ad4042942"
     },
     "6000": {
-      "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_6000.npz",
+      "path": "checkpoint_6000.npz",
       "state_hash": "15760ba78e08bc94afcd0ca99dd0fc524807fe0b564b19f5ec7ed172335e8de6"
     },
     "8000": {
-      "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_8000.npz",
+      "path": "checkpoint_8000.npz",
       "state_hash": "d528b8a8ad5143b55ff7f4131f1df96863c4a0cebc28b3fd465012da09422e34"
     },
     "10000": {
-      "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_10000.npz",
+      "path": "checkpoint_10000.npz",
       "state_hash": "4dafceef8912cd8f383f5ef54d7f5621b665bf1d7336f95bf94707612a6956e5"
     }
   },

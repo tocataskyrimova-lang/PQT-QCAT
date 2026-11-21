@@ -125,7 +125,7 @@ def run_t1_experiment(
             if current_tick > 0 and current_tick % checkpoint_interval == 0 and current_tick not in periodic_checkpoints:
                 ckpt_p = output_dir / f"checkpoint_{current_tick}.npz"
                 h_p = save_checkpoint(ckpt_p, org.capture_full_state())
-                periodic_checkpoints[current_tick] = {"path": str(ckpt_p), "state_hash": h_p}
+                periodic_checkpoints[current_tick] = {"path": ckpt_p.name, "state_hash": h_p}
                 print(f"[Tick {current_tick}] Periodic checkpoint saved: {h_p}")
 
             # Decide whether to run idle tick or query event
@@ -177,7 +177,7 @@ def run_t1_experiment(
     # Save final periodic checkpoint at 10,000
     final_ckpt = output_dir / f"checkpoint_{org.clock.core_tick}.npz"
     h_final = save_checkpoint(final_ckpt, org.capture_full_state())
-    periodic_checkpoints[org.clock.core_tick] = {"path": str(final_ckpt), "state_hash": h_final}
+    periodic_checkpoints[org.clock.core_tick] = {"path": final_ckpt.name, "state_hash": h_final}
     print(f"[Tick {org.clock.core_tick}] Final checkpoint saved: {h_final}")
 
     resume_verification["status"] = (
