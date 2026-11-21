@@ -595,7 +595,7 @@ def test_fix4_witness_integrity_and_ledger_validation():
     assert d_ep == "ABSTAIN"
     assert zero_tripped is True
 
-    # 2. Genuine witness record in ledger is accepted
+    # 2. Genuine OBSERVED record in ledger is accepted as observation, but CANNOT authorize COMMIT
     obs_rec = org.ledger.append_entry(
         record_type="OBSERVED",
         payload={"query": 1, "prediction": 3, "entropy": 0.95},
@@ -604,15 +604,37 @@ def test_fix4_witness_integrity_and_ledger_validation():
     is_valid_real, _ = org.ledger.verify_witness_reference(obs_rec["entry_hash"])
     assert is_valid_real is True
 
-    d_ep_real, zero_tripped_real = org.sankalpa.evaluate_epistemic_channel(
+    # High support score with OBSERVED record yields CLASS_ONLY, NEVER COMMIT (Item 1 & 5)
+    d_ep_obs, zero_tripped_obs = org.sankalpa.evaluate_epistemic_channel(
         witness_ref=obs_rec["entry_hash"],
         witness_support_score=0.95,
         ledger=org.ledger,
     )
-    assert d_ep_real == "COMMIT"
-    assert zero_tripped_real is False
+    assert d_ep_obs == "CLASS_ONLY"
+    assert d_ep_obs != "COMMIT"
+    assert zero_tripped_obs is False
 
-    # 3. Eviction logging: HypothesisPool records eviction info when capacity exceeded
+    # 3. Genuine VERIFIED_FEEDBACK record with matching provenance and outcome permits COMMIT (Item 2)
+    fb_rec = org.ledger.append_verified_feedback(
+        hypothesis_id="H_evt_1",
+        action=3,
+        result="TARGET_MATCH",
+        provenance="H_evt_1",
+        applicability_domain="QUERY_1",
+        support_score=0.90,
+        clock=org.clock,
+    )
+    d_ep_fb, zero_tripped_fb = org.sankalpa.evaluate_epistemic_channel(
+        witness_ref=fb_rec["entry_hash"],
+        ledger=org.ledger,
+        hypothesis="H_evt_1",
+        candidate_action=3,
+        context={"domain": "QUERY_1"},
+    )
+    assert d_ep_fb == "COMMIT"
+    assert zero_tripped_fb is False
+
+    # 4. Eviction logging: HypothesisPool records eviction info when capacity exceeded
     pool = HypothesisPool(max_active_hypotheses=3)
     pool.register_candidate("H1", 1, v_just="SUPPORTED")
     pool.register_candidate("H2", 2, v_just="UNVERIFIED")
@@ -625,3 +647,132 @@ def test_fix4_witness_integrity_and_ledger_validation():
     assert pool.last_eviction["candidate_id"] == "H3"
     assert pool.last_eviction["v_just"] == "REFUTED"
     assert pool.last_eviction["reason"] == "POOL_CAPACITY_EXCEEDED"
+
+
+# ---------------------------------------------------------------------------
+# LIFE-003 / T1-EPISTEMIC-PATCH-001 Tests
+# ---------------------------------------------------------------------------
+def test_epistemic_patch_observed_and_shadow_cannot_authorize_commit():
+    """Negative Test (Items 1 & 5): Genuine OBSERVED or AUDIT_SHADOW records
+    in Ledger NEVER permit COMMIT even with arbitrary high witness_support_score.
+    """
+    gate = SankalpaGate(require_structured_witness=True, witness_support_min_score=0.60)
+    ledger = SaksinLedger()
+    clk = LifeClock()
+
+    # 1. OBSERVED record in ledger
+    obs_rec = ledger.append_entry(
+        record_type="OBSERVED",
+        payload={"query": 1, "prediction": 2, "entropy": 0.85},
+        clock=clk,
+    )
+    # Authenticity in ledger is valid
+    is_valid, _ = ledger.verify_witness_reference(obs_rec["entry_hash"])
+    assert is_valid is True
+
+    # High support score MUST NOT authorize COMMIT (strictly CLASS_ONLY)
+    d_ep, zero_tripped = gate.evaluate_epistemic_channel(
+        witness_ref=obs_rec["entry_hash"],
+        witness_support_score=0.99,  # Arbitrarily high caller score
+        ledger=ledger,
+    )
+    assert d_ep != "COMMIT", "Authentic OBSERVED record must NEVER authorize COMMIT!"
+    assert d_ep == "CLASS_ONLY"
+    assert zero_tripped is False
+
+    # Also via full decide() interface
+    dec = gate.decide(
+        candidate_action=2,
+        witness_ref=obs_rec["entry_hash"],
+        witness_support_score=0.99,
+        ledger=ledger,
+    )
+    assert dec.epistemic_channel != "COMMIT"
+    assert dec.epistemic_channel == "CLASS_ONLY"
+    assert dec.operational_channel == 2
+
+    # 2. AUDIT_SHADOW record in ledger
+    shadow_rec = ledger.append_entry(
+        record_type="AUDIT_SHADOW",
+        payload={"world_step": 1, "reward": 1.0, "done": False},
+        clock=clk,
+    )
+    is_valid_shadow, _ = ledger.verify_witness_reference(shadow_rec["entry_hash"])
+    assert is_valid_shadow is True
+
+    d_ep_sh, zero_tripped_sh = gate.evaluate_epistemic_channel(
+        witness_ref=shadow_rec["entry_hash"],
+        witness_support_score=0.99,
+        ledger=ledger,
+    )
+    assert d_ep_sh != "COMMIT", "AUDIT_SHADOW record must NEVER authorize COMMIT!"
+    assert d_ep_sh == "ABSTAIN"
+    assert zero_tripped_sh is True
+
+
+def test_epistemic_patch_missing_ledger_fails_closed_abstain():
+    """Item 3: When require_structured_witness=True and ledger is None,
+    evaluate_epistemic_channel fails closed to ABSTAIN with zero-witness guard tripped.
+    """
+    gate = SankalpaGate(require_structured_witness=True)
+    d_ep, zero_tripped = gate.evaluate_epistemic_channel(
+        witness_ref="0" * 64,
+        witness_support_score=0.99,
+        ledger=None,
+    )
+    assert d_ep == "ABSTAIN"
+    assert zero_tripped is True
+
+    # decide() also returns ABSTAIN
+    dec = gate.decide(
+        candidate_action=1,
+        witness_ref="0" * 64,
+        witness_support_score=0.99,
+        ledger=None,
+    )
+    assert dec.epistemic_channel == "ABSTAIN"
+    assert dec.zero_witness_guard_tripped is True
+
+
+def test_epistemic_patch_ledger_integrity_seq_and_prev_hash():
+    """Item 4: Ledger integrity checks seq == len(records) and prev_hash matches computed hash."""
+    ledger = SaksinLedger(genesis_config_sha="a" * 64)
+    clk = LifeClock()
+    ledger.append_entry("OBSERVED", {"query": 1}, clk)
+    ledger.append_entry("OBSERVED", {"query": 2}, clk)
+    assert ledger.validate_integrity() is True
+
+    # 1. Mutate seq
+    ledger.seq = 999
+    assert ledger.validate_integrity() is False
+    ledger.seq = len(ledger.records)
+    assert ledger.validate_integrity() is True
+
+    # 2. Mutate prev_hash
+    real_prev = ledger.prev_hash
+    ledger.prev_hash = "f" * 64
+    assert ledger.validate_integrity() is False
+    ledger.prev_hash = real_prev
+    assert ledger.validate_integrity() is True
+
+
+def test_epistemic_patch_sidecar_neural_entropy_terminology():
+    """Item 6: Sidecar deliberation terminology reflects neural prediction entropy selection,
+    not empirical future outcome comparison.
+    """
+    core = SixEchelonCore(seed=42)
+    pool = SidecarPool()
+    rng = np.random.default_rng(123)
+    stim = np.zeros(8)
+    stim[1] = 1.0
+
+    res = pool.run_deliberation(core, stim, rng, num_clones=3)
+    assert res["selection_criterion"] == "MINIMAL_NEURAL_PREDICTION_ENTROPY"
+    assert res["divergence_mechanism"] in (
+        "MULTI_BRANCH_PREDICTION_ENTROPY_SELECTION",
+        "CONCORDANT_PREDICTION",
+    )
+    # Ensure misleading term is completely absent
+    assert res["divergence_mechanism"] != "MULTI_CANDIDATE_OUTCOME_COMPARISON"
+    assert "epistemic_disclaimer" in res
+

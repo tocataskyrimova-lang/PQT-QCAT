@@ -218,6 +218,7 @@ def run_t1_experiment(
             "uncertainty_real": res_real_a["trigger"]["components"]["uncertainty"],
             "energy_deficit_real": res_real_a["trigger"]["components"]["energy_deficit"],
             "divergence_mechanism": res_real_a["deliberation"]["divergence_mechanism"],
+            "selection_criterion": res_real_a["deliberation"].get("selection_criterion", "MINIMAL_NEURAL_PREDICTION_ENTROPY"),
             "clones_executed": res_real_a["deliberation"]["clones_executed"],
         },
         "verdict": "PASS" if (a_live != a_sidecar and real_act_a != real_act_b and z_pre == z_post and k_pre == k_post and rng_pre == rng_post) else "FAIL",

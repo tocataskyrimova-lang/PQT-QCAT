@@ -4,6 +4,12 @@ Supports:
 1. single_sidecar_reader: strictly single Z0-64 branch evaluation.
 2. run_deliberation: multi-candidate branch deliberation where requested clone count
    strictly matches the actual number of executed branches.
+
+Epistemic Status (EPISTEMIC-PATCH-001):
+Sidecar deliberation compares internal neural prediction entropy across alternative
+candidate rollouts (selection_criterion: MINIMAL_NEURAL_PREDICTION_ENTROPY).
+This is an internal neural prediction selection, NOT a proven causal comparison
+of actual future world consequences or outcomes.
 """
 from __future__ import annotations
 import copy
@@ -181,7 +187,7 @@ class SidecarPool:
         live_pred = int(np.argmax(live_logits)) + 1
         if best_branch["prediction"] != live_pred:
             if clones_to_run > 1:
-                mechanism = "MULTI_CANDIDATE_OUTCOME_COMPARISON"
+                mechanism = "MULTI_BRANCH_PREDICTION_ENTROPY_SELECTION"
             else:
                 mechanism = "READOUT_RELAXATION_Z0_64"
         else:
@@ -201,5 +207,7 @@ class SidecarPool:
             "sidecar_probabilities": best_branch["probabilities"],
             "sidecar_entropy": best_branch["entropy"],
             "divergence_mechanism": mechanism,
+            "selection_criterion": "MINIMAL_NEURAL_PREDICTION_ENTROPY",
+            "epistemic_disclaimer": "Comparison of candidate neural prediction entropies; not a validated world outcome comparison.",
             "main_unmutated": True,
         }

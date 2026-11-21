@@ -82,6 +82,37 @@ class SaksinLedger:
         self.seq += 1
         return record
 
+    def append_verified_feedback(
+        self,
+        hypothesis_id: str | None,
+        action: int | str,
+        result: Any,
+        provenance: str | dict[str, Any],
+        applicability_domain: str | dict[str, Any],
+        support_score: float = 1.0,
+        confirmed: bool = True,
+        clock: LifeClock | None = None,
+    ) -> dict[str, Any]:
+        """Append a strictly verified feedback record to the ledger.
+        
+        Requires explicit provenance, action/result outcome, and applicability domain.
+        """
+        payload = {
+            "hypothesis_id": hypothesis_id,
+            "action": action,
+            "result": result,
+            "provenance": provenance,
+            "applicability_domain": applicability_domain,
+            "support_score": float(support_score),
+            "confirmed": bool(confirmed),
+        }
+        clk = clock or LifeClock()
+        return self.append_entry(
+            record_type="VERIFIED_FEEDBACK",
+            payload=payload,
+            clock=clk,
+        )
+
     def get_entry(self, entry_hash: str) -> dict[str, Any] | None:
         """Find record by its entry_hash."""
         for rec in self.records:
@@ -130,7 +161,16 @@ class SaksinLedger:
         return True, "WITNESS_VALID"
 
     def validate_integrity(self) -> bool:
-        """Verify the cryptographic hash-chain across all historical records."""
+        """Verify the cryptographic hash-chain across all historical records.
+        
+        CRITICAL EPISTEMIC CHECK (Item 4):
+        - self.seq must strictly equal len(self.records).
+        - self.prev_hash must strictly match the computed final record hash
+          (or '0'*64 if empty).
+        """
+        if self.seq != len(self.records):
+            return False
+
         expected_prev = "0" * 64
         for idx, rec in enumerate(self.records):
             if rec["seq"] != idx:
@@ -152,6 +192,9 @@ class SaksinLedger:
                 return False
 
             expected_prev = rec["entry_hash"]
+
+        if self.prev_hash != expected_prev:
+            return False
 
         return True
 

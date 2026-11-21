@@ -1,10 +1,11 @@
 {
   "git_branch": "exp/life-003-continuous-thought-001",
   "git_commit": "06fbd5b7e6fcc224619d19b78ded716f74694a08",
-  "manifest_version": "1.1",
-  "task": "LIFE-003 / CONTINUOUS-THOUGHT-001 (T0+T1 + T1-FIX-001 Audit Resolution)",
+  "manifest_version": "1.2",
+  "task": "LIFE-003 / CONTINUOUS-THOUGHT-001 (T0+T1 + T1-FIX-001 + T1-EPISTEMIC-PATCH-001)",
   "hashes": {
     "LIFE_003_THOUGHT_LOOP_ARCH.md": "afb7e2b7ea4d2c682f6c52f24bf68e54ed82eee583a522a8508d713df492ac55",
+    "T1-EPISTEMIC-PATCH-001_REPORT.md": "b2df60bdb6ff14c482145479848f9a9b0adabe223d631a73ec5b0d3f614d3fb0",
     "T1-FIX-001_REPORT.md": "f38bb98079de9ec69b9eaca518cad0a20faaca19498628a78cc0b1f9c8c149e1",
     "T1_REPORT_RU.md": "14e253025d15ee39154a7060449c588f22c8bd18bb7f4ff4f84bc0e24fffe2d7",
     "configs/life003_t1_prereg.yaml": "09efa0a3a497dbc33637fd99921d23e42f799576555deb6d85af4a9642ea683e",
@@ -14,10 +15,10 @@
     "life003/clock.py": "6e246b1fb1918650b3f499f363c403eb2b9e4766aed1dda98e57f8afb1bdadc8",
     "life003/config.py": "b37ebf7f43d39db03a8ee6d1ce52692dad977fa73adea4992dd7a1c65c3c88d3",
     "life003/hypotheses.py": "16180bcd539e0a768df7f97dd6cefef2127a4781decc0e370e3bac5eb77628c7",
-    "life003/ledger.py": "68e4347c3adbdbb2eaa7ff250dc3e4ea852fdbcb0512b86c83aee924682652fd",
-    "life003/sankalpa.py": "8cfe8a619d090d60d4b0f0e393c8b1a6a6f5ff9200ae32b8f0a1a80e8e9a244c",
+    "life003/ledger.py": "756dd08de9a4070c0651b699615d5a0f510735144de933180a05aff9c226c463",
+    "life003/sankalpa.py": "1ca032d3ae76e0412cf324e66710b422123292377b81063f41e635fecf14ea67",
     "life003/scheduler.py": "739a2bea3d7e55ddffbe2cf35e6a14d120a69b82d694827935c1228f9fa4a3b7",
-    "life003/sidecar_pool.py": "a67fdd41ca3ef52e0f52862f2412727b926fe49cb69ef13f3fa5a879b063dbe3",
+    "life003/sidecar_pool.py": "cf8863b18348280102ac6d7fc6772a2055cf97f1b3e681c386d84a4aa9924723",
     "life003/trigger.py": "dbe8deee5a30906bebaee60b2631437bb66c91c2620a67ed88ed44004e80d7d9",
     "pqt_qcat/core/security.py": "157c0cf78506649b4fbaf4ec5c65fcd2e5395e5f043c033c792f3dafcff0ceaa",
     "pqt_qcat/core/six_echelon.py": "54dc6f7346a7f5c46410be637371843693b9281609956b5928536f1820e5aaab",
@@ -39,7 +40,7 @@
     "results/THOUGHT_LOOP_T1/resume_verification.json": "29b5a33e5ad94d56bd08d0efe36b434f06b5818b3bbed6627a5353ed105e372d",
     "results/THOUGHT_LOOP_T1/thought_stream.jsonl": "29a02ca82dabaa66cc74a97b1f8c0c7dff62718664cc9f7ec6d592f39705a6a7",
     "results/THOUGHT_LOOP_T1/trigger_on_vs_off.json": "34414b617c942954fc48523299f61a421e4fb50b9484f7fbcd9c7ced6bac9c25",
-    "scripts/run_t1_heartbeat.py": "0ae3c6be3d92f5ac1e536e9da9e6dd50008e6bea2d3f1de0ad458ae4e7a72524",
-    "tests/test_continuous_life.py": "c93e5518b022704f642d27d70deb0d54d11bcf074c15523736dffe686a1364c2"
+    "scripts/run_t1_heartbeat.py": "86a08ab0981835e85f1d413e49d875ec9f0516d62763f0b9fd1061d3d3b38580",
+    "tests/test_continuous_life.py": "d5c316fbd368bcc1c8a824d185fee997ebf7eb3412da7a32e0ff102eb8bdaa4a"
   }
 }
