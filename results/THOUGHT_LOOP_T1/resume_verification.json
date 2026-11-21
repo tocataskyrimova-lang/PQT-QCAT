@@ -1,34 +1,39 @@
 {
   "resume_tick": 5000,
-  "checkpoint_hash_pre": "98dc003eeea319654b63debd6542522c1a71c63cf623aebff600833c772cfa51",
-  "checkpoint_hash_post": "98dc003eeea319654b63debd6542522c1a71c63cf623aebff600833c772cfa51",
+  "checkpoint_hash_pre": "73f34556483783a26cfe17528a9bec7778e3d84f5c8dad441976383c713606a5",
+  "checkpoint_hash_post": "73f34556483783a26cfe17528a9bec7778e3d84f5c8dad441976383c713606a5",
   "step_discrepancy_count": 0,
-  "total_verified_ticks": 4125,
+  "subtick_discrepancy_count": 0,
+  "verified_scheduler_steps": 4125,
+  "verified_physical_ticks": 5000,
+  "verified_interior_query_subticks": 875,
+  "all_5000_physical_ticks_identical": true,
+  "total_verified_ticks": 5000,
   "status": "PASS",
   "periodic_checkpoints": {
     "2000": {
       "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_2000.npz",
-      "state_hash": "411b1af50e1e4d2674aa03ffa7a66c520534dccba5ed67550b425a4b23b52cea"
+      "state_hash": "12e1a2870f1309bdc8e64e75266614e889a09d66a7fc6c1eb013362c6b5f3cfa"
     },
     "4000": {
       "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_4000.npz",
-      "state_hash": "4a1f234362accc9333c6444834c8a57ada7364fde82c68f344861bebaa929148"
+      "state_hash": "03d1d33eb208ddd0129ccba9d334d44b5608ee4fbc21faba71f7413ad4042942"
     },
     "6000": {
       "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_6000.npz",
-      "state_hash": "e062ae4995b2dd130f1db7001be435a98ae22172a8812ae09de8f9a3af65df49"
+      "state_hash": "15760ba78e08bc94afcd0ca99dd0fc524807fe0b564b19f5ec7ed172335e8de6"
     },
     "8000": {
       "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_8000.npz",
-      "state_hash": "597002fde0dfbfe03e12a16c555c3c30254653d3ea7e083e2df26c4deb723fbc"
+      "state_hash": "d528b8a8ad5143b55ff7f4131f1df96863c4a0cebc28b3fd465012da09422e34"
     },
     "10000": {
       "path": "C:\\AGI\\PQT-QCAT\\results\\THOUGHT_LOOP_T1\\checkpoint_10000.npz",
-      "state_hash": "c4f69033ad931ddbcca48e59ed7769b23e65ea87ed7f0d923a1bfc52288c6716"
+      "state_hash": "4dafceef8912cd8f383f5ef54d7f5621b665bf1d7336f95bf94707612a6956e5"
     }
   },
   "total_ticks_run": 10000,
-  "final_state_hash": "c4f69033ad931ddbcca48e59ed7769b23e65ea87ed7f0d923a1bfc52288c6716",
+  "final_state_hash": "4dafceef8912cd8f383f5ef54d7f5621b665bf1d7336f95bf94707612a6956e5",
   "ledger_chain_valid": true,
   "total_ledger_records": 793,
   "total_deliberations": 150

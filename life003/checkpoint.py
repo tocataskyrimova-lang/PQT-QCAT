@@ -8,6 +8,7 @@ import copy
 import hashlib
 import json
 from pathlib import Path
+import struct
 from typing import Any
 import numpy as np
 
@@ -48,27 +49,62 @@ def unpack_state(val: Any, arrays: Any) -> Any:
         return val
 
 
+def canonical_encode(val: Any) -> bytes:
+    """Type-tagged, length-prefixed canonical binary serialization.
+    
+    Guarantees injectivity across types, boundaries, and sequence elements:
+    - [1, 23] vs [12, 3] -> distinct digests
+    - 1 vs "1" -> distinct digests
+    - True vs 1 -> distinct digests
+    - [1, 2] vs (1, 2) -> distinct digests
+    - None vs "None" -> distinct digests
+    - numpy.ndarray -> (tag="A", dtype, shape, len(bytes), raw_bytes)
+    - dict -> sorted keys, (tag="D", len(keys), key_enc, val_enc)
+    """
+    if val is None:
+        return b"N;"
+    if isinstance(val, bool):
+        return b"B:1;" if val else b"B:0;"
+    if isinstance(val, (int, np.integer)):
+        s = str(int(val)).encode("ascii")
+        return b"I:" + str(len(s)).encode("ascii") + b":" + s + b";"
+    if isinstance(val, (float, np.floating)):
+        return b"F:" + struct.pack(">d", float(val)) + b";"
+    if isinstance(val, str):
+        s_bytes = val.encode("utf-8")
+        return b"S:" + str(len(s_bytes)).encode("ascii") + b":" + s_bytes + b";"
+    if isinstance(val, (bytes, bytearray)):
+        b_bytes = bytes(val)
+        return b"Y:" + str(len(b_bytes)).encode("ascii") + b":" + b_bytes + b";"
+    if isinstance(val, np.ndarray):
+        dt = val.dtype.str.encode("ascii")
+        sh = ",".join(str(x) for x in val.shape).encode("ascii")
+        raw = val.tobytes()
+        return (
+            b"A:" + str(len(dt)).encode("ascii") + b":" + dt +
+            b":" + str(len(sh)).encode("ascii") + b":" + sh +
+            b":" + str(len(raw)).encode("ascii") + b":" + raw + b";"
+        )
+    if isinstance(val, list):
+        items = b"".join(canonical_encode(x) for x in val)
+        return b"L:" + str(len(val)).encode("ascii") + b"[" + items + b"];"
+    if isinstance(val, tuple):
+        items = b"".join(canonical_encode(x) for x in val)
+        return b"T:" + str(len(val)).encode("ascii") + b"(" + items + b");"
+    if isinstance(val, dict):
+        keys = sorted(val.keys(), key=lambda k: str(k))
+        k_enc = []
+        for k in keys:
+            k_enc.append(canonical_encode(str(k)))
+            k_enc.append(canonical_encode(val[k]))
+        content = b"".join(k_enc)
+        return b"D:" + str(len(keys)).encode("ascii") + b"{" + content + b"};"
+    raise TypeError(f"Unsupported type for canonical encoding: {type(val)}")
+
+
 def compute_state_hash(state: dict[str, Any]) -> str:
-    """Compute deterministic SHA-256 digest of organism state."""
-    hasher = hashlib.sha256()
-
-    def walk(val):
-        if isinstance(val, np.ndarray):
-            hasher.update(str(val.dtype).encode("utf-8"))
-            hasher.update(str(val.shape).encode("utf-8"))
-            hasher.update(val.tobytes())
-        elif isinstance(val, dict):
-            for k in sorted(val.keys()):
-                hasher.update(str(k).encode("utf-8"))
-                walk(val[k])
-        elif isinstance(val, (list, tuple)):
-            for item in val:
-                walk(item)
-        else:
-            hasher.update(str(val).encode("utf-8"))
-
-    walk(state)
-    return hasher.hexdigest()
+    """Compute deterministic, strictly injective SHA-256 digest of organism state."""
+    return hashlib.sha256(canonical_encode(state)).hexdigest()
 
 
 def save_checkpoint(filepath: str | Path, state: dict[str, Any]) -> str:

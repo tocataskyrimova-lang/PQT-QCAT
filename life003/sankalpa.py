@@ -91,8 +91,24 @@ class SankalpaGate:
                     # AUDIT_SHADOW, HYPOTHESIS, EVICTED, etc. cannot act as epistemic witness
                     return "ABSTAIN", True
 
-            # Requirement 2: VERIFIED_FEEDBACK validation
-            # 2a. Provenance check
+            # Requirement 2: Strict whitelist fail-closed VERIFIED_FEEDBACK validation
+            # All 4 conditions are mandatory simultaneously for COMMIT authorization:
+            
+            # Condition 1: Strict boolean confirmed is True
+            confirmed = payload.get("confirmed")
+            if not (isinstance(confirmed, bool) and confirmed is True):
+                return "ABSTAIN", True
+            if payload.get("status") in ("REFUTED", "REJECTED", "FAILED", "CONFLICTED"):
+                return "ABSTAIN", True
+
+            # Condition 2: result present and non-empty
+            result = payload.get("result")
+            if result is None or (isinstance(result, (str, list, tuple, dict, set)) and len(result) == 0):
+                return "ABSTAIN", True
+
+            # Condition 3: provenance, action, domain ALL present, non-empty on both sides and match strictly
+            # 3a. Provenance check
+            rec_prov = payload.get("provenance") or payload.get("hypothesis_id") or payload.get("candidate_id")
             hyp_id = None
             if hypothesis is not None:
                 hyp_id = getattr(hypothesis, "candidate_id", None)
@@ -100,35 +116,47 @@ class SankalpaGate:
                     hyp_id = hypothesis.get("candidate_id")
                 elif hyp_id is None and isinstance(hypothesis, str):
                     hyp_id = hypothesis
+            elif context is not None:
+                hyp_id = context.get("provenance") or context.get("candidate_id") or context.get("hypothesis_id")
 
-            rec_prov = payload.get("provenance") or payload.get("hypothesis_id") or payload.get("candidate_id")
-            if hyp_id is not None and rec_prov is not None:
-                if rec_prov != "*" and rec_prov != hyp_id:
-                    if isinstance(rec_prov, (list, tuple, set)):
-                        if hyp_id not in rec_prov:
-                            return "ABSTAIN", True
-                    else:
-                        return "ABSTAIN", True
+            if not rec_prov or not hyp_id:
+                return "ABSTAIN", True
+            if isinstance(rec_prov, str) and not rec_prov.strip():
+                return "ABSTAIN", True
+            if isinstance(hyp_id, str) and not str(hyp_id).strip():
+                return "ABSTAIN", True
 
-            # 2b. Outcome / action check
+            if isinstance(rec_prov, (list, tuple, set)):
+                if hyp_id not in rec_prov:
+                    return "ABSTAIN", True
+            else:
+                if str(rec_prov) != str(hyp_id):
+                    return "ABSTAIN", True
+
+            # 3b. Outcome / action check
+            rec_act = payload.get("action")
+            if rec_act is None:
+                rec_act = payload.get("candidate_action")
+
             target_act = candidate_action
             if target_act is None and hypothesis is not None:
                 target_act = getattr(hypothesis, "action_candidate", None)
                 if target_act is None and isinstance(hypothesis, dict):
                     target_act = hypothesis.get("action_candidate")
+            elif target_act is None and context is not None:
+                target_act = context.get("action") or context.get("candidate_action")
 
-            rec_act = payload.get("action") or payload.get("candidate_action")
-            if target_act is not None and rec_act is not None:
-                if str(target_act) != str(rec_act):
-                    return "ABSTAIN", True
-
-            # Check outcome confirmation status
-            if payload.get("confirmed") is False or payload.get("status") in (
-                "REFUTED", "REJECTED", "FAILED", "CONFLICTED"
-            ):
+            if rec_act is None or target_act is None:
+                return "ABSTAIN", True
+            if isinstance(rec_act, str) and not rec_act.strip():
+                return "ABSTAIN", True
+            if isinstance(target_act, str) and not str(target_act).strip():
                 return "ABSTAIN", True
 
-            # 2c. Applicability domain check
+            if str(target_act) != str(rec_act):
+                return "ABSTAIN", True
+
+            # 3c. Applicability domain check
             rec_domain = payload.get("applicability_domain") or payload.get("domain") or payload.get("context")
             hyp_domain = None
             if context is not None:
@@ -137,12 +165,20 @@ class SankalpaGate:
                 hyp_ctx = getattr(hypothesis, "context", None)
                 if isinstance(hyp_ctx, dict):
                     hyp_domain = hyp_ctx.get("applicability_domain") or hyp_ctx.get("domain") or hyp_ctx.get("query")
+                elif isinstance(hyp_ctx, str):
+                    hyp_domain = hyp_ctx
 
-            if hyp_domain is not None and rec_domain is not None:
-                if rec_domain != "*" and rec_domain != hyp_domain:
-                    return "ABSTAIN", True
+            if not rec_domain or not hyp_domain:
+                return "ABSTAIN", True
+            if isinstance(rec_domain, str) and not str(rec_domain).strip():
+                return "ABSTAIN", True
+            if isinstance(hyp_domain, str) and not str(hyp_domain).strip():
+                return "ABSTAIN", True
 
-            # 2d. Verified evidence score (must come from ledger payload, not caller parameter)
+            if str(rec_domain) != str(hyp_domain):
+                return "ABSTAIN", True
+
+            # Condition 4: Verified evidence score (must come from ledger payload, not caller parameter)
             if "support_score" in payload:
                 verified_score = float(payload["support_score"])
             elif "confidence" in payload:

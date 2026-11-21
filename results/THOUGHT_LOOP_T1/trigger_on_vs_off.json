@@ -53,7 +53,8 @@
     "surprise_proxy_real": 0.4129511409473562,
     "uncertainty_real": 0.9972841150979309,
     "energy_deficit_real": 0.0,
-    "divergence_mechanism": "MULTI_CANDIDATE_OUTCOME_COMPARISON",
+    "divergence_mechanism": "MULTI_BRANCH_PREDICTION_ENTROPY_SELECTION",
+    "selection_criterion": "MINIMAL_NEURAL_PREDICTION_ENTROPY",
     "clones_executed": 3
   },
   "verdict": "PASS"

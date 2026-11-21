@@ -8,9 +8,54 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pqt_qcat.core.six_echelon import SixEchelonCore
 from life003.config import load_and_validate_prereg_config
 from life003.scheduler import ContinuousLifeOrganism, array_hash
 from life003.checkpoint import compute_state_hash, save_checkpoint, load_checkpoint
+
+
+class PhysicalStepObserver:
+    """Non-destructive observer comparing MAIN physical core steps between uninterrupted and resumed organism."""
+    def __init__(self, org_main: ContinuousLifeOrganism, org_clone: ContinuousLifeOrganism):
+        self.org_main = org_main
+        self.org_clone = org_clone
+        self.total_physical_steps_observed = 0
+        self.interior_query_subticks_observed = 0
+        self.scheduler_steps_observed = 0
+        self.subtick_discrepancies = 0
+        self.step_discrepancies = 0
+
+        self.orig_class_step = SixEchelonCore.step
+        self._pending_main_snaps = []
+
+        observer = self
+
+        def wrapped_step(core_self, *args, **kwargs):
+            res = observer.orig_class_step(core_self, *args, **kwargs)
+            if core_self is observer.org_main.core:
+                snap = {
+                    "Z_hash": array_hash(core_self.Z),
+                    "K_hash": array_hash(core_self.K),
+                    "rng_state": copy.deepcopy(core_self.rng.bit_generator.state),
+                }
+                observer._pending_main_snaps.append(snap)
+            elif core_self is observer.org_clone.core:
+                observer.total_physical_steps_observed += 1
+                if observer._pending_main_snaps:
+                    main_snap = observer._pending_main_snaps.pop(0)
+                    clone_z = array_hash(core_self.Z)
+                    clone_k = array_hash(core_self.K)
+                    clone_rng = copy.deepcopy(core_self.rng.bit_generator.state)
+                    if (clone_z != main_snap["Z_hash"] or 
+                        clone_k != main_snap["K_hash"] or 
+                        clone_rng != main_snap["rng_state"]):
+                        observer.subtick_discrepancies += 1
+            return res
+
+        SixEchelonCore.step = wrapped_step
+
+    def unwrap(self):
+        SixEchelonCore.step = self.orig_class_step
 
 
 def run_t1_experiment(
@@ -33,18 +78,24 @@ def run_t1_experiment(
         "checkpoint_hash_pre": None,
         "checkpoint_hash_post": None,
         "step_discrepancy_count": 0,
+        "subtick_discrepancy_count": 0,
+        "verified_scheduler_steps": 0,
+        "verified_physical_ticks": 0,
+        "verified_interior_query_subticks": 0,
+        "all_5000_physical_ticks_identical": False,
         "total_verified_ticks": 0,
         "status": "PENDING",
     }
 
     org_resumed: ContinuousLifeOrganism | None = None
+    observer: PhysicalStepObserver | None = None
     resumed_matched = True
 
     event_counter = 0
     jsonl_path = output_dir / "thought_stream.jsonl"
     print(f"Beginning 10,000 physical tick execution loop to {jsonl_path}...")
 
-    with open(jsonl_path, "w", encoding="utf-8") as f_out:
+    with open(jsonl_path, mode="w", encoding="utf-8", newline="\n") as f_out:
         while org.clock.core_tick < total_target_ticks:
             current_tick = org.clock.core_tick
 
@@ -67,6 +118,9 @@ def run_t1_experiment(
                 assert h_clone == h_pre, "Cloned organism state hash diverged from pre-resume!"
                 print(f"[Tick {current_tick}] Checkpoint verified: SHA-256 = {h_pre}")
 
+                # Attach non-destructive physical step observer
+                observer = PhysicalStepObserver(org, org_resumed)
+
             # Check periodic checkpoints
             if current_tick > 0 and current_tick % checkpoint_interval == 0 and current_tick not in periodic_checkpoints:
                 ckpt_p = output_dir / f"checkpoint_{current_tick}.npz"
@@ -84,6 +138,8 @@ def run_t1_experiment(
                 log_entry = org.execute_physical_tick(event_query=query_token)
                 if org_resumed is not None:
                     log_entry_res = org_resumed.execute_physical_tick(event_query=query_token)
+                    if observer is not None:
+                        observer.interior_query_subticks_observed += (org.t_query - 1)
             else:
                 log_entry = org.execute_physical_tick(event_query=None)
                 if org_resumed is not None:
@@ -95,12 +151,28 @@ def run_t1_experiment(
             # Verification of resumed clone against uninterrupted continuation:
             # FIX-1: Compare COMPLETE dictionary states via deterministic state hash
             if org_resumed is not None:
-                resume_verification["total_verified_ticks"] += 1
+                if observer is not None:
+                    observer.scheduler_steps_observed += 1
                 h_org = compute_state_hash(org.capture_full_state())
                 h_res = compute_state_hash(org_resumed.capture_full_state())
                 if h_org != h_res:
-                    resume_verification["step_discrepancy_count"] += 1
+                    if observer is not None:
+                        observer.step_discrepancies += 1
                     resumed_matched = False
+
+    if observer is not None:
+        observer.unwrap()
+        resume_verification["verified_scheduler_steps"] = observer.scheduler_steps_observed
+        resume_verification["verified_physical_ticks"] = observer.total_physical_steps_observed
+        resume_verification["verified_interior_query_subticks"] = observer.interior_query_subticks_observed
+        resume_verification["step_discrepancy_count"] = observer.step_discrepancies
+        resume_verification["subtick_discrepancy_count"] = observer.subtick_discrepancies
+        resume_verification["all_5000_physical_ticks_identical"] = (
+            observer.total_physical_steps_observed == 5000 and 
+            observer.subtick_discrepancies == 0 and 
+            observer.step_discrepancies == 0
+        )
+        resume_verification["total_verified_ticks"] = observer.total_physical_steps_observed
 
     # Save final periodic checkpoint at 10,000
     final_ckpt = output_dir / f"checkpoint_{org.clock.core_tick}.npz"
@@ -108,9 +180,13 @@ def run_t1_experiment(
     periodic_checkpoints[org.clock.core_tick] = {"path": str(final_ckpt), "state_hash": h_final}
     print(f"[Tick {org.clock.core_tick}] Final checkpoint saved: {h_final}")
 
-    resume_verification["status"] = "PASS" if (resumed_matched and resume_verification["step_discrepancy_count"] == 0) else "FAIL"
+    resume_verification["status"] = (
+        "PASS"
+        if (resumed_matched and resume_verification["step_discrepancy_count"] == 0 and resume_verification["subtick_discrepancy_count"] == 0)
+        else "FAIL"
+    )
 
-    with open(output_dir / "resume_verification.json", "w", encoding="utf-8") as f_res:
+    with open(output_dir / "resume_verification.json", mode="w", encoding="utf-8", newline="\n") as f_res:
         json.dump(
             {
                 **resume_verification,
@@ -224,7 +300,7 @@ def run_t1_experiment(
         "verdict": "PASS" if (a_live != a_sidecar and real_act_a != real_act_b and z_pre == z_post and k_pre == k_post and rng_pre == rng_post) else "FAIL",
     }
 
-    with open(output_dir / "trigger_on_vs_off.json", "w", encoding="utf-8") as f_t19:
+    with open(output_dir / "trigger_on_vs_off.json", mode="w", encoding="utf-8", newline="\n") as f_t19:
         json.dump(t19_log, f_t19, indent=2)
     print("Test 19 & FIX-3 paired log saved: trigger_on_vs_off.json")
     print("Heartbeat T1 execution finished successfully.")

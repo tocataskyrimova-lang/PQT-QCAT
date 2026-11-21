@@ -1,8 +1,7 @@
 __pycache__/
 *.pyc
 *.tmp
-results/*
-!results/THOUGHT_LOOP_T1/
+results/
 long_results/
 temporal_results/
 runtime/
