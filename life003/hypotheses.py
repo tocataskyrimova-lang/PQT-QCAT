@@ -48,6 +48,62 @@ class Hypothesis:
             self.s_fresh = "FRESH"
 
 
+def _validate_supported_witness(
+    candidate_id: str,
+    action_candidate: int | str,
+    witness_ref: str | None,
+    ledger: Any | None,
+    context: dict[str, Any] | None = None,
+    is_audit: bool = False,
+) -> None:
+    """Enforce fail-closed verification for any candidate promoting to or registering as SUPPORTED.
+    
+    All conditions must hold simultaneously:
+    1. witness_ref must be non-empty.
+    2. ledger must be provided and authentic.
+    3. witness_ref must exist in ledger with valid cryptographic hash chain.
+    4. record_type must be VERIFIED_FEEDBACK.
+    5. payload['confirmed'] must be strict boolean True (False or truthy int rejected).
+    6. payload['result'] must be present and non-empty.
+    7. Candidate action, id, and domain must match strictly if present.
+    """
+    if not witness_ref or not str(witness_ref).strip():
+        if is_audit:
+            raise ValueError(f"Cannot promote candidate '{candidate_id}' to SUPPORTED without a valid witness_ref")
+        else:
+            raise ValueError(f"Cannot register hypothesis with v_just='SUPPORTED' without a non-empty witness_ref")
+    if ledger is None:
+        raise ValueError(f"Cannot establish v_just='SUPPORTED' for candidate '{candidate_id}' without an authentic ledger")
+
+    is_valid, reason = ledger.verify_witness_reference(witness_ref)
+    if not is_valid:
+        raise ValueError(f"Witness reference '{witness_ref}' not verified in ledger: {reason}")
+    rec = ledger.get_entry(witness_ref)
+    if rec is None or rec.get("record_type") != "VERIFIED_FEEDBACK":
+        raise ValueError(f"Witness reference '{witness_ref}' is not a VERIFIED_FEEDBACK record")
+
+    payload = rec.get("payload", {})
+    if type(payload.get("confirmed")) is not bool or payload.get("confirmed") is not True:
+        raise ValueError(f"Witness record '{witness_ref}' confirmed status is not strict True bool")
+
+    result = payload.get("result")
+    if result is None or (isinstance(result, (str, list, tuple, dict, set)) and len(result) == 0):
+        raise ValueError(f"Witness record '{witness_ref}' has empty result")
+
+    rec_act = payload.get("action") if payload.get("action") is not None else payload.get("candidate_action")
+    if rec_act is not None and str(rec_act) != str(action_candidate):
+        raise ValueError(f"Witness action '{rec_act}' does not match hypothesis action '{action_candidate}'")
+
+    rec_cid = payload.get("hypothesis_id") or payload.get("candidate_id") or payload.get("provenance")
+    if rec_cid is not None and isinstance(rec_cid, str) and rec_cid.strip() and str(rec_cid) != str(candidate_id):
+        raise ValueError(f"Witness candidate '{rec_cid}' does not match hypothesis '{candidate_id}'")
+
+    rec_dom = payload.get("applicability_domain") or payload.get("domain")
+    ctx_dom = context.get("applicability_domain") or context.get("domain") if isinstance(context, dict) else None
+    if rec_dom is not None and ctx_dom is not None and str(rec_dom) != str(ctx_dom):
+        raise ValueError(f"Witness domain '{rec_dom}' does not match hypothesis context domain '{ctx_dom}'")
+
+
 class HypothesisPool:
     """Bounded set of hypotheses |H| <= max_active_hypotheses with auditable lifecycle."""
 
@@ -75,15 +131,22 @@ class HypothesisPool:
         v_just: str = "UNVERIFIED",
         witness_ref: str | None = None,
         context: dict[str, Any] | None = None,
+        ledger: Any | None = None,
     ) -> Hypothesis:
         """Register a new candidate.
         
         CRITICAL FIX-1 & FIX-3:
         - If eviction is required, choose candidate strictly by deterministic (created_seq, candidate_id).
-        - v_just='SUPPORTED' strictly requires a non-empty confirmed witness_ref.
+        - v_just='SUPPORTED' strictly requires a non-empty confirmed witness_ref verified against an authentic ledger.
         """
-        if v_just == "SUPPORTED" and (not witness_ref or not str(witness_ref).strip()):
-            raise ValueError("Cannot register hypothesis with v_just='SUPPORTED' without a non-empty witness_ref")
+        if v_just == "SUPPORTED":
+            _validate_supported_witness(
+                candidate_id=candidate_id,
+                action_candidate=action_candidate,
+                witness_ref=witness_ref,
+                ledger=ledger,
+                context=context,
+            )
 
         eviction_info = None
 
@@ -162,23 +225,22 @@ class HypothesisPool:
     ) -> dict[str, Any] | None:
         """External feedback verifies or refutes hypothesis; resets Spanda staleness.
         
-        CRITICAL FIX-3: Promotion to SUPPORTED strictly requires a valid non-empty witness_ref.
-        If ledger is provided, witness_ref must exist and be of type VERIFIED_FEEDBACK.
+        CRITICAL FIX-3: Promotion to SUPPORTED strictly requires an authentic ledger
+        and a valid non-empty matching VERIFIED_FEEDBACK record.
         """
         if candidate_id in self.hypotheses:
             hyp = self.hypotheses[candidate_id]
             prev_v = hyp.v_just
             if is_supported:
                 eff_witness = witness_ref if witness_ref is not None else hyp.witness_ref
-                if not eff_witness or not str(eff_witness).strip():
-                    raise ValueError(f"Cannot promote candidate '{candidate_id}' to SUPPORTED without a valid witness_ref")
-                if ledger is not None:
-                    is_valid, reason = ledger.verify_witness_reference(eff_witness)
-                    if not is_valid:
-                        raise ValueError(f"Witness reference '{eff_witness}' not verified in ledger: {reason}")
-                    rec = ledger.get_entry(eff_witness)
-                    if rec is None or rec.get("record_type") != "VERIFIED_FEEDBACK":
-                        raise ValueError(f"Witness reference '{eff_witness}' is not a VERIFIED_FEEDBACK record")
+                _validate_supported_witness(
+                    candidate_id=candidate_id,
+                    action_candidate=hyp.action_candidate,
+                    witness_ref=eff_witness,
+                    ledger=ledger,
+                    context=hyp.context,
+                    is_audit=True,
+                )
                 hyp.v_just = "SUPPORTED"
                 hyp.witness_ref = str(eff_witness)
             else:

@@ -97,6 +97,8 @@ class SaksinLedger:
         
         Requires explicit provenance, action/result outcome, and applicability domain.
         """
+        if type(confirmed) is not bool:
+            raise TypeError(f"confirmed must be strict bool, got {type(confirmed).__name__}")
         payload = {
             "hypothesis_id": hypothesis_id,
             "action": action,
@@ -104,7 +106,7 @@ class SaksinLedger:
             "provenance": provenance,
             "applicability_domain": applicability_domain,
             "support_score": float(support_score),
-            "confirmed": bool(confirmed),
+            "confirmed": confirmed,
         }
         clk = clock or LifeClock()
         return self.append_entry(

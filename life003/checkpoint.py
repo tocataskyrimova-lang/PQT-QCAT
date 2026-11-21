@@ -14,37 +14,58 @@ import numpy as np
 
 
 def pack_state(val: Any, arrays: dict[str, np.ndarray], prefix: str = "") -> Any:
-    """Recursively extract all numpy ndarrays for raw npz storage without pickle."""
+    """Recursively extract all numpy ndarrays and tagged types for raw npz storage without pickle."""
     if isinstance(val, np.ndarray):
         arrays[prefix] = val
         return {
             "__ndarray__": prefix,
-            "dtype": str(val.dtype),
+            "descr": canonical_encode(val.dtype.descr).hex(),
             "shape": list(val.shape),
         }
+    elif isinstance(val, (bytes, bytearray)):
+        return {"__bytes__": bytes(val).hex()}
+    elif isinstance(val, tuple):
+        return {
+            "__tuple__": [pack_state(item, arrays, f"{prefix}[{i}]") for i, item in enumerate(val)]
+        }
+    elif isinstance(val, list):
+        return [pack_state(item, arrays, f"{prefix}[{i}]") for i, item in enumerate(val)]
     elif isinstance(val, dict):
+        if any(not isinstance(k, str) for k in val.keys()):
+            return {
+                "__dict_pairs__": [
+                    [pack_state(k, arrays, f"{prefix}/k_{i}"), pack_state(v, arrays, f"{prefix}/v_{i}")]
+                    for i, (k, v) in enumerate(val.items())
+                ]
+            }
         return {
             k: pack_state(v, arrays, f"{prefix}/{k}" if prefix else k)
             for k, v in val.items()
         }
-    elif isinstance(val, (list, tuple)):
-        packed = [pack_state(item, arrays, f"{prefix}[{i}]") for i, item in enumerate(val)]
-        return tuple(packed) if isinstance(val, tuple) else packed
-    else:
+    elif val is None or isinstance(val, (bool, int, float, str, np.integer, np.floating)):
         return val
+    else:
+        raise TypeError(f"Unsupported type for checkpoint serialization: {type(val)}")
 
 
 def unpack_state(val: Any, arrays: Any) -> Any:
-    """Recursively reconstruct state structure and re-insert numpy ndarrays."""
+    """Recursively reconstruct state structure, preserving tuple/dict/bytes types and numpy ndarrays."""
     if isinstance(val, dict):
-        if "__ndarray__" in val:
+        if "__ndarray__" in val and len(val) == 3:
             key = val["__ndarray__"]
             return arrays[key]
+        if "__bytes__" in val and len(val) == 1:
+            return bytes.fromhex(val["__bytes__"])
+        if "__tuple__" in val and len(val) == 1:
+            return tuple(unpack_state(item, arrays) for item in val["__tuple__"])
+        if "__dict_pairs__" in val and len(val) == 1:
+            return {
+                unpack_state(pair[0], arrays): unpack_state(pair[1], arrays)
+                for pair in val["__dict_pairs__"]
+            }
         return {k: unpack_state(v, arrays) for k, v in val.items()}
     elif isinstance(val, list):
         return [unpack_state(item, arrays) for item in val]
-    elif isinstance(val, tuple):
-        return tuple(unpack_state(item, arrays) for item in val)
     else:
         return val
 
@@ -58,8 +79,10 @@ def canonical_encode(val: Any) -> bytes:
     - True vs 1 -> distinct digests
     - [1, 2] vs (1, 2) -> distinct digests
     - None vs "None" -> distinct digests
-    - numpy.ndarray -> (tag="A", dtype, shape, len(bytes), raw_bytes)
-    - dict -> sorted keys, (tag="D", len(keys), key_enc, val_enc)
+    - {1: "a"} vs {"1": "a"} -> distinct digests (recursive key canonical_encode)
+    - numpy structured dtypes with different field names -> distinct digests (canonical_encode of descr)
+    - numpy.ndarray -> (tag="A", descr_enc, shape, len(bytes), raw_bytes)
+    - dict -> sorted by canonical bytes of keys, (tag="D", len(pairs), key_enc + val_enc)
     """
     if val is None:
         return b"N;"
@@ -77,11 +100,11 @@ def canonical_encode(val: Any) -> bytes:
         b_bytes = bytes(val)
         return b"Y:" + str(len(b_bytes)).encode("ascii") + b":" + b_bytes + b";"
     if isinstance(val, np.ndarray):
-        dt = val.dtype.str.encode("ascii")
+        dt_descr = canonical_encode(val.dtype.descr)
         sh = ",".join(str(x) for x in val.shape).encode("ascii")
         raw = val.tobytes()
         return (
-            b"A:" + str(len(dt)).encode("ascii") + b":" + dt +
+            b"A:" + str(len(dt_descr)).encode("ascii") + b":" + dt_descr +
             b":" + str(len(sh)).encode("ascii") + b":" + sh +
             b":" + str(len(raw)).encode("ascii") + b":" + raw + b";"
         )
@@ -92,13 +115,10 @@ def canonical_encode(val: Any) -> bytes:
         items = b"".join(canonical_encode(x) for x in val)
         return b"T:" + str(len(val)).encode("ascii") + b"(" + items + b");"
     if isinstance(val, dict):
-        keys = sorted(val.keys(), key=lambda k: str(k))
-        k_enc = []
-        for k in keys:
-            k_enc.append(canonical_encode(str(k)))
-            k_enc.append(canonical_encode(val[k]))
-        content = b"".join(k_enc)
-        return b"D:" + str(len(keys)).encode("ascii") + b"{" + content + b"};"
+        encoded_pairs = [(canonical_encode(k), canonical_encode(v)) for k, v in val.items()]
+        encoded_pairs.sort(key=lambda pair: pair[0])
+        content = b"".join(k_bytes + v_bytes for k_bytes, v_bytes in encoded_pairs)
+        return b"D:" + str(len(val)).encode("ascii") + b"{" + content + b"};"
     raise TypeError(f"Unsupported type for canonical encoding: {type(val)}")
 
 

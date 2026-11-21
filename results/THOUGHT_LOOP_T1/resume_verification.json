@@ -1,7 +1,7 @@
 {
   "resume_tick": 5000,
-  "checkpoint_hash_pre": "73f34556483783a26cfe17528a9bec7778e3d84f5c8dad441976383c713606a5",
-  "checkpoint_hash_post": "73f34556483783a26cfe17528a9bec7778e3d84f5c8dad441976383c713606a5",
+  "checkpoint_hash_pre": "df9797cfd8fb98dab957dbcb44759935118d6175db4628806e44790cccf31402",
+  "checkpoint_hash_post": "df9797cfd8fb98dab957dbcb44759935118d6175db4628806e44790cccf31402",
   "step_discrepancy_count": 0,
   "subtick_discrepancy_count": 0,
   "verified_scheduler_steps": 4125,
@@ -13,27 +13,27 @@
   "periodic_checkpoints": {
     "2000": {
       "path": "checkpoint_2000.npz",
-      "state_hash": "12e1a2870f1309bdc8e64e75266614e889a09d66a7fc6c1eb013362c6b5f3cfa"
+      "state_hash": "83180c4635e9780d7e1c0223d836986ea825646d3a7c96c159eac6f8a45a2de5"
     },
     "4000": {
       "path": "checkpoint_4000.npz",
-      "state_hash": "03d1d33eb208ddd0129ccba9d334d44b5608ee4fbc21faba71f7413ad4042942"
+      "state_hash": "f95e2efe4854fa96c06ca3c6e4b4ead4f49f063dbc6432c6fe74bb8490c8eda1"
     },
     "6000": {
       "path": "checkpoint_6000.npz",
-      "state_hash": "15760ba78e08bc94afcd0ca99dd0fc524807fe0b564b19f5ec7ed172335e8de6"
+      "state_hash": "b5c74f3f5703f565b26971f99319d6aa337e9d2fece17f752d55580d1bef9f56"
     },
     "8000": {
       "path": "checkpoint_8000.npz",
-      "state_hash": "d528b8a8ad5143b55ff7f4131f1df96863c4a0cebc28b3fd465012da09422e34"
+      "state_hash": "66871b9e86d1b5143916d7696a03b58b5b56ca9686c89bd483434c8e1fafc2ae"
     },
     "10000": {
       "path": "checkpoint_10000.npz",
-      "state_hash": "4dafceef8912cd8f383f5ef54d7f5621b665bf1d7336f95bf94707612a6956e5"
+      "state_hash": "0f3418870285f58f68a659dda70daa1e5f82d3165d155de98957216f3b4dda4a"
     }
   },
   "total_ticks_run": 10000,
-  "final_state_hash": "4dafceef8912cd8f383f5ef54d7f5621b665bf1d7336f95bf94707612a6956e5",
+  "final_state_hash": "0f3418870285f58f68a659dda70daa1e5f82d3165d155de98957216f3b4dda4a",
   "ledger_chain_valid": true,
   "total_ledger_records": 793,
   "total_deliberations": 150

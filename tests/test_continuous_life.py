@@ -297,11 +297,14 @@ def test_stale_evidence_not_marked_refuted():
         age_ticks_aging=50,
         age_ticks_ossified=200,
     )
+    ledger = SaksinLedger()
+    rec1 = ledger.append_verified_feedback("H_test", 2, "OK", "H_test", "DOMAIN_A", 1.0, True, LifeClock())
     hyp = pool.register_candidate(
         candidate_id="H_test",
         action_candidate=2,
         v_just="SUPPORTED",
-        witness_ref="WITNESS_STALE_TEST_001",
+        witness_ref=rec1["entry_hash"],
+        ledger=ledger,
     )
     assert hyp.s_fresh == "FRESH"
     assert hyp.v_just == "SUPPORTED"
@@ -316,7 +319,8 @@ def test_stale_evidence_not_marked_refuted():
     assert hyp.v_just != "REFUTED"
 
     # Also test elapsed time trigger
-    hyp2 = pool.register_candidate("H_test2", 1, v_just="SUPPORTED", witness_ref="WITNESS_STALE_TEST_002")
+    rec2 = ledger.append_verified_feedback("H_test2", 1, "OK", "H_test2", "DOMAIN_A", 1.0, True, LifeClock())
+    hyp2 = pool.register_candidate("H_test2", 1, v_just="SUPPORTED", witness_ref=rec2["entry_hash"], ledger=ledger)
     pool.advance_time(250)
     assert hyp2.s_fresh == "OSSIFIED"
     assert hyp2.v_just == "SUPPORTED"
@@ -637,7 +641,9 @@ def test_fix4_witness_integrity_and_ledger_validation():
 
     # 4. Eviction logging: HypothesisPool records eviction info when capacity exceeded
     pool = HypothesisPool(max_active_hypotheses=3)
-    pool.register_candidate("H1", 1, v_just="SUPPORTED", witness_ref="WITNESS_H1_001")
+    ev_ledger = SaksinLedger()
+    rec_h1 = ev_ledger.append_verified_feedback("H1", 1, "OK", "H1", "DOMAIN_A", 1.0, True, LifeClock())
+    pool.register_candidate("H1", 1, v_just="SUPPORTED", witness_ref=rec_h1["entry_hash"], ledger=ev_ledger)
     pool.register_candidate("H2", 2, v_just="UNVERIFIED")
     pool.register_candidate("H3", 3, v_just="REFUTED")
     assert pool.last_eviction is None
@@ -1046,4 +1052,158 @@ def test_clean_reproduction_matches_published_thought_stream_and_trigger_artifac
     with open(stream_path, "r", encoding="utf-8") as f:
         for line in f:
             assert "MULTI_CANDIDATE_OUTCOME_COMPARISON" not in line
+
+
+# ---------------------------------------------------------------------------
+# LIFE-003 / T1-FIX-003 (RC3) Regression Tests
+# ---------------------------------------------------------------------------
+def test_canonical_encode_distinguishes_int_and_str_dict_keys():
+    """FIX-2 (RC3): {1: 'a'} and {'1': 'a'} must produce distinct canonical encodings and digests."""
+    h_int = compute_state_hash({1: "a"})
+    h_str = compute_state_hash({"1": "a"})
+    assert h_int != h_str, f"Collision between int and str dict keys: {h_int}"
+
+
+def test_canonical_encode_distinguishes_structured_numpy_field_names():
+    """FIX-2 (RC3): Structured arrays with different field names must produce distinct digests."""
+    a_x = np.zeros(3, dtype=[("x", "<i4")])
+    a_y = np.zeros(3, dtype=[("y", "<i4")])
+    h_x = compute_state_hash({"arr": a_x})
+    h_y = compute_state_hash({"arr": a_y})
+    assert h_x != h_y, f"Collision between structured numpy dtypes with different field names: {h_x}"
+
+
+def test_checkpoint_save_load_preserves_tuple_and_digest_or_rejects_explicitly(tmp_path):
+    """FIX-2 (RC3): Round-trip saving and loading preserves tuples, dict key types, and compute_state_hash."""
+    orig_state = {
+        "tuple_data": (1, 2, (3, 4)),
+        "list_data": [5, 6],
+        "int_keys": {10: "val10", 20: "val20"},
+        "str_keys": {"10": "str10", "20": "str20"},
+        "struct_arr": np.array([(1, 2.5)], dtype=[("field_a", "<i4"), ("field_b", "<f4")]),
+        "raw_bytes": b"binary_payload",
+    }
+    ckpt_file = tmp_path / "test_roundtrip.npz"
+    orig_hash = save_checkpoint(ckpt_file, orig_state)
+    loaded_state, loaded_hash = load_checkpoint(ckpt_file)
+
+    assert isinstance(loaded_state["tuple_data"], tuple)
+    assert isinstance(loaded_state["tuple_data"][2], tuple)
+    assert isinstance(loaded_state["list_data"], list)
+    assert isinstance(loaded_state["raw_bytes"], bytes)
+    assert 10 in loaded_state["int_keys"] and isinstance(list(loaded_state["int_keys"].keys())[0], int)
+    assert "10" in loaded_state["str_keys"] and isinstance(list(loaded_state["str_keys"].keys())[0], str)
+    assert loaded_state["struct_arr"].dtype == orig_state["struct_arr"].dtype
+    assert orig_hash == loaded_hash
+    assert compute_state_hash(loaded_state) == compute_state_hash(orig_state)
+
+
+def test_hypothesis_promotion_without_ledger_fails_closed():
+    """FIX-3 (RC3): Establishing v_just='SUPPORTED' without a ledger strictly fails closed."""
+    pool = HypothesisPool()
+    hyp = pool.register_candidate("H_test", 1, v_just="UNVERIFIED")
+
+    # 1. audit_verification with ledger=None must raise ValueError and remain UNVERIFIED
+    with pytest.raises(ValueError, match="without an authentic ledger"):
+        pool.audit_verification("H_test", is_supported=True, witness_ref="FAKE_WITNESS_999", ledger=None)
+    assert hyp.v_just == "UNVERIFIED"
+
+    # 2. Direct registration with v_just='SUPPORTED' and ledger=None must raise ValueError
+    with pytest.raises(ValueError, match="without an authentic ledger"):
+        pool.register_candidate("H_new", 1, v_just="SUPPORTED", witness_ref="FAKE_WITNESS_999", ledger=None)
+
+
+def test_hypothesis_promotion_rejects_negative_feedback_record():
+    """FIX-3 (RC3): Genuine VERIFIED_FEEDBACK record with confirmed=False fails closed on promotion."""
+    pool = HypothesisPool()
+    hyp = pool.register_candidate("H_neg", 2, v_just="UNVERIFIED")
+    ledger = SaksinLedger()
+
+    # Create authentic feedback with confirmed=False via raw append_entry
+    neg_payload = {
+        "hypothesis_id": "H_neg",
+        "action": 2,
+        "result": "DISCONFIRMED",
+        "provenance": "H_neg",
+        "applicability_domain": "DOMAIN_A",
+        "support_score": 0.0,
+        "confirmed": False,
+    }
+    rec = ledger.append_entry("VERIFIED_FEEDBACK", neg_payload, LifeClock())
+
+    with pytest.raises(ValueError, match="confirmed status is not strict True"):
+        pool.audit_verification("H_neg", is_supported=True, witness_ref=rec["entry_hash"], ledger=ledger)
+    assert hyp.v_just == "UNVERIFIED"
+
+
+def test_hypothesis_promotion_rejects_mismatched_candidate_or_action_feedback():
+    """FIX-3 (RC3): Genuine VERIFIED_FEEDBACK from another candidate or action fails closed on promotion."""
+    pool = HypothesisPool()
+    hyp = pool.register_candidate("H_target", 2, v_just="UNVERIFIED")
+    ledger = SaksinLedger()
+
+    # Feedback from different candidate ("H_other", action 2)
+    fb_other_cand = ledger.append_verified_feedback("H_other", 2, "OUTCOME_OK", "H_other", "DOMAIN_A", 1.0, True, LifeClock())
+    with pytest.raises(ValueError, match="does not match hypothesis"):
+        pool.audit_verification("H_target", is_supported=True, witness_ref=fb_other_cand["entry_hash"], ledger=ledger)
+    assert hyp.v_just == "UNVERIFIED"
+
+    # Feedback from same candidate but different action ("H_target", action 3)
+    fb_other_act = ledger.append_verified_feedback("H_target", 3, "OUTCOME_OK", "H_target", "DOMAIN_A", 1.0, True, LifeClock())
+    with pytest.raises(ValueError, match="does not match hypothesis action"):
+        pool.audit_verification("H_target", is_supported=True, witness_ref=fb_other_act["entry_hash"], ledger=ledger)
+    assert hyp.v_just == "UNVERIFIED"
+
+
+def test_public_ledger_writer_rejects_int_confirmed_before_sankalpa():
+    """FIX-3 (RC3): Public ledger writer rejects int confirmed=1 with TypeError before reaching Sankalpa."""
+    ledger = SaksinLedger()
+    gate = SankalpaGate(require_structured_witness=True, witness_support_min_score=0.60)
+
+    # 1. Public writer must raise TypeError when confirmed is not strict bool
+    with pytest.raises(TypeError, match="confirmed must be strict bool, got int"):
+        ledger.append_verified_feedback(
+            hypothesis_id="H_strict",
+            action=1,
+            result="RESULT_OK",
+            provenance="H_strict",
+            applicability_domain="DOMAIN_A",
+            support_score=1.0,
+            confirmed=1,
+            clock=LifeClock(),
+        )
+
+    # 2. Attempting to pass confirmed='True' (str) also raises TypeError
+    with pytest.raises(TypeError, match="confirmed must be strict bool, got str"):
+        ledger.append_verified_feedback(
+            hypothesis_id="H_strict",
+            action=1,
+            result="RESULT_OK",
+            provenance="H_strict",
+            applicability_domain="DOMAIN_A",
+            support_score=1.0,
+            confirmed="True",
+            clock=LifeClock(),
+        )
+
+    # 3. Valid bool True succeeds in writer and authorizes COMMIT in Sankalpa
+    valid_rec = ledger.append_verified_feedback(
+        hypothesis_id="H_strict",
+        action=1,
+        result="RESULT_OK",
+        provenance="H_strict",
+        applicability_domain="DOMAIN_A",
+        support_score=1.0,
+        confirmed=True,
+        clock=LifeClock(),
+    )
+    d_ep, tripped = gate.evaluate_epistemic_channel(
+        witness_ref=valid_rec["entry_hash"],
+        ledger=ledger,
+        hypothesis={"candidate_id": "H_strict", "action_candidate": 1},
+        candidate_action=1,
+        context={"domain": "DOMAIN_A"},
+    )
+    assert d_ep == "COMMIT"
+    assert tripped is False
 

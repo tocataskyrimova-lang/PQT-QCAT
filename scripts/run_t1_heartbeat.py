@@ -40,9 +40,9 @@ class PhysicalStepObserver:
                 }
                 observer._pending_main_snaps.append(snap)
             elif core_self is observer.org_clone.core:
-                observer.total_physical_steps_observed += 1
                 if observer._pending_main_snaps:
                     main_snap = observer._pending_main_snaps.pop(0)
+                    observer.total_physical_steps_observed += 1
                     clone_z = array_hash(core_self.Z)
                     clone_k = array_hash(core_self.K)
                     clone_rng = copy.deepcopy(core_self.rng.bit_generator.state)
