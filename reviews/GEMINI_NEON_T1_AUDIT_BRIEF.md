@@ -4,7 +4,8 @@
 - **Subject of Audit:** LIFE-003 / CONTINUOUS-THOUGHT-001 (Phase T1 Delivery & Epistemic Hardening)
 - **Repository:** `https://github.com/tocataskyrimova-lang/PQT-QCAT`
 - **Working Branch:** `exp/life-003-continuous-thought-001`
-- **Target Tag:** `life-003-t1-audit-2026-11-21`
+- **Target Tag:** `life-003-t1-audit-2026-11-21-r2` (Release Candidate 2 addressing GPT-Astra audit)
+- **Historical Tag:** `life-003-t1-audit-2026-11-21` (preserved in append-only history)
 - **Frozen Reference Baseline (LIFE-002):** `06fbd5b7e6fcc224619d19b78ded716f74694a08` (`life-002-freeze-2026-11-20`)
 - **Epistemic Status:** `W_CANDIDATE`, `proof_claim = false`
 - **Mandate:** Strictly **T0 + T1** (T2/T3/T4 are NOT implemented or claimed).
