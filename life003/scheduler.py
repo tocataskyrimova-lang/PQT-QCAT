@@ -79,7 +79,9 @@ class ContinuousLifeOrganism:
 
         # 6. Hypotheses Space H
         h_cfg = self.cfg["hypotheses_and_ledger"]
+        san_cfg = self.cfg["sankalpa_policy_channels"]
         self.hypotheses = HypothesisPool(
+            witness_support_min_score=san_cfg["epistemic"]["witness_support_min_score"],
             max_active_hypotheses=h_cfg["max_active_hypotheses"],
             m_phi_uses_aging=h_cfg["m_phi_uses_aging"],
             m_phi_uses_ossified=h_cfg["m_phi_uses_ossified"],
@@ -109,7 +111,6 @@ class ContinuousLifeOrganism:
         )
 
         # 9. Two-channel SANKALPA Gate
-        san_cfg = self.cfg["sankalpa_policy_channels"]
         self.sankalpa = SankalpaGate(
             require_structured_witness=san_cfg["epistemic"]["require_structured_witness"],
             witness_support_min_score=san_cfg["epistemic"]["witness_support_min_score"],
@@ -382,6 +383,10 @@ class ContinuousLifeOrganism:
 
     def restore_full_state(self, state: dict[str, Any]) -> None:
         """Restore complete organism state bit-for-bit."""
+        ledger = SaksinLedger.restore(state["ledger"])
+        hypotheses = HypothesisPool.restore(
+            state["hypotheses"], ledger, witness_support_min_score=self.sankalpa.witness_support_min_score
+        )
         if "core_snapshot" in state:
             self.core.restore(state["core_snapshot"])
         else:
@@ -402,8 +407,8 @@ class ContinuousLifeOrganism:
 
         self.rng_sidecar.bit_generator.state = copy.deepcopy(state["rng_sidecar_state"])
         self.clock = LifeClock.restore(state["clock"])
-        self.ledger = SaksinLedger.restore(state["ledger"])
-        self.hypotheses = HypothesisPool.restore(state["hypotheses"])
+        self.ledger = ledger
+        self.hypotheses = hypotheses
         self.trigger = EndogenousTrigger.restore(state["trigger"])
         self.world = AmoebaWorld.restore(state["world"])
 

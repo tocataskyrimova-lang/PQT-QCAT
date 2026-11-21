@@ -304,6 +304,7 @@ def test_stale_evidence_not_marked_refuted():
         action_candidate=2,
         v_just="SUPPORTED",
         witness_ref=rec1["entry_hash"],
+        context={"domain": "DOMAIN_A"},
         ledger=ledger,
     )
     assert hyp.s_fresh == "FRESH"
@@ -320,7 +321,7 @@ def test_stale_evidence_not_marked_refuted():
 
     # Also test elapsed time trigger
     rec2 = ledger.append_verified_feedback("H_test2", 1, "OK", "H_test2", "DOMAIN_A", 1.0, True, LifeClock())
-    hyp2 = pool.register_candidate("H_test2", 1, v_just="SUPPORTED", witness_ref=rec2["entry_hash"], ledger=ledger)
+    hyp2 = pool.register_candidate("H_test2", 1, v_just="SUPPORTED", witness_ref=rec2["entry_hash"], context={"domain": "DOMAIN_A"}, ledger=ledger)
     pool.advance_time(250)
     assert hyp2.s_fresh == "OSSIFIED"
     assert hyp2.v_just == "SUPPORTED"
@@ -643,7 +644,7 @@ def test_fix4_witness_integrity_and_ledger_validation():
     pool = HypothesisPool(max_active_hypotheses=3)
     ev_ledger = SaksinLedger()
     rec_h1 = ev_ledger.append_verified_feedback("H1", 1, "OK", "H1", "DOMAIN_A", 1.0, True, LifeClock())
-    pool.register_candidate("H1", 1, v_just="SUPPORTED", witness_ref=rec_h1["entry_hash"], ledger=ev_ledger)
+    pool.register_candidate("H1", 1, v_just="SUPPORTED", witness_ref=rec_h1["entry_hash"], context={"domain": "DOMAIN_A"}, ledger=ev_ledger)
     pool.register_candidate("H2", 2, v_just="UNVERIFIED")
     pool.register_candidate("H3", 3, v_just="REFUTED")
     assert pool.last_eviction is None
@@ -886,7 +887,7 @@ def test_checkpoint_digest_injective_no_sequence_or_type_collision():
 def test_hypothesis_cannot_promote_to_supported_without_verified_witness():
     """FIX-3 (Check D & Focus 4): Promotion to SUPPORTED strictly requires non-empty verified witness."""
     pool = HypothesisPool()
-    hyp = pool.register_candidate("H_cand", 2, v_just="UNVERIFIED")
+    hyp = pool.register_candidate("H_cand", 2, context={"domain": "DOMAIN_A"})
 
     # 1. audit_verification with None witness_ref fails closed
     with pytest.raises(ValueError, match="without a valid witness_ref"):

@@ -30,6 +30,47 @@ def canonical_json_bytes(obj: Any) -> bytes:
     ).encode("utf-8")
 
 
+DEFAULT_SUPPORT_MIN_SCORE = 0.60
+
+
+def _present(value: Any) -> bool:
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, (list, tuple, dict)):
+        return bool(value)
+    return value is not None
+
+
+def feedback_score(payload: dict, candidate_id: str, action: int | str, domain: Any) -> float:
+    """Return the recorded score only for complete, positively matched feedback."""
+    if payload.get("confirmed") is not True or payload.get("status") in (
+        "REFUTED", "REJECTED", "FAILED", "CONFLICTED",
+    ):
+        raise ValueError("Feedback confirmed status is not strict True or was rejected")
+    if not _present(payload.get("result")):
+        raise ValueError("Witness record has empty result")
+    if type(action) not in (str, int) or not _present(action) or (
+        type(payload.get("action")) is not type(action) or payload["action"] != action
+    ):
+        raise ValueError("Witness action does not match hypothesis action")
+    identity = payload.get("hypothesis_id", payload.get("candidate_id"))
+    if not isinstance(candidate_id, str) or not candidate_id.strip() or identity != candidate_id:
+        raise ValueError("Witness candidate does not match hypothesis")
+    if "candidate_id" in payload and payload["candidate_id"] != candidate_id:
+        raise ValueError("Conflicting witness candidate identity")
+    provenance = payload.get("provenance")
+    if isinstance(provenance, dict):
+        provenance = provenance.get("candidate_id", provenance.get("hypothesis_id"))
+    if provenance != candidate_id:
+        raise ValueError("Witness provenance does not match hypothesis")
+    if not _present(domain) or canonical_json_bytes(payload.get("applicability_domain")) != canonical_json_bytes(domain):
+        raise ValueError("Witness domain does not match hypothesis domain")
+    score = payload.get("support_score")
+    if type(score) not in (float, int) or not 0 <= score <= 1:
+        raise ValueError("Invalid verified support_score")
+    return float(score)
+
+
 class SaksinLedger:
     """Append-only witness and belief ledger with strict SHA-256 hash chaining."""
 
@@ -99,6 +140,10 @@ class SaksinLedger:
         """
         if type(confirmed) is not bool:
             raise TypeError(f"confirmed must be strict bool, got {type(confirmed).__name__}")
+        if not all(_present(field) for field in (hypothesis_id, action, result, provenance, applicability_domain)):
+            raise ValueError("Verified feedback requires identity, action, result, provenance and domain")
+        if type(support_score) not in (float, int) or not 0 <= support_score <= 1:
+            raise ValueError("Invalid verified support_score")
         payload = {
             "hypothesis_id": hypothesis_id,
             "action": action,

@@ -1,8 +1,10 @@
 """Two-coordinate hypothesis space H for LIFE-003 (PQT-KC-001 v0.3)."""
 from __future__ import annotations
 import copy
-from dataclasses import dataclass, asdict
+from dataclasses import InitVar, dataclass, asdict
 from typing import Any
+
+from .ledger import DEFAULT_SUPPORT_MIN_SCORE, feedback_score
 
 JUSTIFICATION_STATUSES = {"UNVERIFIED", "SUPPORTED", "CONFLICTED", "REFUTED"}
 FRESHNESS_STATUSES = {"FRESH", "AGING", "OSSIFIED"}
@@ -21,13 +23,17 @@ class Hypothesis:
     context: dict[str, Any] | None = None
     created_seq: int = 0                 # Monotonic creation sequence for deterministic eviction
 
-    def __post_init__(self):
+    ledger: InitVar[Any] = None
+    min_score: InitVar[float] = DEFAULT_SUPPORT_MIN_SCORE
+
+    def __post_init__(self, ledger, min_score):
         if self.v_just not in JUSTIFICATION_STATUSES:
             raise ValueError(f"Invalid justification status: {self.v_just}")
         if self.s_fresh not in FRESHNESS_STATUSES:
             raise ValueError(f"Invalid freshness status: {self.s_fresh}")
-        if self.v_just == "SUPPORTED" and (not self.witness_ref or not str(self.witness_ref).strip()):
-            raise ValueError("Hypothesis cannot have v_just='SUPPORTED' without a non-empty witness_ref")
+        if self.v_just == "SUPPORTED":
+            _validate_supported_witness(self.candidate_id, self.action_candidate, self.witness_ref,
+                                        ledger, self.context, min_score=min_score)
 
     def update_freshness(
         self,
@@ -54,6 +60,8 @@ def _validate_supported_witness(
     witness_ref: str | None,
     ledger: Any | None,
     context: dict[str, Any] | None = None,
+    *,
+    min_score: float,
     is_audit: bool = False,
 ) -> None:
     """Enforce fail-closed verification for any candidate promoting to or registering as SUPPORTED.
@@ -65,7 +73,8 @@ def _validate_supported_witness(
     4. record_type must be VERIFIED_FEEDBACK.
     5. payload['confirmed'] must be strict boolean True (False or truthy int rejected).
     6. payload['result'] must be present and non-empty.
-    7. Candidate action, id, and domain must match strictly if present.
+    7. Candidate identity, provenance, action and domain must match.
+    8. The verified score must meet the active COMMIT threshold.
     """
     if not witness_ref or not str(witness_ref).strip():
         if is_audit:
@@ -82,26 +91,13 @@ def _validate_supported_witness(
     if rec is None or rec.get("record_type") != "VERIFIED_FEEDBACK":
         raise ValueError(f"Witness reference '{witness_ref}' is not a VERIFIED_FEEDBACK record")
 
-    payload = rec.get("payload", {})
-    if type(payload.get("confirmed")) is not bool or payload.get("confirmed") is not True:
-        raise ValueError(f"Witness record '{witness_ref}' confirmed status is not strict True bool")
-
-    result = payload.get("result")
-    if result is None or (isinstance(result, (str, list, tuple, dict, set)) and len(result) == 0):
-        raise ValueError(f"Witness record '{witness_ref}' has empty result")
-
-    rec_act = payload.get("action") if payload.get("action") is not None else payload.get("candidate_action")
-    if rec_act is not None and str(rec_act) != str(action_candidate):
-        raise ValueError(f"Witness action '{rec_act}' does not match hypothesis action '{action_candidate}'")
-
-    rec_cid = payload.get("hypothesis_id") or payload.get("candidate_id") or payload.get("provenance")
-    if rec_cid is not None and isinstance(rec_cid, str) and rec_cid.strip() and str(rec_cid) != str(candidate_id):
-        raise ValueError(f"Witness candidate '{rec_cid}' does not match hypothesis '{candidate_id}'")
-
-    rec_dom = payload.get("applicability_domain") or payload.get("domain")
-    ctx_dom = context.get("applicability_domain") or context.get("domain") if isinstance(context, dict) else None
-    if rec_dom is not None and ctx_dom is not None and str(rec_dom) != str(ctx_dom):
-        raise ValueError(f"Witness domain '{rec_dom}' does not match hypothesis context domain '{ctx_dom}'")
+    if not ledger.validate_integrity():
+        raise ValueError("Witness ledger failed integrity validation")
+    ctx = context or {}
+    domain = ctx.get("applicability_domain", ctx.get("domain", ctx.get("query")))
+    score = feedback_score(rec["payload"], candidate_id, action_candidate, domain)
+    if not (score >= min_score):
+        raise ValueError("Insufficient witness support_score")
 
 
 class HypothesisPool:
@@ -114,7 +110,9 @@ class HypothesisPool:
         m_phi_uses_ossified: int = 32,
         age_ticks_aging: int = 50,
         age_ticks_ossified: int = 200,
+        witness_support_min_score: float = DEFAULT_SUPPORT_MIN_SCORE,
     ):
+        self.witness_support_min_score = witness_support_min_score
         self.max_capacity = max_active_hypotheses
         self.m_phi_uses_aging = m_phi_uses_aging
         self.m_phi_uses_ossified = m_phi_uses_ossified
@@ -139,15 +137,11 @@ class HypothesisPool:
         - If eviction is required, choose candidate strictly by deterministic (created_seq, candidate_id).
         - v_just='SUPPORTED' strictly requires a non-empty confirmed witness_ref verified against an authentic ledger.
         """
-        if v_just == "SUPPORTED":
-            _validate_supported_witness(
-                candidate_id=candidate_id,
-                action_candidate=action_candidate,
-                witness_ref=witness_ref,
-                ledger=ledger,
-                context=context,
-            )
-
+        hyp = Hypothesis(
+            candidate_id=candidate_id, action_candidate=action_candidate, v_just=v_just,
+            witness_ref=witness_ref, context=copy.deepcopy(context), created_seq=self._next_seq,
+            ledger=ledger, min_score=self.witness_support_min_score,
+        )
         eviction_info = None
 
         if len(self.hypotheses) >= self.max_capacity and candidate_id not in self.hypotheses:
@@ -175,20 +169,7 @@ class HypothesisPool:
             }
             del self.hypotheses[evict_id]
 
-        seq = self._next_seq
         self._next_seq += 1
-
-        hyp = Hypothesis(
-            candidate_id=candidate_id,
-            action_candidate=action_candidate,
-            v_just=v_just,
-            s_fresh="FRESH",
-            inertia_m_phi_uses=0,
-            ticks_since_audit=0,
-            witness_ref=witness_ref,
-            context=copy.deepcopy(context),
-            created_seq=seq,
-        )
         self.hypotheses[candidate_id] = hyp
         self.last_eviction = eviction_info
         return hyp
@@ -240,6 +221,7 @@ class HypothesisPool:
                     ledger=ledger,
                     context=hyp.context,
                     is_audit=True,
+                    min_score=self.witness_support_min_score,
                 )
                 hyp.v_just = "SUPPORTED"
                 hyp.witness_ref = str(eff_witness)
@@ -270,8 +252,10 @@ class HypothesisPool:
         }
 
     @classmethod
-    def restore(cls, data: dict[str, Any]) -> HypothesisPool:
+    def restore(cls, data: dict[str, Any], ledger=None, *,
+                witness_support_min_score: float = DEFAULT_SUPPORT_MIN_SCORE) -> HypothesisPool:
         pool = cls(
+            witness_support_min_score=witness_support_min_score,
             max_active_hypotheses=int(data["max_capacity"]),
             m_phi_uses_aging=int(data["m_phi_uses_aging"]),
             m_phi_uses_ossified=int(data["m_phi_uses_ossified"]),
@@ -279,7 +263,11 @@ class HypothesisPool:
             age_ticks_ossified=int(data["age_ticks_ossified"]),
         )
         pool._next_seq = int(data.get("_next_seq", 0))
-        loaded = [Hypothesis(**hdata) for hdata in data["hypotheses"].values()]
+        loaded = []
+        for candidate_id, fields in data["hypotheses"].items():
+            if fields["candidate_id"] != candidate_id:
+                raise ValueError("Restored hypothesis identity mismatch")
+            loaded.append(Hypothesis(**fields, ledger=ledger, min_score=witness_support_min_score))
         loaded.sort(key=lambda h: (h.created_seq, h.candidate_id))
         for hyp in loaded:
             pool.hypotheses[hyp.candidate_id] = hyp

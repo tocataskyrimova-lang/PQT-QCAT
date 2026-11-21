@@ -4,54 +4,59 @@ Supports arbitrary nested dictionaries, lists, and numpy arrays without requirin
 (strict allow_pickle=False compliance).
 """
 from __future__ import annotations
-import copy
 import hashlib
 import json
 from pathlib import Path
 import struct
+import tempfile
 from typing import Any
 import numpy as np
 
 
-def pack_state(val: Any, arrays: dict[str, np.ndarray], prefix: str = "") -> Any:
-    """Recursively extract all numpy ndarrays and tagged types for raw npz storage without pickle."""
-    if isinstance(val, np.ndarray):
-        arrays[prefix] = val
-        return {
-            "__ndarray__": prefix,
-            "descr": canonical_encode(val.dtype.descr).hex(),
-            "shape": list(val.shape),
-        }
-    elif isinstance(val, (bytes, bytearray)):
-        return {"__bytes__": bytes(val).hex()}
-    elif isinstance(val, tuple):
-        return {
-            "__tuple__": [pack_state(item, arrays, f"{prefix}[{i}]") for i, item in enumerate(val)]
-        }
-    elif isinstance(val, list):
-        return [pack_state(item, arrays, f"{prefix}[{i}]") for i, item in enumerate(val)]
-    elif isinstance(val, dict):
-        if any(not isinstance(k, str) for k in val.keys()):
-            return {
-                "__dict_pairs__": [
-                    [pack_state(k, arrays, f"{prefix}/k_{i}"), pack_state(v, arrays, f"{prefix}/v_{i}")]
-                    for i, (k, v) in enumerate(val.items())
-                ]
-            }
-        return {
-            k: pack_state(v, arrays, f"{prefix}/{k}" if prefix else k)
-            for k, v in val.items()
-        }
-    elif val is None or isinstance(val, (bool, int, float, str, np.integer, np.floating)):
+def _check_dtype(dtype: np.dtype) -> None:
+    # NPY drops dtype metadata and alignment flags, including on nested fields.
+    if dtype.hasobject or dtype.metadata is not None or dtype.isalignedstruct or dtype.type is np.record:
+        raise TypeError(f"Unsupported checkpoint dtype: {dtype!r}")
+    for name in dtype.names or ():
+        _check_dtype(dtype.fields[name][0])
+    if dtype.subdtype is not None:
+        _check_dtype(dtype.subdtype[0])
+
+
+def pack_state(val: Any, arrays: dict[str, np.ndarray]) -> Any:
+    """Encode every dictionary as pairs; only the encoder emits tag objects."""
+    kind = type(val)
+    if kind is np.ndarray or isinstance(val, np.generic):
+        arr = np.asarray(val)
+        _check_dtype(arr.dtype)
+        if kind is not np.ndarray and (kind is not arr.dtype.type or kind is np.record):
+            raise TypeError(f"Unsupported NumPy scalar subclass: {kind}")
+        key = f"array_{len(arrays)}"
+        arrays[key] = arr
+        return {"__ndarray__" if kind is np.ndarray else "__scalar__": key}
+    if kind is dict:
+        return {"__dict_pairs__": [
+            [pack_state(k, arrays), pack_state(v, arrays)] for k, v in val.items()
+        ]}
+    if kind is tuple:
+        return {"__tuple__": [pack_state(item, arrays) for item in val]}
+    if kind is list:
+        return [pack_state(item, arrays) for item in val]
+    if kind in (bytes, bytearray):
+        return {"__bytes__" if kind is bytes else "__bytearray__": val.hex()}
+    if val is None or kind in (bool, int, float, str):
         return val
-    else:
-        raise TypeError(f"Unsupported type for checkpoint serialization: {type(val)}")
+    raise TypeError(f"Unsupported checkpoint value: {kind}")
 
 
 def unpack_state(val: Any, arrays: Any) -> Any:
     """Recursively reconstruct state structure, preserving tuple/dict/bytes types and numpy ndarrays."""
     if isinstance(val, dict):
-        if "__ndarray__" in val and len(val) == 3:
+        if "__scalar__" in val and len(val) == 1:
+            return arrays[val["__scalar__"]][()]
+        if "__bytearray__" in val and len(val) == 1:
+            return bytearray.fromhex(val["__bytearray__"])
+        if "__ndarray__" in val and len(val) in (1, 3):
             key = val["__ndarray__"]
             return arrays[key]
         if "__bytes__" in val and len(val) == 1:
@@ -86,6 +91,8 @@ def canonical_encode(val: Any) -> bytes:
     """
     if val is None:
         return b"N;"
+    if isinstance(val, np.generic):
+        return b"G:" + canonical_encode(np.asarray(val))
     if isinstance(val, bool):
         return b"B:1;" if val else b"B:0;"
     if isinstance(val, (int, np.integer)):
@@ -98,7 +105,8 @@ def canonical_encode(val: Any) -> bytes:
         return b"S:" + str(len(s_bytes)).encode("ascii") + b":" + s_bytes + b";"
     if isinstance(val, (bytes, bytearray)):
         b_bytes = bytes(val)
-        return b"Y:" + str(len(b_bytes)).encode("ascii") + b":" + b_bytes + b";"
+        tag = b"Y:" if isinstance(val, bytes) else b"J:"
+        return tag + str(len(b_bytes)).encode("ascii") + b":" + b_bytes + b";"
     if isinstance(val, np.ndarray):
         dt_descr = canonical_encode(val.dtype.descr)
         sh = ",".join(str(x) for x in val.shape).encode("ascii")
@@ -123,7 +131,7 @@ def canonical_encode(val: Any) -> bytes:
 
 
 def compute_state_hash(state: dict[str, Any]) -> str:
-    """Compute deterministic, strictly injective SHA-256 digest of organism state."""
+    """Hash the canonical, type-tagged encoding of the organism state."""
     return hashlib.sha256(canonical_encode(state)).hexdigest()
 
 
@@ -133,34 +141,39 @@ def save_checkpoint(filepath: str | Path, state: dict[str, Any]) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
 
     arrays: dict[str, np.ndarray] = {}
-    packed_meta = pack_state(state, arrays)
+    packed = pack_state(state, arrays)
+    original_hash = compute_state_hash(state)
+    envelope = {"format": "life003-rc4", "state_hash": original_hash, "state": packed}
+    meta = json.dumps(envelope, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
+    arrays["__meta_json__"] = np.frombuffer(meta.encode("utf-8"), dtype=np.uint8)
 
-    meta_json = json.dumps(
-        packed_meta,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-        allow_nan=False,
-    )
-    arrays["__meta_json__"] = np.frombuffer(meta_json.encode("utf-8"), dtype=np.uint8)
-
-    temp_path = path.with_suffix(".tmp.npz")
-    np.savez_compressed(temp_path, **arrays)
-    temp_path.replace(path)
-
-    return compute_state_hash(state)
+    with tempfile.NamedTemporaryFile(dir=path.parent, suffix=".npz", delete=False) as tmp:
+        temp_path = Path(tmp.name)
+    try:
+        np.savez_compressed(temp_path, **arrays)
+        load_checkpoint(temp_path, expected_state_hash=original_hash)
+        temp_path.replace(path)
+    finally:
+        temp_path.unlink(missing_ok=True)
+    return original_hash
 
 
-def load_checkpoint(filepath: str | Path) -> tuple[dict[str, Any], str]:
-    """Load complete organism state from npz archive and verify consistency."""
-    path = Path(filepath)
-    if not path.is_file():
-        raise FileNotFoundError(f"Checkpoint archive not found at: {path}")
-
-    with np.load(path, allow_pickle=False) as npz:
-        meta_bytes = npz["__meta_json__"].tobytes()
-        packed_meta = json.loads(meta_bytes.decode("utf-8"))
-        state = unpack_state(packed_meta, npz)
-
-    state_hash = compute_state_hash(state)
-    return state, state_hash
+def load_checkpoint(filepath: str | Path, *, expected_state_hash: str | None = None) -> tuple[dict[str, Any], str]:
+    """Verify the recorded digest. RC3 archives require an external original digest."""
+    with np.load(filepath, allow_pickle=False) as npz:
+        meta = json.loads(npz["__meta_json__"].tobytes())
+        if meta.get("format") == "life003-rc4":
+            recorded_hash = meta.get("state_hash")
+            if not isinstance(recorded_hash, str):
+                raise ValueError("Missing original checkpoint state hash")
+            packed = meta["state"]
+        elif expected_state_hash is not None:
+            recorded_hash = expected_state_hash
+            packed = meta
+        else:
+            raise ValueError("Missing checkpoint format or original state hash")
+        state = unpack_state(packed, npz)
+    actual_hash = compute_state_hash(state)
+    if actual_hash != recorded_hash or (expected_state_hash is not None and actual_hash != expected_state_hash):
+        raise ValueError("Checkpoint state hash mismatch")
+    return state, actual_hash
